@@ -1,66 +1,206 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="/src/css/main.css" />
-  </head>
-  <body>
-    <main class="app-shell app-shell-wide">
-      <header class="page-header">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Supply Chain Analysis</title>
+  <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+  <main class="dashboard-shell">
+    <aside class="filter-sidebar neo-card">
+      <div class="sidebar-heading">
+        <p class="label-caps">Interactive Filter</p>
+        <h2>Dataset View</h2>
+      </div>
+
+      <form class="filter-form">
+        <label class="filter-field">
+          <span>Date Range</span>
+          <input type="date" aria-label="Start date">
+          <input type="date" aria-label="End date">
+        </label>
+
+        <label class="filter-field">
+          <span>Market</span>
+          <select>
+            <option>All Market</option>
+            <option>APAC</option>
+            <option>Europe</option>
+            <option>LATAM</option>
+            <option>USCA</option>
+          </select>
+        </label>
+
+        <label class="filter-field">
+          <span>Order Region</span>
+          <select>
+            <option>All Region</option>
+            <option>Central America</option>
+            <option>Western Europe</option>
+            <option>Southeast Asia</option>
+          </select>
+        </label>
+
+        <label class="filter-field">
+          <span>Order Country</span>
+          <select>
+            <option>All Country</option>
+            <option>United States</option>
+            <option>France</option>
+            <option>Mexico</option>
+            <option>Indonesia</option>
+          </select>
+        </label>
+
+        <label class="filter-field">
+          <span>Shipping Mode</span>
+          <select>
+            <option>All Shipping Mode</option>
+            <option>Standard Class</option>
+            <option>First Class</option>
+            <option>Second Class</option>
+            <option>Same Day</option>
+          </select>
+        </label>
+
+        <label class="filter-field">
+          <span>Category Name</span>
+          <select>
+            <option>All Category</option>
+            <option>Technology</option>
+            <option>Furniture</option>
+            <option>Office Supplies</option>
+          </select>
+        </label>
+
+        <label class="filter-field">
+          <span>Department Name</span>
+          <select>
+            <option>All Department</option>
+            <option>Fan Shop</option>
+            <option>Apparel</option>
+            <option>Fitness</option>
+          </select>
+        </label>
+
+        <label class="filter-field">
+          <span>Customer Segment</span>
+          <select>
+            <option>All Segment</option>
+            <option>Consumer</option>
+            <option>Corporate</option>
+            <option>Home Office</option>
+          </select>
+        </label>
+
+        <label class="filter-field">
+          <span>Order Status</span>
+          <select>
+            <option>All Status</option>
+            <option>Complete</option>
+            <option>Pending</option>
+            <option>Processing</option>
+            <option>Closed</option>
+          </select>
+        </label>
+
+        <label class="filter-field">
+          <span>Risk Level</span>
+          <select>
+            <option>All Risk Level</option>
+            <option>Low</option>
+            <option>Medium</option>
+            <option>High</option>
+          </select>
+        </label>
+      </form>
+    </aside>
+
+    <section class="dashboard-content">
+      <header class="dashboard-header">
         <div>
-          <p class="eyebrow">Dashboard</p>
-          <h1>Supply Chain Analytics</h1>
+          <p class="label-caps">Executive Summary</p>
+          <h1>Supply Chain Dashboard</h1>
         </div>
-        <a class="link-button" href="/">Home</a>
+        <a class="text-link" href="../../index.html">Home</a>
       </header>
 
-      <section class="toolbar">
-        <p data-status>Memuat data...</p>
+      <section class="kpi-grid" aria-label="Executive summary metrics">
+        <article class="neo-card kpi-card">
+          <span class="label-caps">Total Orders</span>
+          <strong>0</strong>
+          <p>All recorded order transactions.</p>
+        </article>
+
+        <article class="neo-card kpi-card">
+          <span class="label-caps">Total Sales</span>
+          <strong>$0</strong>
+          <p>Gross sales from selected scope.</p>
+        </article>
+
+        <article class="neo-card kpi-card">
+          <span class="label-caps">Late Shipment Rate</span>
+          <strong>0%</strong>
+          <p>Shipment ratio marked as late.</p>
+        </article>
+
+        <article class="neo-card kpi-card">
+          <span class="label-caps">Average Shipping Delay</span>
+          <strong>0 days</strong>
+          <p>Average delivery delay duration.</p>
+        </article>
+
+        <article class="neo-card kpi-card">
+          <span class="label-caps">High Risk Shipment Count</span>
+          <strong>0</strong>
+          <p>Shipments classified as high risk.</p>
+        </article>
+
+        <article class="neo-card kpi-card">
+          <span class="label-caps">Total Profit</span>
+          <strong>$0</strong>
+          <p>Profit after selected filters.</p>
+        </article>
+
+        <article class="neo-card kpi-card">
+          <span class="label-caps">Average Discount Rate</span>
+          <strong>0%</strong>
+          <p>Average discount across orders.</p>
+        </article>
       </section>
 
-      <section class="metric-grid" data-dashboard-summary></section>
-
-      <section class="dashboard-grid">
-        <article class="panel table-panel">
-          <h2>Risk by Market</h2>
-          <div class="table-scroll">
-            <table>
-              <thead>
-                <tr><th>Market</th><th>Orders</th><th>Late</th><th>Rate</th></tr>
-              </thead>
-              <tbody data-risk-by-market></tbody>
-            </table>
+      <section class="dashboard-panels">
+        <article class="neo-card panel-card wide-panel">
+          <div>
+            <p class="label-caps">Dataset Signal</p>
+            <h2>Late Shipment Overview</h2>
+          </div>
+          <div class="placeholder-chart" aria-label="Late shipment overview placeholder">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
           </div>
         </article>
 
-        <article class="panel table-panel">
-          <h2>Sales by Category</h2>
-          <div class="table-scroll">
-            <table>
-              <thead>
-                <tr><th>Category</th><th>Sales</th><th>Orders</th></tr>
-              </thead>
-              <tbody data-sales-by-category></tbody>
-            </table>
-          </div>
-        </article>
-
-        <article class="panel table-panel dashboard-wide">
-          <h2>Shipping Performance</h2>
-          <div class="table-scroll">
-            <table>
-              <thead>
-                <tr><th>Mode</th><th>Orders</th><th>Late Rate</th><th>Avg Days</th></tr>
-              </thead>
-              <tbody data-shipping-performance></tbody>
-            </table>
+        <article class="neo-card panel-card">
+          <p class="label-caps">Risk Composition</p>
+          <h2>Shipment Risk</h2>
+          <div class="risk-stack">
+            <span class="risk-low">Low</span>
+            <span class="risk-mid">Medium</span>
+            <span class="risk-high">High</span>
           </div>
         </article>
       </section>
-    </main>
+    </section>
+  </main>
 
-    <script type="module" src="/src/js/main.js"></script>
-  </body>
+  <a class="neo-btn floating-action" href="./SupplierSelection.html">
+    Choose your Product
+  </a>
+</body>
 </html>

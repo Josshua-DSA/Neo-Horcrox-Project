@@ -1,0 +1,237 @@
+.dashboard-shell {
+  width: min(1320px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 2rem 0 7rem;
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 1.5rem;
+}
+
+.filter-sidebar {
+  position: sticky;
+  top: 1.5rem;
+  align-self: start;
+  max-height: calc(100vh - 3rem);
+  overflow: auto;
+  padding: 1.35rem;
+}
+
+.sidebar-heading {
+  margin-bottom: 1.25rem;
+}
+
+.sidebar-heading h2,
+.dashboard-header h1,
+.panel-card h2 {
+  color: var(--ink);
+}
+
+.filter-form {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.filter-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.filter-field span {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink3);
+}
+
+.filter-field input,
+.filter-field select {
+  width: 100%;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  box-shadow: var(--shadow-in);
+  color: var(--ink2);
+  font-family: 'IM Fell English', Georgia, serif;
+  font-size: 0.9rem;
+  padding: 0.72rem 0.85rem;
+  outline: none;
+}
+
+.dashboard-content {
+  min-width: 0;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-header h1 {
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  margin-top: 0.3rem;
+}
+
+.text-link {
+  color: var(--ink3);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.text-link:hover {
+  color: var(--ink);
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.kpi-card {
+  min-height: 170px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.kpi-card strong {
+  display: block;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.7rem, 3vw, 2.45rem);
+  line-height: 1;
+  color: var(--ink);
+}
+
+.kpi-card p,
+.panel-card p {
+  font-family: 'IM Fell English', Georgia, serif;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--ink3);
+}
+
+.dashboard-panels {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.panel-card {
+  min-height: 250px;
+  padding: 1.5rem;
+}
+
+.wide-panel {
+  display: grid;
+  grid-template-columns: 0.75fr 1.25fr;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.placeholder-chart {
+  height: 180px;
+  display: flex;
+  align-items: end;
+  gap: 0.7rem;
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  box-shadow: var(--shadow-in2);
+}
+
+.placeholder-chart span {
+  flex: 1;
+  min-width: 18px;
+  border-radius: 999px 999px 0 0;
+  background: rgba(26, 24, 20, 0.24);
+}
+
+.placeholder-chart span:nth-child(1) { height: 38%; }
+.placeholder-chart span:nth-child(2) { height: 68%; }
+.placeholder-chart span:nth-child(3) { height: 48%; }
+.placeholder-chart span:nth-child(4) { height: 82%; }
+.placeholder-chart span:nth-child(5) { height: 56%; }
+
+.risk-stack {
+  margin-top: 1.4rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.risk-stack span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  padding: 0 1rem;
+  border-radius: 999px;
+  background: var(--bg);
+  box-shadow: var(--shadow-in);
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.floating-action {
+  position: fixed;
+  right: 2rem;
+  bottom: 2rem;
+  z-index: 20;
+  text-decoration: none;
+}
+
+@media (max-width: 1080px) {
+  .dashboard-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-sidebar {
+    position: static;
+    max-height: none;
+  }
+
+  .filter-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .dashboard-shell {
+    width: min(100% - 28px, 1320px);
+  }
+
+  .filter-form,
+  .kpi-grid,
+  .dashboard-panels,
+  .wide-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+  }
+
+  .floating-action {
+    right: 1rem;
+    bottom: 1rem;
+    max-width: calc(100% - 2rem);
+    text-align: center;
+  }
+}

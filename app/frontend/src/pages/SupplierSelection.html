@@ -1,59 +1,75 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Supplier Selection</title>
-    <link rel="stylesheet" href="/src/css/main.css" />
-  </head>
-  <body>
-    <main class="app-shell app-shell-wide">
-      <header class="page-header">
-        <div>
-          <p class="eyebrow">Supplier Selection</p>
-          <h1>Ranking Produk dan Supplier</h1>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supplier Selection - Supply Chain Analysis</title>
+  <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="../css/supplier-selection.css">
+</head>
+<body>
+  <main class="supplier-page">
+    <header class="supplier-header">
+      <div>
+        <p class="label-caps">Supplier Selection</p>
+        <h1>Choose Product by Category</h1>
+      </div>
+      <a class="text-link" href="./Dashboard.html">Dashboard</a>
+    </header>
+
+    <section class="neo-card chose-body">
+      <div class="field-group">
+        <span class="label-caps">Product Category</span>
+        <div class="neo-select-wrap">
+          <select class="neo-select" id="category-select" data-category-select>
+            <option value="">Search / Select Category...</option>
+            <option value="Technology">Technology</option>
+            <option value="Furniture">Furniture</option>
+            <option value="Office Supplies">Office Supplies</option>
+          </select>
+          <span class="neo-select-arrow">v</span>
         </div>
-        <a class="link-button" href="/">Home</a>
-      </header>
+      </div>
 
-      <section class="toolbar">
-        <p data-status>Memuat data...</p>
-      </section>
+      <div class="table-label">
+        <div>
+          <p class="label-caps">Candidate List</p>
+          <h2 class="section-title">Top Product</h2>
+        </div>
+        <span class="hint">choose one product for profiling</span>
+      </div>
 
-      <section class="split-layout">
-        <aside class="panel">
-          <h2>Kategori</h2>
-          <div class="category-list" data-category-list></div>
-        </aside>
+      <div class="neo-table-wrap">
+        <table class="neo-table" id="products-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Product Name</th>
+              <th>Supplier</th>
+              <th>Risk Level</th>
+              <th>TOPSIS</th>
+            </tr>
+          </thead>
+          <tbody id="products-tbody" data-product-table>
+            <tr class="empty-row">
+              <td colspan="5">Select a category to view product candidates</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-        <section class="panel table-panel">
-          <h2>Kandidat Terbaik</h2>
-          <div class="table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>Rank</th>
-                  <th>Nama</th>
-                  <th>Rekomendasi</th>
-                  <th>Risk</th>
-                  <th>TOPSIS</th>
-                  <th>Late</th>
-                  <th>Sales</th>
-                </tr>
-              </thead>
-              <tbody data-product-table>
-                <tr><td colspan="7">Memuat data...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </section>
+    <section class="neo-card detail-panel" data-product-detail>
+      <p class="label-caps">Selected Product Detail</p>
+      <p class="body-serif">
+        Detail kandidat akan muncul setelah produk dipilih. Area ini disiapkan untuk data supplier,
+        skor rekomendasi, tingkat risiko, penjualan, dan performa keterlambatan.
+      </p>
+    </section>
+  </main>
 
-      <section class="panel" data-product-detail>
-        <p class="muted">Detail kandidat</p>
-      </section>
-    </main>
-
-    <script type="module" src="/src/js/main.js"></script>
-  </body>
+  <a class="neo-btn floating-action" id="btn-next" href="./Product-Profiling.html">
+    Product profiling
+  </a>
+</body>
 </html>
