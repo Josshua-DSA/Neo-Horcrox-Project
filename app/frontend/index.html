@@ -1,20 +1,156 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Project TA Dashboard</title>
-    <link rel="stylesheet" href="/src/css/main.css" />
-  </head>
-  <body>
-    <main class="app-shell">
-      <h1>Supply Chain Analytics</h1>
-      <nav>
-        <a href="/src/pages/Dashboard.html">Dashboard</a>
-        <a href="/src/pages/Product-Profiling.html">Product Profiling</a>
-        <a href="/src/pages/SupplierSelection.html">Supplier Selection</a>
-      </nav>
-    </main>
-    <script type="module" src="/src/js/main.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supply Chain Analysis</title>
+  <link rel="stylesheet" href="/app/frontend/src/css/shared.css">
+  <link rel="stylesheet" href="/app/frontend/src/css/main.css">
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       HERO SECTION
+  ══════════════════════════════════════ -->
+  <section class="hero">
+    <h1 class="headline-xl">Supply Chain<br>Analysis</h1>
+    <p class="body-serif">
+      Proyek ini merupakan solusi analitik cerdas berbasis Machine Learning yang dirancang untuk
+      mengoptimalkan efisiensi rantai pasok dengan mentransformasi data mentah menjadi wawasan
+      strategis. Sistem ini mampu mengidentifikasi hambatan logistik secara proaktif, sehingga
+      memungkinkan perusahaan untuk mengambil keputusan berbasis data guna meningkatkan
+      keandalan pengiriman dan kepuasan pelanggan.
+    </p>
+  </section>
+
+  <div class="divider-ornate"><span class="ornament">✦ ✦ ✦</span></div>
+
+  <!-- ══════════════════════════════════════
+       FEATURE SECTION
+  ══════════════════════════════════════ -->
+  <section class="feature-section">
+    <h2 class="section-title">Feature</h2>
+
+    <div class="feature-list">
+
+      <!-- Feature 1 — from LEFT -->
+      <div class="feature-item from-left" data-delay="0">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <div class="feature-text">
+          <h3>Product Trend Analysis</h3>
+          <p>Memantau tren penjualan produk selama beberapa tahun terakhir sebagai pendukung keputusan strategis.</p>
+        </div>
+      </div>
+
+      <!-- Feature 2 — from RIGHT -->
+      <div class="feature-item from-right" data-delay="160">
+        <div class="feature-text">
+          <h3>Delivery Delay Risk Prediction</h3>
+          <p>Menggunakan model Machine Learning untuk memprediksi probabilitas keterlambatan pengiriman berdasarkan data historis dan variabel logistik.</p>
+        </div>
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Feature 3 — from LEFT -->
+      <div class="feature-item from-left" data-delay="320">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <div class="feature-text">
+          <h3>Supplier Performance Profiling</h3>
+          <p>Analisis kompetensi dan rekam jejak pemasok untuk meminimalisir risiko kegagalan pengadaan.</p>
+        </div>
+      </div>
+
+      <!-- Feature 4 — from RIGHT -->
+      <div class="feature-item from-right" data-delay="480">
+        <div class="feature-text">
+          <h3>Interactive Analytics Dashboard</h3>
+          <p>Visualisasi data yang komprehensif dengan antarmuka modern yang memudahkan pemantauan metrik operasional.</p>
+        </div>
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3"  y="3"  width="7" height="7"/>
+            <rect x="14" y="3"  width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/>
+            <rect x="3"  y="14" width="7" height="7"/>
+          </svg>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider-ornate"><span class="ornament">✦ ✦ ✦</span></div>
+
+  <!-- ══════════════════════════════════════
+  CHOSE PRODUCT — Body
+  ══════════════════════════════════════ -->
+  <h2 class="section-title">Chose Product</h2>
+  <div class="neo-card chose-body">
+
+    <!-- Category Dropdown -->
+    <div class="field-group">
+      <span class="label-caps">Product Category</span>
+      <div class="neo-select-wrap">
+        <select class="neo-select" id="category-select">
+          <option value="">Search / Select Category…</option>
+          <option value="Technology">Technology</option>
+          <option value="Furniture">Furniture</option>
+          <option value="Office Supplies">Office Supplies</option>
+        </select>
+        <span class="neo-select-arrow">▾</span>
+      </div>
+    </div>
+
+    <!-- Top Products Table -->
+    <div class="table-label">
+      <h2 class="section-title">Top Product</h2>
+      <span class="hint">chose product for analysis</span>
+    </div>
+
+    <div class="neo-table-wrap">
+      <table class="neo-table" id="products-table">
+        <thead>
+          <tr>
+            <th>Product Name</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody id="products-tbody">
+          <tr class="empty-row">
+            <td colspan="2">Select a category to view products</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Next / Analyze Button -->
+    
+  </div><!-- /chose-body -->
+  
+  <div class="cta-row">
+    <button class="neo-btn neo-btn-icon" id="btn-next" title="Proceed to analysis">
+      →
+    </button>
+  </div>
+  
+  <!-- ── SCRIPTS ── -->
+  <script src="/app/frontend/src/js/data.js"></script>
+  <script src="/app/frontend/src/js/main.js"></script>
+</body>
 </html>

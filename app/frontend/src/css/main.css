@@ -1,21 +1,324 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  color: #1f2937;
-  background: #f8fafc;
+/* ═══════════════════════════════════════════════
+   main.css  —  Supply Chain Analysis
+   Styles specific to index.html (Main / Landing page)
+═══════════════════════════════════════════════ */
+
+/* ── HERO ── */
+.hero {
+  padding: 4rem 2.5rem 3rem;
+  min-width: 50vw;
+  margin-bottom: 20vh;
 }
 
-.app-shell {
-  width: min(960px, calc(100% - 32px));
-  margin: 48px auto;
+.hero .headline-xl {
+  margin-bottom: 1.5rem;
 }
 
-nav {
+.hero .body-serif {
+  max-width: 60vw;
+  margin-top: 8vh;
+}
+
+/* ── FEATURE SECTION ── */
+.feature-section {
+  margin-bottom: 10vh;
+}
+
+.section-title {
+  margin-bottom: 2.5rem;
+  margin-left: 70px;
+}
+
+/* ── FEATURE LIST ── */
+.feature-list {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+  flex-direction: column;
+  gap: 2.5rem;
 }
 
-a {
-  color: #2563eb;
+/* Feature item — slide-in animation */
+.feature-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 1.25rem;
+
+  opacity: 0;
+  transform: translateX(-60px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+
+.feature-item.visible:hover {
+  /* Skala 1.05 berarti membesar 5% dari ukuran asli */
+  transform: scale(1.05); 
+}
+
+/* Opsional: Membuat ikon sedikit lebih terang atau bergeser saat hover */
+.feature-item:hover .feature-icon svg {
+  stroke: var(--ink); /* Mengubah warna ikon menjadi lebih gelap/tegas */
+  transform: rotate(-5deg); /* Memberikan sedikit rotasi artistik */
+  transition: all 0.3s ease;
+}
+
+.feature-item.from-right {
+  transform: translateX(60px);
+  justify-self: end;
+  grid-template-columns: 1fr auto;
+}
+
+.feature-item.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Right-side item — reverse grid order */
+.feature-item.from-right .feature-text {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  /* background-color: lightgreen; */
+}
+
+.feature-item.from-right .feature-icon {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  margin-right: 130px;
+}
+
+.feature-item.from-left .feature-icon {
+  margin-left: 130px;
+}
+
+/* Icon container */
+.feature-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.feature-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: var(--ink3);
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Text block */
+.feature-text h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+  color: var(--ink);
+}
+
+.feature-text p {
+  font-family: 'IM Fell English', serif;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--ink3);
+  max-width: 40vw;
+}
+
+.feature-item.from-right .feature-text p {
+  margin-left: auto; /* Memastikan p tidak melebar ke kiri */
+  text-align: right;
+}
+
+/* ── CHOSE PRODUCT — Sticky header ── */
+.chose-wrapper {
+  margin-bottom: 2.5rem;
+  margin-left: 25px;
+}
+
+.chose-wrapper .section-title {
+  margin-bottom: 0;
+}
+
+/* ── CHOSE PRODUCT — Body card ── */
+.chose-body {
+  position: relative;
+  margin: 0 4rem 1px;
+  padding: 2.5rem 2rem 2.2rem;
+  z-index: 0;
+}
+
+/* Paper stack shadow */
+.chose-body::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: -8px;
+  bottom: -8px;
+  border-radius: var(--radius);
+  z-index: -1;
+}
+
+/* ── FIELD GROUP ── */
+.field-group {
+  margin-bottom: 2rem;
+}
+
+.field-group .label-caps {
+  display: block;
+  margin-bottom: 0.6rem;
+}
+
+/* ── NEO SELECT (inner-shadow dropdown) ── */
+.neo-select-wrap {
+  position: relative;
+}
+
+.neo-select {
+  width: 100%;
+  padding: 0.85rem 3rem 0.85rem 1.1rem;
+  background: var(--bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-in2);
+  font-family: 'IM Fell English', serif;
+  font-size: 0.92rem;
+  color: var(--ink2);
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition);
+}
+
+.neo-select:focus {
+  box-shadow: inset 5px 5px 12px rgba(184, 179, 170, 0.6),
+              inset -5px -5px 12px rgba(255, 255, 255, 0.8),
+              0 0 0 2px rgba(26, 24, 20, 0.1);
+}
+
+.neo-select-arrow {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--ink3);
+  font-size: 0.8rem;
+}
+
+/* ── TABLE LABEL ROW ── */
+.table-label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.table-label .section-title {
+  font-size: 1.1rem;
+}
+
+.table-label .hint {
+  font-family: 'IM Fell English', serif;
+  font-size: 0.8rem;
+  color: var(--ink3);
+  font-style: italic;
+}
+
+/* ── PRODUCTS TABLE ── */
+.neo-table-wrap {
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-in2);
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.neo-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'IM Fell English', serif;
+  font-size: 0.88rem;
+}
+
+.neo-table thead tr {
+  background: rgba(26, 24, 20, 0.06);
+}
+
+.neo-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  color: var(--ink3);
+  border-bottom: 1px solid rgba(26, 24, 20, 0.1);
+}
+
+.neo-table td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid rgba(26, 24, 20, 0.06);
+  color: var(--ink2);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.neo-table tbody tr:hover td {
+  background: rgba(26, 24, 20, 0.04);
+}
+
+.neo-table tbody tr.selected td {
+  background: rgba(26, 24, 20, 0.09);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.neo-table tbody tr.selected td:first-child::before {
+  content: '▸ ';
+  color: var(--ink3);
+}
+
+.neo-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Empty state row */
+.neo-table .empty-row td {
+  text-align: center;
+  color: var(--ink3);
+  font-style: italic;
+  padding: 2rem 1rem;
+  cursor: default;
+}
+
+/* ── CTA ROW (next button) ── */
+.cta-row {
+  display: flex;
+  justify-content: center;
+  padding: 2.5rem 0 0.5rem;
+  margin-bottom: 2rem;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 520px) {
+  .hero {
+    padding: 2.5rem 1.5rem 2rem;
+  }
+
+  .feature-section,
+  .chose-body {
+    margin: 0 1rem 2.5rem;
+    padding: 2rem 1.25rem 2.5rem;
+  }
+
+  .feature-text p {
+    max-width: 220px;
+  }
 }

@@ -1,14 +1,117 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="/src/css/main.css" />
-  </head>
-  <body>
-    <main class="app-shell">
-      <h1>Dashboard</h1>
-    </main>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Trend — Supply Chain Analysis</title>
+  <link rel="stylesheet" href="/app/frontend/src/css/shared.css">
+  <link rel="stylesheet" href="/app/frontend/src/css/dashboard.css">
+</head>
+<body>
+
+  <main class="dashboard-page">
+
+    <!-- ── PAGE TITLE ── -->
+    <h2 class="section-title dash-title">Product Trend</h2>
+
+    <!-- ── SELECTED PRODUCT BADGE ── -->
+    <div class="neo-inset product-badge" id="product-badge">
+      <!-- Populated by dashboard.js -->
+      <span>Loading…</span>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         METRICS ROW  +  TREND CHART
+    ══════════════════════════════════════ -->
+    <div class="metrics-row">
+
+      <!-- Left column: KPI cards -->
+      <div class="metrics-col">
+
+        <!-- Total Revenue -->
+        <div class="neo-card metric-card">
+          <span class="label-caps">Total Revenue</span>
+          <div class="metric-value">
+            <span class="currency">$</span>
+            <span id="total-revenue">0</span>
+          </div>
+        </div>
+
+        <!-- Total Sales -->
+        <div class="neo-card metric-card">
+          <span class="label-caps">Total Sales</span>
+          <div class="metric-value">
+            <span id="total-sales">0</span>
+          </div>
+          <span class="label-caps" style="font-size:0.63rem;margin-top:-0.2rem;">units sold</span>
+        </div>
+
+      </div><!-- /metrics-col -->
+
+      <!-- Right column: Trend Chart -->
+      <div class="neo-card chart-area">
+        <span class="label-caps">Sales &amp; Revenue Trend</span>
+        <canvas id="trend-chart"></canvas>
+      </div>
+
+    </div><!-- /metrics-row -->
+
+    <!-- ══════════════════════════════════════
+         SHIPPING MODE TABS
+    ══════════════════════════════════════ -->
+    <div class="shipping-section">
+      <span class="label-caps">Shipping Mode</span>
+      <div class="tab-group">
+        <span class="tab-group-label">Choose Mode</span>
+        <button class="tab-btn active" data-mode="Standard Class">Standard Class</button>
+        <button class="tab-btn"        data-mode="First Class">First Class</button>
+        <button class="tab-btn"        data-mode="Second Class">Second Class</button>
+        <button class="tab-btn"        data-mode="Same Day">Same Day</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         PREDICT BUTTON
+    ══════════════════════════════════════ -->
+    <div class="predict-row">
+      <button class="neo-btn predict-btn" id="btn-predict">
+        Predict Late Risk
+      </button>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         PREDICTION RESULTS
+    ══════════════════════════════════════ -->
+    <div class="results-row">
+
+      <!-- Estimation Days -->
+      <div class="neo-card result-card">
+        <div class="result-value" id="result-days">0</div>
+        <div class="result-label">Days &mdash; Estimation</div>
+      </div>
+
+      <!-- Late Risk % -->
+      <div class="neo-card result-card">
+        <div class="result-value" id="result-risk">0 %</div>
+        <div class="result-label">Late Risk</div>
+      </div>
+
+    </div>
+
+    <!-- ══════════════════════════════════════
+         BACK BUTTON
+    ══════════════════════════════════════ -->
+    <div class="back-row">
+      <button class="neo-btn neo-btn-icon" id="btn-back" title="Back to product selection">
+        ←
+      </button>
+    </div>
+
+  </main><!-- /dashboard-page -->
+
+  <!-- ── SCRIPTS ── -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="/app/frontend/src/js/data.js"></script>
+  <script src="/app/frontend/src/js/dashboard.js"></script>
+</body>
 </html>

@@ -1,0 +1,240 @@
+/* ═══════════════════════════════════════════════
+   dashboard.css  —  Supply Chain Analysis
+   Styles specific to dashboard.html
+═══════════════════════════════════════════════ */
+
+/* ── PAGE WRAPPER ── */
+.dashboard-page {
+  padding: 3rem 2rem 4rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ── DASHBOARD TITLE ── */
+.dash-title {
+  margin-bottom: 2.5rem;
+}
+
+/* ── METRICS + CHART GRID ── */
+.metrics-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+  align-items: start;
+}
+
+.metrics-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ── METRIC CARD ── */
+.metric-card {
+  padding: 1.5rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+  min-height: 120px;
+}
+
+.metric-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+  transition: all 0.3s ease;
+}
+
+.metric-value .currency {
+  font-size: 1.4rem;
+  color: var(--ink3);
+}
+
+/* ── CHART CARD ── */
+.chart-area {
+  padding: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 1.5rem;
+  height: 260px; 
+}
+
+.chart-area .label-caps {
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+#trend-chart {
+  /* flex: 1; */
+  width: 100%;
+  height: 180px;
+}
+
+/* ── SHIPPING MODE ── */
+.shipping-section {
+  margin: 2rem 0;
+  margin-bottom: 10vh;
+}
+
+.shipping-section > .label-caps {
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.tab-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  background: var(--bg);
+  border-radius: 50px;
+  box-shadow: var(--shadow-in);
+  flex-wrap: wrap;
+}
+
+.tab-group-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink3);
+  padding-right: 0.75rem;
+  border-right: 1px solid rgba(26, 24, 20, 0.15);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tab-btn {
+  padding: 0.5rem 1.1rem;
+  border-radius: 50px;
+  border: none;
+  background: transparent;
+  font-family: 'IM Fell English', serif;
+  font-size: 0.88rem;
+  color: var(--ink3);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.tab-btn.active {
+  background: var(--surface);
+  box-shadow: var(--shadow-out-1);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.tab-btn:not(.active):hover {
+  color: var(--ink2);
+}
+
+/* ── PREDICT BUTTON ROW ── */
+.predict-row {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.predict-btn {
+  padding: 0.9rem 2.8rem;
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-style: italic;
+  letter-spacing: 0.05em;
+}
+
+/* ── RESULTS GRID ── */
+.results-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.result-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+  min-height: 150px;
+  text-align: center;
+  gap: 0.6rem;
+}
+
+.result-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+              color 0.4s ease;
+}
+
+.result-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink3);
+}
+
+/* ── BACK ROW ── */
+.back-row {
+  display: flex;
+  justify-content: center;
+  padding-top: 1rem;
+}
+
+/* ── SELECTED PRODUCT BADGE ── */
+.product-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1rem;
+  background: var(--bg);
+  border-radius: 50px;
+  box-shadow: var(--shadow-in);
+  font-family: 'IM Fell English', serif;
+  font-size: 0.82rem;
+  color: var(--ink3);
+  margin-bottom: 2rem;
+}
+
+.product-badge strong {
+  color: var(--ink2);
+  font-style: italic;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .metrics-row {
+    grid-template-columns: 1fr;
+  }
+
+  .results-row {
+    grid-template-columns: 1fr;
+  }
+
+  .tab-group {
+    gap: 0.25rem;
+    padding: 0.5rem 0.6rem;
+  }
+
+  .tab-btn {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.82rem;
+  }
+
+  .result-value {
+    font-size: 2.4rem;
+  }
+
+  .dashboard-page {
+    padding: 2rem 1.25rem 3rem;
+  }
+}
