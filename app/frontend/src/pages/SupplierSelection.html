@@ -22,10 +22,7 @@
         <span class="label-caps">Product Category</span>
         <div class="neo-select-wrap">
           <select class="neo-select" id="category-select" data-category-select>
-            <option value="">Search / Select Category...</option>
-            <option value="Technology">Technology</option>
-            <option value="Furniture">Furniture</option>
-            <option value="Office Supplies">Office Supplies</option>
+            <option value="">Loading categories...</option>
           </select>
           <span class="neo-select-arrow">v</span>
         </div>
@@ -36,7 +33,7 @@
           <p class="label-caps">Candidate List</p>
           <h2 class="section-title">Top Product</h2>
         </div>
-        <span class="hint">choose one product for profiling</span>
+        <span class="hint" data-status>choose one product for profiling</span>
       </div>
 
       <div class="neo-table-wrap">
@@ -48,11 +45,13 @@
               <th>Supplier</th>
               <th>Risk Level</th>
               <th>TOPSIS</th>
+              <th>Late Rate</th>
+              <th>Total Sales</th>
             </tr>
           </thead>
           <tbody id="products-tbody" data-product-table>
             <tr class="empty-row">
-              <td colspan="5">Select a category to view product candidates</td>
+              <td colspan="7">Select a category to view product candidates</td>
             </tr>
           </tbody>
         </table>
@@ -71,5 +70,6 @@
   <a class="neo-btn floating-action" id="btn-next" href="./Product-Profiling.html">
     Product profiling
   </a>
+  <script type="module" src="../js/pages/suplier_selectionPage.js"></script>
 </body>
 </html>

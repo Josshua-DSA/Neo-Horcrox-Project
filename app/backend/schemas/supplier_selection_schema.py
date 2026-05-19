@@ -31,6 +31,7 @@ class SupplierCandidate(BaseModel):
     late_rate: float | None = None
     prequalified: bool | None = None
     compliance_passed: bool | None = None
+    metrics: dict[str, Any] = Field(default_factory=dict)
 
 
 class SupplierCandidateDetail(BaseModel):

@@ -37,12 +37,15 @@ class OrderService:
         db: AsyncIOMotorDatabase,
         market: str | None = None,
         late_delivery_risk: int | None = None,
+        shipping_mode: str | None = None,
     ) -> int:
         query: dict[str, Any] = {}
         if market:
             query["market"] = market
         if late_delivery_risk is not None:
             query["late_delivery_risk"] = late_delivery_risk
+        if shipping_mode:
+            query["shipping_mode"] = shipping_mode
         return await db.orders.count_documents(query)
 
     async def insert_order(self, db: AsyncIOMotorDatabase, order: OrderDocument) -> str:

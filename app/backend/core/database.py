@@ -73,6 +73,10 @@ class MongoDB:
         await self.db.orders.create_index("order_date")
         await self.db.orders.create_index("customer_id")
         await self.db.orders.create_index("late_delivery_risk")
+        await self.db.orders.create_index("market")
+        await self.db.orders.create_index("shipping_mode")
+        await self.db.orders.create_index("category_name")
+        await self.db.orders.create_index("product_card_id")
 
         await self.db.order_items.create_index("order_id")
         await self.db.order_items.create_index("order_item_id", unique=True)

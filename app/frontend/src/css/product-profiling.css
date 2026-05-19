@@ -193,6 +193,149 @@
   padding-top: 1rem;
 }
 
+/* Runtime profiling additions */
+.dashboard-page {
+  max-width: 1040px;
+}
+
+.profile-header,
+.panel-heading-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.profile-header {
+  margin-bottom: 1.5rem;
+}
+
+.profile-header .text-link {
+  color: var(--ink3);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.dash-title {
+  margin-top: 0.3rem;
+  margin-bottom: 0;
+}
+
+.chart-area {
+  height: 300px;
+}
+
+#trend-chart {
+  height: 220px;
+}
+
+.metric-note {
+  font-size: 0.63rem;
+  margin-top: -0.2rem;
+}
+
+.forecast-panel {
+  padding: 1.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.forecast-panel h2 {
+  margin-top: 0.25rem;
+  color: var(--ink);
+}
+
+.forecast-controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.forecast-controls select {
+  min-width: 180px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  box-shadow: var(--shadow-in);
+  color: var(--ink2);
+  font-family: 'IM Fell English', Georgia, serif;
+  padding: 0.72rem 0.85rem;
+  outline: none;
+}
+
+.forecast-summary,
+.profile-status,
+.panel-heading-row small {
+  font-family: 'IM Fell English', Georgia, serif;
+  color: var(--ink3);
+}
+
+.forecast-summary {
+  margin-top: 1rem;
+}
+
+.forecast-list {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.forecast-point {
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  box-shadow: var(--shadow-in);
+}
+
+.forecast-point strong,
+.forecast-point span {
+  display: block;
+}
+
+.forecast-point strong {
+  color: var(--ink);
+  font-family: 'Playfair Display', serif;
+}
+
+.forecast-point span {
+  margin-top: 0.2rem;
+  color: var(--ink3);
+  font-family: 'IM Fell English', Georgia, serif;
+  font-size: 0.86rem;
+}
+
+.shipping-section {
+  margin-bottom: 2rem;
+}
+
+.tab-btn small {
+  display: block;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  color: var(--ink3);
+}
+
+.profile-status {
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .forecast-list {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .profile-header,
+  .panel-heading-row {
+    flex-direction: column;
+  }
+}
+
 .choose-product-subtitle {
   font-family: 'Cormorant Garamond', serif;
   font-size: 0.9rem;

@@ -16,6 +16,11 @@ async def summary(db: AsyncIOMotorDatabase | None = Depends(get_db)) -> dict:
     return await dashboard_service.summary(db)
 
 
+@router.get("/filters", summary="Dashboard filter options from raw dataset")
+async def filters(db: AsyncIOMotorDatabase | None = Depends(get_db)) -> dict:
+    return await dashboard_service.filters(db)
+
+
 @router.get("/risk-by-market", summary="Late delivery risk by market")
 async def risk_by_market(db: AsyncIOMotorDatabase | None = Depends(get_db)) -> dict:
     data = await dashboard_service.risk_by_market(db)

@@ -10,9 +10,12 @@ from pydantic import BaseModel, ConfigDict, Field
 class RiskPredictionItem(BaseModel):
     index: int
     late_delivery_risk: int = Field(..., description="0 = on time, 1 = late risk")
-    risk_label: str
+    risk_label: str = Field(..., description="yes/no label for late delivery risk")
+    delivery_label: str
     late_probability: float = Field(..., ge=0.0, le=1.0)
     on_time_probability: float = Field(..., ge=0.0, le=1.0)
+    risk_probability: float = Field(..., ge=0.0, le=1.0)
+    risk_percentage: float = Field(..., ge=0.0, le=100.0)
     threshold: float
 
 

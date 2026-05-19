@@ -128,6 +128,12 @@
   margin-top: 1rem;
 }
 
+.dashboard-status {
+  margin: -0.5rem 0 1rem;
+  font-family: 'IM Fell English', Georgia, serif;
+  color: var(--ink3);
+}
+
 .panel-card {
   min-height: 250px;
   padding: 1.5rem;
@@ -138,6 +144,46 @@
   grid-template-columns: 0.75fr 1.25fr;
   gap: 1.5rem;
   align-items: center;
+}
+
+.table-panel {
+  min-width: 0;
+  overflow: auto;
+}
+
+.category-panel {
+  margin-top: 1rem;
+}
+
+.category-panel h2 {
+  margin: 0.25rem 0 1rem;
+  color: var(--ink);
+}
+
+.mini-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'IM Fell English', Georgia, serif;
+  font-size: 0.88rem;
+}
+
+.mini-table th,
+.mini-table td {
+  padding: 0.65rem 0.55rem;
+  border-bottom: 1px solid rgba(26, 24, 20, 0.08);
+  text-align: left;
+}
+
+.mini-table th {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink3);
+}
+
+.mini-table td {
+  color: var(--ink2);
 }
 
 .placeholder-chart {

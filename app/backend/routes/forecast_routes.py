@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from ..core.database import get_db
+from ..schemas.db_models import ForecastLogDocument
 from ..schemas.forecast_schema import ForecastInput, ForecastResponse
 from ..services.forecast_service import forecast_service
 
@@ -30,13 +33,36 @@ def metadata() -> dict:
     return forecast_service.metadata()
 
 
+@router.get("/options", summary="Forecast categories and markets for frontend controls")
+def options() -> dict:
+    return {
+        "categories": forecast_service.categories(),
+        "markets": forecast_service.markets(),
+        "metadata": forecast_service.metadata(),
+    }
+
+
 @router.post("/predict", response_model=ForecastResponse, summary="Predict daily demand")
-def predict(payload: ForecastInput) -> ForecastResponse:
+async def predict(
+    payload: ForecastInput,
+    db: AsyncIOMotorDatabase | None = Depends(get_db),
+) -> ForecastResponse:
     try:
-        return forecast_service.predict(payload)
+        result = forecast_service.predict(payload)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)) from exc
+
+    if db is not None:
+        doc = ForecastLogDocument(
+            category_name=result.category_name,
+            market=result.market,
+            periods=result.periods,
+            forecast_result=[item.model_dump() for item in result.forecast],
+            model_version=result.model_version,
+        )
+        await db.forecast_logs.insert_one(doc.model_dump())
+    return result

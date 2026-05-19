@@ -31,7 +31,12 @@ async def list_orders(
         late_delivery_risk=late_delivery_risk,
         shipping_mode=shipping_mode,
     )
-    total = await order_service.count_orders(db, market=market, late_delivery_risk=late_delivery_risk)
+    total = await order_service.count_orders(
+        db,
+        market=market,
+        late_delivery_risk=late_delivery_risk,
+        shipping_mode=shipping_mode,
+    )
     return {"total": total, "skip": skip, "limit": limit, "data": orders}
 
 

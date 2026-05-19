@@ -7,8 +7,11 @@ import json
 from pathlib import Path
 from typing import Any
 
+import pandas as pd
+
 from ..config import settings
 from ..schemas.supplier_selection_schema import SupplierCandidate, SupplierCategory
+from .dashboard_dataset import dashboard_dataset_repository
 
 
 class SupplierSelectionService:
@@ -23,6 +26,7 @@ class SupplierSelectionService:
         self._primary_rows: list[dict[str, Any]] | None = None
         self._summary: dict[str, Any] | None = None
         self._weights: list[dict[str, Any]] | None = None
+        self._raw_dataset: pd.DataFrame | None = None
 
     def health(self) -> dict[str, Any]:
         full_rows = self._load_full_rows()
@@ -104,6 +108,28 @@ class SupplierSelectionService:
         return {
             "candidate": candidate,
             "related_candidates": [item.model_dump() for item in related],
+            "dataset_profile": self._dataset_profile(candidate),
+        }
+
+    def columns(self) -> dict[str, Any]:
+        rows = self._load_full_rows()
+        return {
+            "columns": list(rows[0].keys()) if rows else [],
+            "total_columns": len(rows[0].keys()) if rows else 0,
+        }
+
+    def preview_by_category(self, category_id: str, limit: int = 5) -> dict[str, Any]:
+        rows = [
+            self._convert_row(row)
+            for row in self._load_full_rows()
+            if str(row.get("category_id")) == str(category_id)
+        ]
+        if not rows:
+            raise LookupError(f"Category {category_id} was not found.")
+        return {
+            "total": len(rows),
+            "columns": list(rows[0].keys()),
+            "data": rows[:limit],
         }
 
     def summary(self) -> dict[str, Any]:
@@ -156,7 +182,142 @@ class SupplierSelectionService:
             late_rate=converted.get("late_rate"),
             prequalified=converted.get("prequalified"),
             compliance_passed=converted.get("compliance_passed"),
+            metrics=converted,
         )
+
+    def _dataset_profile(self, candidate: dict[str, Any]) -> dict[str, Any]:
+        frame = self._load_raw_dataset()
+        candidate_id = candidate.get("candidate_id")
+        category_name = candidate.get("category_name")
+        if frame.empty:
+            return self._fallback_dataset_profile(candidate)
+
+        product_rows = frame[frame["Product Card Id"].astype(str) == str(candidate_id)]
+        if product_rows.empty and category_name:
+            product_rows = frame[frame["Category Name"].astype(str) == str(category_name)]
+        if product_rows.empty:
+            return self._fallback_dataset_profile(candidate)
+
+        product_rows = product_rows.copy()
+        product_rows["order_date"] = pd.to_datetime(product_rows["order date (DateOrders)"], errors="coerce")
+        latest = product_rows.sort_values("order_date", ascending=False).iloc[0].to_dict()
+        market = self._mode(product_rows, "Market")
+        shipping_modes = self._shipping_modes(product_rows)
+
+        return {
+            "summary": {
+                "total_revenue": round(float(product_rows["Sales"].sum()), 2),
+                "total_quantity": int(product_rows["Order Item Quantity"].sum()),
+                "total_orders": int(product_rows["Order Id"].nunique()),
+                "avg_late_rate": round(float(product_rows["Late_delivery_risk"].mean()), 4),
+                "market": market,
+            },
+            "risk_input": {
+                "Latitude": self._safe_float(latest.get("Latitude")),
+                "Longitude": self._safe_float(latest.get("Longitude")),
+                "order_date": str(latest.get("order date (DateOrders)") or ""),
+                "scheduled_days": self._safe_float(latest.get("Days for shipment (scheduled)")),
+                "Shipping Mode": str(latest.get("Shipping Mode") or ""),
+            },
+            "forecast_input": {
+                "category_name": str(category_name or latest.get("Category Name") or ""),
+                "market": str(market or latest.get("Market") or ""),
+                "periods": 30,
+            },
+            "shipping_modes": shipping_modes,
+            "trend": self._monthly_trend(product_rows),
+        }
+
+    def _fallback_dataset_profile(self, candidate: dict[str, Any]) -> dict[str, Any]:
+        return {
+            "summary": {
+                "total_revenue": candidate.get("total_sales") or 0,
+                "total_quantity": candidate.get("total_quantity") or 0,
+                "total_orders": candidate.get("total_orders") or 0,
+                "avg_late_rate": candidate.get("late_rate") or 0,
+                "market": None,
+            },
+            "risk_input": {},
+            "forecast_input": {
+                "category_name": candidate.get("category_name"),
+                "market": None,
+                "periods": 30,
+            },
+            "shipping_modes": [],
+            "trend": [],
+        }
+
+    def _load_raw_dataset(self) -> pd.DataFrame:
+        if self._raw_dataset is not None:
+            return self._raw_dataset
+        columns = [
+            "Product Card Id",
+            "Category Name",
+            "Sales",
+            "Order Item Quantity",
+            "Order Id",
+            "Late_delivery_risk",
+            "Latitude",
+            "Longitude",
+            "order date (DateOrders)",
+            "Days for shipment (scheduled)",
+            "Shipping Mode",
+            "Market",
+        ]
+        self._raw_dataset = dashboard_dataset_repository.load(columns)
+        return self._raw_dataset
+
+    def _mode(self, frame: pd.DataFrame, column: str) -> str | None:
+        if column not in frame.columns or frame.empty:
+            return None
+        modes = frame[column].dropna().astype(str).mode()
+        return str(modes.iloc[0]) if not modes.empty else None
+
+    def _shipping_modes(self, frame: pd.DataFrame) -> list[dict[str, Any]]:
+        if "Shipping Mode" not in frame.columns:
+            return []
+        grouped = frame.groupby("Shipping Mode", dropna=False).agg(
+            scheduled_days=("Days for shipment (scheduled)", "median"),
+            total_orders=("Order Id", "nunique"),
+            late_rate=("Late_delivery_risk", "mean"),
+        )
+        return [
+            {
+                "mode": str(index),
+                "scheduled_days": self._safe_float(row["scheduled_days"]),
+                "total_orders": int(row["total_orders"]),
+                "late_rate": round(float(row["late_rate"]), 4),
+            }
+            for index, row in grouped.sort_values("total_orders", ascending=False).iterrows()
+        ]
+
+    def _monthly_trend(self, frame: pd.DataFrame) -> list[dict[str, Any]]:
+        if "order_date" not in frame.columns:
+            return []
+        valid = frame.dropna(subset=["order_date"]).copy()
+        if valid.empty:
+            return []
+        valid["month"] = valid["order_date"].dt.to_period("M").astype(str)
+        grouped = valid.groupby("month").agg(
+            revenue=("Sales", "sum"),
+            quantity=("Order Item Quantity", "sum"),
+        )
+        return [
+            {
+                "date": str(index),
+                "revenue": round(float(row["revenue"]), 2),
+                "quantity": int(row["quantity"]),
+            }
+            for index, row in grouped.tail(12).iterrows()
+        ]
+
+    def _safe_float(self, value: Any) -> float | None:
+        try:
+            if value in (None, "") or pd.isna(value):
+                return None
+            return float(value)
+        except (TypeError, ValueError):
+            return None
 
     def _convert_row(self, row: dict[str, Any]) -> dict[str, Any]:
         converted: dict[str, Any] = {}

@@ -20,6 +20,11 @@ def categories() -> dict:
     return {"total": len(items), "data": items}
 
 
+@router.get("/columns", summary="Supplier selection CSV columns")
+def columns() -> dict:
+    return supplier_selection_service.columns()
+
+
 @router.get("/categories/{category_id}/products", summary="Ranked products/suppliers by category")
 def products_by_category(
     category_id: str,
@@ -36,6 +41,17 @@ def products_by_category(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
     data = [item.model_dump() for item in items]
     return {"total": len(data), "data": data}
+
+
+@router.get("/categories/{category_id}/preview", summary="Raw supplier selection preview by category")
+def preview_by_category(
+    category_id: str,
+    limit: int = Query(5, ge=1, le=50),
+) -> dict:
+    try:
+        return supplier_selection_service.preview_by_category(category_id, limit=limit)
+    except LookupError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
 
 
 @router.get("/products/{candidate_id}", summary="Supplier/product candidate detail")
