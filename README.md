@@ -7,9 +7,6 @@ Project TA untuk analitik supply chain:
 2. Demand forecasting
 3. Supplier selection ranking
 4. Dashboard analytics
->>>>>>> prefix-app
-
-Backend sudah diarahkan ke FastAPI penuh. Flask lama sudah dihapus dari runtime supaya tidak bentrok dengan struktur API baru.
 
 ## Struktur Project
 
@@ -75,7 +72,6 @@ Mapping shipping mode:
 - `Second Class` -> `2` hari
 - `Standard Class` -> `4` hari
 
-=======
 Run API:
 
 ```bash
@@ -145,4 +141,3 @@ Dashboard:
 ## Environment
 
 Lihat `.env.example` untuk override path artifact, dataset, CORS, dan MongoDB.
->>>>>>> prefix-app
