@@ -1,4 +1,3 @@
-=======
 # Supply Chain Analytics
 
 Project TA untuk analitik supply chain:
