@@ -30,47 +30,7 @@ class RiskPredictionService:
     def __init__(self) -> None:
         self._scaler_stats: dict[str, dict[str, float]] | None = None
 
-<<<<<<< HEAD
-def predict_late_shipment(payload: dict) -> dict:
-    model = load_champion_model()
-    metadata = load_champion_metadata()
-    records = normalize_records(payload)
-    feature_names = metadata.get("features", [])
-    features = build_late_shipment_features(records, feature_names)
 
-    if model is None:
-        return {
-            "count": len(records),
-            "target": metadata.get("target", "Late_delivery_risk"),
-            "predictions": [],
-            "warning": "Champion model file was not found or could not be loaded.",
-        }
-
-    frame = pd.DataFrame(features)
-    probabilities = _predict_probability(model, frame)
-    threshold = float(metadata.get("threshold", 0.5))
-
-    predictions = []
-    for index, probability in enumerate(probabilities):
-        risk = int(probability >= threshold)
-        predictions.append(
-            {
-                "index": index,
-                "late_delivery_risk": risk,
-                "risk_label": "late" if risk else "on_time",
-                "late_probability": float(probability),
-                "threshold": threshold,
-                "features": features[index],
-            }
-        )
-
-    return {
-        "count": len(predictions),
-        "target": metadata.get("target", "Late_delivery_risk"),
-        "feature_order": feature_names,
-        "predictions": predictions,
-    }
-=======
     def get_model_info(self) -> RiskModelInfo:
         metadata = model_registry.champion_metadata or {}
         features = self._effective_feature_names(model_registry.champion_model, metadata)
@@ -339,7 +299,7 @@ def predict_late_shipment(payload: dict) -> dict:
                 "std": float(values.std(ddof=0)),
             }
         return self._scaler_stats
->>>>>>> prefix-app
+
 
 
 risk_prediction_service = RiskPredictionService()

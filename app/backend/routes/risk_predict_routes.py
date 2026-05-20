@@ -53,16 +53,6 @@ async def prediction_logs(
     return {"total": len(logs), "data": logs}
 
 
-<<<<<<< HEAD
-@risk_predict_bp.post("/predict")
-@risk_predict_bp.post("/predict/late-shipment")
-def predict():
-    payload = request.get_json(silent=True) or {}
-    try:
-        return jsonify(predict_late_shipment(payload))
-    except ValueError as error:
-        return jsonify({"error": str(error)}), 400
-=======
 async def _log_predictions(
     db: AsyncIOMotorDatabase,
     payload: dict[str, Any],
@@ -93,4 +83,4 @@ def _extract_order_id(snapshot: dict[str, Any]) -> int | None:
         except (TypeError, ValueError):
             return None
     return None
->>>>>>> prefix-app
+
