@@ -72,7 +72,6 @@ model/artifacts/logs/*
 mlruns/
 mlartifacts/
 catboost_info/
-*.pkl
 *.joblib
 *.sav
 *.ubj
