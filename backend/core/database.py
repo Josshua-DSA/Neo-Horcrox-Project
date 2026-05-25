@@ -1,9 +1,9 @@
 """
 core/database.py
 -----------------
-MongoDB connection manager menggunakan Motor (async driver).
+PostgreSQL connection manager menggunakan SQLAlchemy async + asyncpg.
 
-Collections:
+Tables:
   - orders          → data order lengkap dari supply chain
   - order_items     → detail item per order
   - predictions     → log hasil prediksi risk model
@@ -11,60 +11,46 @@ Collections:
 """
 
 import logging
-from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from backend.core.config import settings
 
 logger = logging.getLogger(__name__)
 
 
-class MongoDB:
-    client: AsyncIOMotorClient = None
-    db: AsyncIOMotorDatabase = None
+class Database:
+    def __init__(self):
+        self.engine = None
+        self.async_session = None
 
     async def connect(self):
-        logger.info(f"Connecting to MongoDB: {settings.MONGODB_URI}")
-        self.client = AsyncIOMotorClient(settings.MONGODB_URI)
-        self.db = self.client[settings.MONGODB_DB_NAME]
-        # Ping untuk pastikan koneksi berhasil
-        await self.client.admin.command("ping")
-        logger.info(f"Connected to MongoDB database: {settings.MONGODB_DB_NAME}")
-        await self._create_indexes()
+        logger.info(f"Connecting to PostgreSQL: {settings.DATABASE_URL}")
+        self.engine = create_async_engine(
+            settings.DATABASE_URL,
+            echo=settings.DEBUG,
+            pool_size=10,
+            max_overflow=20,
+        )
+        self.async_session = async_sessionmaker(
+            self.engine,
+            class_=AsyncSession,
+            expire_on_commit=False,
+        )
+        # Create tables if they don't exist
+        from backend.schemas.db_models import Base
+        async with self.engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        logger.info("PostgreSQL connected and tables ensured.")
 
     async def disconnect(self):
-        if self.client:
-            self.client.close()
-            logger.info("MongoDB connection closed.")
-
-    async def _create_indexes(self):
-        """Buat indexes penting agar query cepat."""
-        # orders
-        await self.db.orders.create_index("order_id", unique=True)
-        await self.db.orders.create_index("order_date")
-        await self.db.orders.create_index("customer_id")
-        await self.db.orders.create_index("late_delivery_risk")
-
-        # order_items
-        await self.db.order_items.create_index("order_id")
-        await self.db.order_items.create_index("order_item_id", unique=True)
-
-        # predictions log
-        await self.db.predictions.create_index("order_id")
-        await self.db.predictions.create_index("created_at")
-        await self.db.predictions.create_index("prediction")
-
-        # forecast log
-        await self.db.forecast_logs.create_index("created_at")
-        await self.db.forecast_logs.create_index("category_name")
-
-        logger.info("MongoDB indexes created.")
-
-    def get_db(self) -> AsyncIOMotorDatabase:
-        return self.db
+        if self.engine:
+            await self.engine.dispose()
+            logger.info("PostgreSQL connection closed.")
 
 
-mongodb = MongoDB()
+database = Database()
 
 
-async def get_db() -> AsyncIOMotorDatabase:
+async def get_db() -> AsyncSession:
     """FastAPI dependency — inject ke router."""
-    return mongodb.get_db()
+    async with database.async_session() as session:
+        yield session

@@ -4,18 +4,18 @@ from contextlib import asynccontextmanager
 
 from backend.routers import risk, forecast, supplier, health, orders
 from backend.core.config import settings
-from backend.core.database import mongodb
+from backend.core.database import database
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    await mongodb.connect()
+    await database.connect()
     from backend.core.model_registry import model_registry
     model_registry.load_all()
     yield
     # Shutdown
-    await mongodb.disconnect()
+    await database.disconnect()
     model_registry.clear()
 
 
@@ -24,7 +24,7 @@ app = FastAPI(
     description=(
         "Backend API for Supply Chain Analytics — "
         "Late Delivery Risk prediction, Demand Forecasting, dan Supplier Selection. "
-        "Database: MongoDB."
+        "Database: PostgreSQL."
     ),
     version="0.1.0",
     lifespan=lifespan,

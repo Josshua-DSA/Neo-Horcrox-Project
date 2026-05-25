@@ -12,11 +12,10 @@ POST /api/v1/orders/bulk               → insert banyak order sekaligus
 """
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional, List
 
 from backend.core.database import get_db
-from backend.schemas.db_models import OrderDocument, OrderItemDocument
 from backend.services import order_service
 
 router = APIRouter()
@@ -29,7 +28,7 @@ async def list_orders(
     market: Optional[str] = Query(None, description="Africa | Europe | LATAM | Pacific Asia | USCA"),
     late_delivery_risk: Optional[int] = Query(None, ge=0, le=1),
     shipping_mode: Optional[str] = Query(None),
-    db: AsyncIOMotorDatabase = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ):
     orders = await order_service.get_orders(
         db, skip=skip, limit=limit,
@@ -42,17 +41,17 @@ async def list_orders(
 
 
 @router.get("/analytics/risk", summary="Summary late delivery risk per market")
-async def risk_summary(db: AsyncIOMotorDatabase = Depends(get_db)):
+async def risk_summary(db: AsyncSession = Depends(get_db)):
     return await order_service.get_risk_summary(db)
 
 
 @router.get("/analytics/sales", summary="Total sales & profit per category")
-async def sales_by_category(db: AsyncIOMotorDatabase = Depends(get_db)):
+async def sales_by_category(db: AsyncSession = Depends(get_db)):
     return await order_service.get_sales_by_category(db)
 
 
 @router.get("/{order_id}", summary="Detail satu order beserta items-nya")
-async def get_order(order_id: int, db: AsyncIOMotorDatabase = Depends(get_db)):
+async def get_order(order_id: int, db: AsyncSession = Depends(get_db)):
     order = await order_service.get_order_by_id(db, order_id)
     if not order:
         raise HTTPException(status_code=404, detail=f"Order {order_id} tidak ditemukan")
@@ -61,15 +60,15 @@ async def get_order(order_id: int, db: AsyncIOMotorDatabase = Depends(get_db)):
 
 
 @router.post("", status_code=status.HTTP_201_CREATED, summary="Insert satu order")
-async def create_order(order: OrderDocument, db: AsyncIOMotorDatabase = Depends(get_db)):
+async def create_order(order: dict, db: AsyncSession = Depends(get_db)):
     inserted_id = await order_service.insert_order(db, order)
-    return {"inserted_id": inserted_id, "order_id": order.order_id}
+    return {"inserted_id": inserted_id, "order_id": order.get("order_id")}
 
 
 @router.post("/bulk", status_code=status.HTTP_201_CREATED, summary="Insert banyak order sekaligus")
 async def create_orders_bulk(
-    orders: List[OrderDocument],
-    db: AsyncIOMotorDatabase = Depends(get_db),
+    orders: List[dict],
+    db: AsyncSession = Depends(get_db),
 ):
     if not orders:
         raise HTTPException(status_code=400, detail="orders list kosong")

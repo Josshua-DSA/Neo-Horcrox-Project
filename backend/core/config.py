@@ -8,8 +8,7 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: List[str] = ["*"]
     ARTIFACTS_DIR: str = "backend/artifacts"
     LOG_LEVEL: str = "INFO"
-    MONGODB_URI: str = "mongodb://localhost:27017"
-    MONGODB_DB_NAME: str = "neo_horcrox"
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/neo_horcrox"
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 

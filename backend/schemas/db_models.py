@@ -1,153 +1,156 @@
 """
 schemas/db_models.py
 ---------------------
-Struktur dokumen MongoDB untuk setiap collection.
-Menggunakan Pydantic v2 untuk validasi saat insert/read.
+SQLAlchemy ORM models untuk PostgreSQL.
+Menggantikan Pydantic-only models yang sebelumnya dipakai untuk MongoDB.
 """
 
-from pydantic import BaseModel, Field
-from typing import Optional, List
+from sqlalchemy import (
+    Column, Integer, BigInteger, String, Float, DateTime, Text, JSON,
+    Index, UniqueConstraint,
+)
+from sqlalchemy.orm import DeclarativeBase
 from datetime import datetime
-from bson import ObjectId
 
 
-# ─── Helper ──────────────────────────────────────────────────────────────────
-
-class PyObjectId(str):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid ObjectId")
-        return str(v)
+class Base(DeclarativeBase):
+    pass
 
 
-# ─── Collection: orders ───────────────────────────────────────────────────────
+# ─── Table: orders ────────────────────────────────────────────────────────────
 
-class OrderDocument(BaseModel):
+class Order(Base):
     """
-    Satu dokumen di collection `orders`.
+    Satu baris di tabel `orders`.
     Mewakili satu baris dari DataCoSupplyChainDataset.
     """
-    order_id: int
-    order_date: Optional[datetime] = None
-    shipping_date: Optional[datetime] = None
+    __tablename__ = "orders"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    order_id = Column(Integer, unique=True, nullable=False, index=True)
+    order_date = Column(DateTime, nullable=True, index=True)
+    shipping_date = Column(DateTime, nullable=True)
 
     # Customer
-    customer_id: int
-    customer_segment: Optional[str] = None
-    customer_city: Optional[str] = None
-    customer_state: Optional[str] = None
-    customer_country: Optional[str] = None
+    customer_id = Column(Integer, nullable=False, index=True)
+    customer_segment = Column(String(50), nullable=True)
+    customer_city = Column(String(100), nullable=True)
+    customer_state = Column(String(100), nullable=True)
+    customer_country = Column(String(100), nullable=True)
 
     # Shipping
-    shipping_mode: Optional[str] = None
-    days_for_shipping_real: Optional[int] = None
-    days_for_shipment_scheduled: Optional[int] = None
-    delivery_status: Optional[str] = None
-    late_delivery_risk: Optional[int] = None  # 0 or 1
+    shipping_mode = Column(String(50), nullable=True)
+    days_for_shipping_real = Column(Integer, nullable=True)
+    days_for_shipment_scheduled = Column(Integer, nullable=True)
+    delivery_status = Column(String(50), nullable=True)
+    late_delivery_risk = Column(Integer, nullable=True, index=True)  # 0 or 1
 
     # Geography
-    market: Optional[str] = None
-    order_region: Optional[str] = None
-    order_country: Optional[str] = None
-    order_city: Optional[str] = None
-    order_state: Optional[str] = None
+    market = Column(String(50), nullable=True)
+    order_region = Column(String(100), nullable=True)
+    order_country = Column(String(100), nullable=True)
+    order_city = Column(String(100), nullable=True)
+    order_state = Column(String(100), nullable=True)
 
     # Financials
-    sales_per_customer: Optional[float] = None
-    benefit_per_order: Optional[float] = None
-    order_profit_per_order: Optional[float] = None
-    order_status: Optional[str] = None
-    type: Optional[str] = None  # transaction type
+    sales_per_customer = Column(Float, nullable=True)
+    benefit_per_order = Column(Float, nullable=True)
+    order_profit_per_order = Column(Float, nullable=True)
+    order_status = Column(String(50), nullable=True)
+    type = Column(String(50), nullable=True)  # transaction type
 
     # Product
-    product_card_id: Optional[int] = None
-    product_name: Optional[str] = None
-    product_price: Optional[float] = None
-    product_status: Optional[int] = None
-    category_id: Optional[int] = None
-    category_name: Optional[str] = None
-    department_id: Optional[int] = None
-    department_name: Optional[str] = None
+    product_card_id = Column(Integer, nullable=True)
+    product_name = Column(String(255), nullable=True)
+    product_price = Column(Float, nullable=True)
+    product_status = Column(Integer, nullable=True)
+    category_id = Column(Integer, nullable=True)
+    category_name = Column(String(100), nullable=True)
+    department_id = Column(Integer, nullable=True)
+    department_name = Column(String(100), nullable=True)
 
     # Store geo
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
 
-    # Engineered features (opsional, bisa di-populate setelah feature engineering)
-    actual_delay: Optional[float] = None
-    shipping_speed_ratio: Optional[float] = None
-    has_price_inconsistency: Optional[int] = None
-    country_mismatch: Optional[int] = None
-    state_mismatch: Optional[int] = None
-    city_mismatch: Optional[int] = None
+    # Engineered features (opsional)
+    actual_delay = Column(Float, nullable=True)
+    shipping_speed_ratio = Column(Float, nullable=True)
+    has_price_inconsistency = Column(Integer, nullable=True)
+    country_mismatch = Column(Integer, nullable=True)
+    state_mismatch = Column(Integer, nullable=True)
+    city_mismatch = Column(Integer, nullable=True)
 
-    class Config:
-        populate_by_name = True
-        arbitrary_types_allowed = True
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns if c.name != "id"}
 
 
-# ─── Collection: order_items ──────────────────────────────────────────────────
+# ─── Table: order_items ───────────────────────────────────────────────────────
 
-class OrderItemDocument(BaseModel):
+class OrderItem(Base):
     """
-    Satu dokumen di collection `order_items`.
+    Satu baris di tabel `order_items`.
     Relasi ke orders via order_id.
     """
-    order_item_id: int
-    order_id: int
-    product_card_id: Optional[int] = None
-    order_item_cardprod_id: Optional[int] = None
-    order_item_quantity: Optional[int] = None
-    order_item_product_price: Optional[float] = None
-    order_item_discount: Optional[float] = None
-    order_item_discount_rate: Optional[float] = None
-    order_item_profit_ratio: Optional[float] = None
-    sales: Optional[float] = None
-    order_item_total: Optional[float] = None
+    __tablename__ = "order_items"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    order_item_id = Column(Integer, unique=True, nullable=False, index=True)
+    order_id = Column(Integer, nullable=False, index=True)
+    product_card_id = Column(Integer, nullable=True)
+    order_item_cardprod_id = Column(Integer, nullable=True)
+    order_item_quantity = Column(Integer, nullable=True)
+    order_item_product_price = Column(Float, nullable=True)
+    order_item_discount = Column(Float, nullable=True)
+    order_item_discount_rate = Column(Float, nullable=True)
+    order_item_profit_ratio = Column(Float, nullable=True)
+    sales = Column(Float, nullable=True)
+    order_item_total = Column(Float, nullable=True)
 
     # Engineered
-    calculated_item_total: Optional[float] = None
-    item_total_gap: Optional[float] = None
-    abs_item_total_gap: Optional[float] = None
+    calculated_item_total = Column(Float, nullable=True)
+    item_total_gap = Column(Float, nullable=True)
+    abs_item_total_gap = Column(Float, nullable=True)
 
-    class Config:
-        populate_by_name = True
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns if c.name != "id"}
 
 
-# ─── Collection: predictions ──────────────────────────────────────────────────
+# ─── Table: predictions ──────────────────────────────────────────────────────
 
-class PredictionLogDocument(BaseModel):
+class PredictionLog(Base):
     """
     Log setiap kali endpoint /risk/predict dipanggil.
     Berguna untuk monitoring model drift.
     """
-    order_id: Optional[int] = None           # referensi ke orders (jika ada)
-    prediction: int                           # 0 or 1
-    probability_late: float
-    probability_on_time: float
-    label: str
-    model_version: str
-    input_snapshot: dict                      # raw input yang dikirim
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    __tablename__ = "predictions"
 
-    class Config:
-        populate_by_name = True
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    order_id = Column(Integer, nullable=True, index=True)
+    prediction = Column(Integer, nullable=False, index=True)
+    probability_late = Column(Float, nullable=False)
+    probability_on_time = Column(Float, nullable=False)
+    label = Column(String(50), nullable=False)
+    model_version = Column(String(20), nullable=False)
+    input_snapshot = Column(JSON, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns if c.name != "id"}
 
 
-# ─── Collection: forecast_logs ────────────────────────────────────────────────
+# ─── Table: forecast_logs ────────────────────────────────────────────────────
 
-class ForecastLogDocument(BaseModel):
-    category_name: str
-    market: str
-    periods: int
-    forecast_result: List[dict]
-    model_version: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+class ForecastLog(Base):
+    __tablename__ = "forecast_logs"
 
-    class Config:
-        populate_by_name = True
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    category_name = Column(String(100), nullable=False, index=True)
+    market = Column(String(50), nullable=False)
+    periods = Column(Integer, nullable=False)
+    forecast_result = Column(JSON, nullable=False)
+    model_version = Column(String(20), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns if c.name != "id"}

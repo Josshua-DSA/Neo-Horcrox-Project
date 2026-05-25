@@ -2,18 +2,21 @@ version: "3.9"
 
 services:
 
-  mongo:
-    image: mongo:7.0
-    container_name: neo_horcrox_mongo
+  postgres:
+    image: postgres:16-alpine
+    container_name: neo_horcrox_postgres
     ports:
-      - "27017:27017"
+      - "5432:5432"
     volumes:
-      - mongo_data:/data/db
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
-      MONGO_INITDB_DATABASE: neo_horcrox
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: neo_horcrox
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d neo_horcrox"]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -29,10 +32,9 @@ services:
       - DEBUG=false
       - ARTIFACTS_DIR=backend/artifacts
       - LOG_LEVEL=INFO
-      - MONGODB_URI=mongodb://mongo:27017
-      - MONGODB_DB_NAME=neo_horcrox
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/neo_horcrox
     depends_on:
-      mongo:
+      postgres:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
@@ -42,4 +44,4 @@ services:
       retries: 3
 
 volumes:
-  mongo_data:
+  postgres_data:
