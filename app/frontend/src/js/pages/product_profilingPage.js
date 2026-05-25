@@ -65,8 +65,8 @@ function renderTrend() {
 
   if (!points.length) {
     trendStatus.textContent = "no trend data";
-    context.fillStyle = "#6b6560";
-    context.font = "16px serif";
+    context.fillStyle = "#94a3b8";
+    context.font = "14px 'Outfit', 'Inter', sans-serif";
     context.fillText("No historical trend for this product.", 24, 110);
     return;
   }
@@ -75,7 +75,23 @@ function renderTrend() {
   const padding = 28;
   const maxRevenue = Math.max(...points.map((item) => Number(item.revenue) || 0), 1);
   const barWidth = (chartCanvas.width - padding * 2) / points.length - 8;
-  context.strokeStyle = "rgba(26,24,20,0.18)";
+
+  // Draw subtle horizontal grid lines
+  context.strokeStyle = "rgba(255, 255, 255, 0.05)";
+  context.lineWidth = 1;
+  context.setLineDash([5, 5]);
+  for (let i = 1; i <= 3; i++) {
+    const gridY = padding + ((chartCanvas.height - padding * 2) * i) / 4;
+    context.beginPath();
+    context.moveTo(padding, gridY);
+    context.lineTo(chartCanvas.width - padding, gridY);
+    context.stroke();
+  }
+  context.setLineDash([]); // Reset line dash
+
+  // Draw bottom baseline
+  context.strokeStyle = "rgba(255, 255, 255, 0.12)";
+  context.lineWidth = 1.5;
   context.beginPath();
   context.moveTo(padding, chartCanvas.height - padding);
   context.lineTo(chartCanvas.width - padding, chartCanvas.height - padding);
@@ -86,10 +102,25 @@ function renderTrend() {
     const height = ((chartCanvas.height - padding * 2) * value) / maxRevenue;
     const x = padding + index * (barWidth + 8);
     const y = chartCanvas.height - padding - height;
-    context.fillStyle = "rgba(26,24,20,0.72)";
+
+    // Draw bar gradient
+    const gradient = context.createLinearGradient(x, y, x, chartCanvas.height - padding);
+    gradient.addColorStop(0, "#00f2fe"); // Glowing cyan at top
+    gradient.addColorStop(1, "rgba(129, 140, 248, 0.15)"); // Faded indigo at bottom
+    context.fillStyle = gradient;
     context.fillRect(x, y, Math.max(8, barWidth), height);
-    context.fillStyle = "#6b6560";
-    context.font = "10px serif";
+
+    // Draw glowing top border for each bar
+    context.strokeStyle = "#00f2fe";
+    context.lineWidth = 2.5;
+    context.beginPath();
+    context.moveTo(x, y);
+    context.lineTo(x + Math.max(8, barWidth), y);
+    context.stroke();
+
+    // Draw date labels
+    context.fillStyle = "#94a3b8"; // Muted grey-blue
+    context.font = "10px 'Outfit', 'Inter', sans-serif";
     context.fillText(String(point.date).slice(5), x, chartCanvas.height - 10);
   });
 }
