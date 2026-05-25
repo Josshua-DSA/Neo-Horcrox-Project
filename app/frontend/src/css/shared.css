@@ -70,6 +70,11 @@
   z-index: 2000;
 }
 
+.menu-btn:hover .menu-icon {
+  transform: scale(1.1);
+  transition: var(--transition);
+}
+
 /* SIDEBAR */
 .sidebar {
   position: fixed;
@@ -126,7 +131,7 @@
 }
 
 .sidebar a:hover {
-  background: var(--bg);
+  background-color: none;
   color: var(--ink2);
   transition: var(--transition);
   padding: 20px 30px;
