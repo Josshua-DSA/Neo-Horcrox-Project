@@ -1,22 +1,19 @@
-"""Application health routes."""
-
-from __future__ import annotations
-
 from fastapi import APIRouter
 
-from ..config import settings
-from ..core.database import mongodb
-from ..core.model_registry import model_registry
+from backend.core.model_registry import model_registry
 
-router = APIRouter(tags=["Health"])
+router = APIRouter()
 
 
-@router.get("/health", summary="Backend health check")
-def health() -> dict:
+@router.get("/health", summary="Health check")
+def health():
     return {
         "status": "ok",
-        "service": settings.APP_NAME,
-        "version": settings.APP_VERSION,
-        "models": model_registry.status(),
-        "mongodb": mongodb.status(),
+        "database": "postgresql",
+        "models": {
+            "risk_model": model_registry.champion_model is not None,
+            "forecast_model": model_registry.forecast_model is not None,
+            "supplier_selection": "csv_json",
+        },
+        "artifacts": model_registry.status()["artifacts"],
     }

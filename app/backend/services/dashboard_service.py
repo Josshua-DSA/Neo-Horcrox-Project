@@ -1,13 +1,17 @@
-"""Dashboard aggregation service with MongoDB-first and CSV fallback paths."""
+"""Dashboard aggregation service using PostgreSQL with CSV fallback."""
 
 from __future__ import annotations
 
+from datetime import timedelta
 from typing import Any
 
 import pandas as pd
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from sqlalchemy import distinct, func, select
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..config import settings
+from ..core.config import settings
+from ..schemas.db_models import Order, OrderItem
 from .dashboard_dataset import dashboard_dataset_repository
 
 
@@ -17,12 +21,11 @@ class DashboardService:
     def __init__(self) -> None:
         self._dataset: pd.DataFrame | None = None
 
-    async def summary(self, db: AsyncIOMotorDatabase | None) -> dict[str, Any]:
-        if db is not None:
-            result = await self._mongo_summary(db)
-            if result["total_orders"] > 0:
-                return result
-        frame = self._load_dataset()
+    async def summary(self, db: AsyncSession | None, filters: dict[str, Any] | None = None) -> dict[str, Any]:
+        if db is not None and await self._postgres_has_orders(db):
+            return await self._postgres_summary(db, filters)
+
+        frame = self._filtered_dataset(filters)
         if frame.empty:
             return self._empty_summary()
         return {
@@ -32,14 +35,31 @@ class DashboardService:
             "total_sales": round(float(frame["Sales"].sum()), 2),
             "total_profit": round(float(frame["Order Profit Per Order"].sum()), 2),
             "late_rate": round(float(frame["Late_delivery_risk"].mean()), 4),
-            "avg_shipping_delay": round(float((frame["Days for shipping (real)"] - frame["Days for shipment (scheduled)"]).mean()), 2),
+            "avg_shipping_delay": round(
+                float((frame["Days for shipping (real)"] - frame["Days for shipment (scheduled)"]).mean()),
+                2,
+            ),
             "high_risk_shipments": int(frame["Late_delivery_risk"].sum()),
             "avg_discount_rate": round(float(frame["Order Item Discount Rate"].mean()), 4),
             "total_categories": int(frame["Category Name"].nunique()),
             "total_markets": int(frame["Market"].nunique()),
         }
 
-    async def filters(self, db: AsyncIOMotorDatabase | None) -> dict[str, list[str]]:
+    async def filters(self, db: AsyncSession | None) -> dict[str, Any]:
+        if db is not None and await self._postgres_has_orders(db):
+            return {
+                "markets": await self._postgres_distinct(db, Order.market),
+                "order_regions": await self._postgres_distinct(db, Order.order_region),
+                "order_countries": await self._postgres_distinct(db, Order.order_country),
+                "shipping_modes": await self._postgres_distinct(db, Order.shipping_mode),
+                "categories": await self._postgres_distinct(db, Order.category_name),
+                "departments": await self._postgres_distinct(db, Order.department_name),
+                "segments": await self._postgres_distinct(db, Order.customer_segment),
+                "statuses": await self._postgres_distinct(db, Order.order_status),
+                "risk_levels": ["On Time", "Late"],
+                "date_range": await self._postgres_date_range(db),
+            }
+
         frame = self._load_dataset()
         if frame.empty:
             return {
@@ -51,6 +71,8 @@ class DashboardService:
                 "departments": [],
                 "segments": [],
                 "statuses": [],
+                "risk_levels": [],
+                "date_range": {},
             }
         return {
             "markets": self._unique_values(frame, "Market"),
@@ -61,19 +83,19 @@ class DashboardService:
             "departments": self._unique_values(frame, "Department Name"),
             "segments": self._unique_values(frame, "Customer Segment"),
             "statuses": self._unique_values(frame, "Order Status"),
+            "risk_levels": ["On Time", "Late"],
+            "date_range": self._csv_date_range(frame),
         }
 
-    async def risk_by_market(self, db: AsyncIOMotorDatabase | None) -> list[dict[str, Any]]:
-        if db is not None:
-            result = await self._mongo_risk_by_market(db)
-            if result:
-                return result
-        frame = self._load_dataset()
+    async def risk_by_market(self, db: AsyncSession | None, filters: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+        if db is not None and await self._postgres_has_orders(db):
+            return await self._postgres_risk_by_market(db, filters)
+
+        frame = self._filtered_dataset(filters)
         if frame.empty:
             return []
         grouped = frame.groupby("Market", dropna=False).agg(
             total_orders=("Order Id", "nunique"),
-            total_rows=("Order Id", "size"),
             late_orders=("Late_delivery_risk", "sum"),
             late_rate=("Late_delivery_risk", "mean"),
         )
@@ -87,12 +109,16 @@ class DashboardService:
             for index, row in grouped.sort_values("late_rate", ascending=False).iterrows()
         ]
 
-    async def sales_by_category(self, db: AsyncIOMotorDatabase | None, limit: int = 20) -> list[dict[str, Any]]:
-        if db is not None:
-            result = await self._mongo_sales_by_category(db, limit)
-            if result:
-                return result
-        frame = self._load_dataset()
+    async def sales_by_category(
+        self,
+        db: AsyncSession | None,
+        limit: int = 20,
+        filters: dict[str, Any] | None = None,
+    ) -> list[dict[str, Any]]:
+        if db is not None and await self._postgres_has_orders(db):
+            return await self._postgres_sales_by_category(db, limit, filters)
+
+        frame = self._filtered_dataset(filters)
         if frame.empty:
             return []
         grouped = frame.groupby("Category Name", dropna=False).agg(
@@ -109,12 +135,15 @@ class DashboardService:
             for index, row in grouped.iterrows()
         ]
 
-    async def shipping_performance(self, db: AsyncIOMotorDatabase | None) -> list[dict[str, Any]]:
-        if db is not None:
-            result = await self._mongo_shipping_performance(db)
-            if result:
-                return result
-        frame = self._load_dataset()
+    async def shipping_performance(
+        self,
+        db: AsyncSession | None,
+        filters: dict[str, Any] | None = None,
+    ) -> list[dict[str, Any]]:
+        if db is not None and await self._postgres_has_orders(db):
+            return await self._postgres_shipping_performance(db, filters)
+
+        frame = self._filtered_dataset(filters)
         if frame.empty:
             return []
         grouped = frame.groupby("Shipping Mode", dropna=False).agg(
@@ -133,6 +162,213 @@ class DashboardService:
             }
             for index, row in grouped.sort_values("order_count", ascending=False).iterrows()
         ]
+
+    async def _postgres_summary(self, db: AsyncSession, filters: dict[str, Any] | None) -> dict[str, Any]:
+        try:
+            statement = self._apply_postgres_filters(
+                select(
+                    func.count(Order.id).label("total_rows"),
+                    func.count(distinct(Order.order_id)).label("total_orders"),
+                    func.coalesce(func.sum(Order.sales_per_customer), 0).label("total_sales"),
+                    func.coalesce(func.sum(Order.order_profit_per_order), 0).label("total_profit"),
+                    func.coalesce(func.avg(Order.late_delivery_risk), 0).label("late_rate"),
+                    func.coalesce(
+                        func.avg(Order.days_for_shipping_real - Order.days_for_shipment_scheduled),
+                        0,
+                    ).label("avg_shipping_delay"),
+                    func.coalesce(func.sum(Order.late_delivery_risk), 0).label("high_risk_shipments"),
+                    func.count(distinct(Order.category_name)).label("total_categories"),
+                    func.count(distinct(Order.market)).label("total_markets"),
+                ),
+                filters,
+            )
+            result = await db.execute(statement)
+            row = result.one()
+            discount_statement = self._apply_postgres_filters(
+                select(func.coalesce(func.avg(OrderItem.order_item_discount_rate), 0))
+                .select_from(OrderItem)
+                .join(Order, Order.order_id == OrderItem.order_id),
+                filters,
+            )
+            avg_discount_rate = await db.scalar(discount_statement)
+        except SQLAlchemyError:
+            return self._empty_summary()
+
+        return {
+            "source": "postgresql",
+            "total_orders": int(row.total_orders or 0),
+            "total_rows": int(row.total_rows or 0),
+            "total_sales": round(float(row.total_sales or 0), 2),
+            "total_profit": round(float(row.total_profit or 0), 2),
+            "late_rate": round(float(row.late_rate or 0), 4),
+            "avg_shipping_delay": round(float(row.avg_shipping_delay or 0), 2),
+            "high_risk_shipments": int(row.high_risk_shipments or 0),
+            "avg_discount_rate": round(float(avg_discount_rate or 0), 4),
+            "total_categories": int(row.total_categories or 0),
+            "total_markets": int(row.total_markets or 0),
+        }
+
+    async def _postgres_has_orders(self, db: AsyncSession) -> bool:
+        try:
+            count = await db.scalar(select(func.count(Order.id)))
+        except SQLAlchemyError:
+            return False
+        return bool(count)
+
+    async def _postgres_distinct(self, db: AsyncSession, column: Any, limit: int = 250) -> list[str]:
+        try:
+            result = await db.execute(
+                select(distinct(column))
+                .where(column.is_not(None))
+                .order_by(column)
+                .limit(limit)
+            )
+        except SQLAlchemyError:
+            return []
+        return [str(value) for value in result.scalars().all() if value not in (None, "")]
+
+    async def _postgres_date_range(self, db: AsyncSession) -> dict[str, str | None]:
+        try:
+            result = await db.execute(select(func.min(Order.order_date), func.max(Order.order_date)))
+        except SQLAlchemyError:
+            return {"start": None, "end": None}
+        start, end = result.one()
+        return {
+            "start": start.date().isoformat() if start else None,
+            "end": end.date().isoformat() if end else None,
+        }
+
+    async def _postgres_risk_by_market(
+        self,
+        db: AsyncSession,
+        filters: dict[str, Any] | None,
+    ) -> list[dict[str, Any]]:
+        try:
+            statement = self._apply_postgres_filters(
+                select(
+                    Order.market,
+                    func.count(distinct(Order.order_id)).label("total_orders"),
+                    func.coalesce(func.sum(Order.late_delivery_risk), 0).label("late_orders"),
+                    func.coalesce(func.avg(Order.late_delivery_risk), 0).label("late_rate"),
+                )
+                .group_by(Order.market)
+                .order_by(func.coalesce(func.avg(Order.late_delivery_risk), 0).desc()),
+                filters,
+            )
+            result = await db.execute(statement)
+        except SQLAlchemyError:
+            return []
+        return [
+            {
+                "market": row.market or "Unknown",
+                "total_orders": int(row.total_orders or 0),
+                "late_orders": int(row.late_orders or 0),
+                "late_rate": round(float(row.late_rate or 0), 4),
+            }
+            for row in result.all()
+        ]
+
+    async def _postgres_sales_by_category(
+        self,
+        db: AsyncSession,
+        limit: int,
+        filters: dict[str, Any] | None,
+    ) -> list[dict[str, Any]]:
+        try:
+            statement = self._apply_postgres_filters(
+                select(
+                    Order.category_name,
+                    func.coalesce(func.sum(Order.sales_per_customer), 0).label("total_sales"),
+                    func.count(distinct(Order.order_id)).label("order_count"),
+                )
+                .group_by(Order.category_name)
+                .order_by(func.coalesce(func.sum(Order.sales_per_customer), 0).desc())
+                .limit(limit),
+                filters,
+            )
+            result = await db.execute(statement)
+        except SQLAlchemyError:
+            return []
+        return [
+            {
+                "category_name": row.category_name or "Unknown",
+                "total_sales": round(float(row.total_sales or 0), 2),
+                "order_count": int(row.order_count or 0),
+            }
+            for row in result.all()
+        ]
+
+    async def _postgres_shipping_performance(
+        self,
+        db: AsyncSession,
+        filters: dict[str, Any] | None,
+    ) -> list[dict[str, Any]]:
+        try:
+            statement = self._apply_postgres_filters(
+                select(
+                    Order.shipping_mode,
+                    func.count(distinct(Order.order_id)).label("order_count"),
+                    func.coalesce(func.avg(Order.late_delivery_risk), 0).label("late_rate"),
+                    func.coalesce(func.avg(Order.days_for_shipping_real), 0).label("avg_shipping_days"),
+                    func.coalesce(func.avg(Order.days_for_shipment_scheduled), 0).label("avg_scheduled_days"),
+                )
+                .group_by(Order.shipping_mode)
+                .order_by(func.count(distinct(Order.order_id)).desc()),
+                filters,
+            )
+            result = await db.execute(statement)
+        except SQLAlchemyError:
+            return []
+        return [
+            {
+                "shipping_mode": row.shipping_mode or "Unknown",
+                "order_count": int(row.order_count or 0),
+                "late_rate": round(float(row.late_rate or 0), 4),
+                "avg_shipping_days": round(float(row.avg_shipping_days or 0), 2),
+                "avg_scheduled_days": round(float(row.avg_scheduled_days or 0), 2),
+            }
+            for row in result.all()
+        ]
+
+    def _apply_postgres_filters(self, statement: Any, filters: dict[str, Any] | None) -> Any:
+        filters = filters or {}
+        mapping = {
+            "market": Order.market,
+            "order_region": Order.order_region,
+            "order_country": Order.order_country,
+            "shipping_mode": Order.shipping_mode,
+            "category": Order.category_name,
+            "department": Order.department_name,
+            "segment": Order.customer_segment,
+            "status": Order.order_status,
+        }
+        for key, column in mapping.items():
+            value = filters.get(key)
+            if value:
+                statement = statement.where(column == value)
+
+        risk_level = str(filters.get("risk_level") or "").lower()
+        if risk_level in {"late", "high", "1"}:
+            statement = statement.where(Order.late_delivery_risk == 1)
+        elif risk_level in {"on time", "low", "0"}:
+            statement = statement.where(Order.late_delivery_risk == 0)
+
+        start_date = self._coerce_datetime_filter(filters.get("start_date"))
+        end_date = self._coerce_datetime_filter(filters.get("end_date"))
+        if start_date:
+            statement = statement.where(Order.order_date >= start_date)
+        if end_date:
+            statement = statement.where(Order.order_date < end_date + timedelta(days=1))
+
+        return statement
+
+    def _coerce_datetime_filter(self, value: Any) -> Any:
+        if not value:
+            return None
+        parsed = pd.to_datetime(value, errors="coerce")
+        if pd.isna(parsed):
+            return None
+        return parsed.to_pydatetime()
 
     def _load_dataset(self) -> pd.DataFrame:
         if self._dataset is not None:
@@ -154,12 +390,52 @@ class DashboardService:
             "Shipping Mode",
             "Days for shipping (real)",
             "Days for shipment (scheduled)",
+            "order date (DateOrders)",
         ]
         if not path.exists():
             self._dataset = pd.DataFrame(columns=columns)
             return self._dataset
         self._dataset = dashboard_dataset_repository.load(columns)
         return self._dataset
+
+    def _filtered_dataset(self, filters: dict[str, Any] | None) -> pd.DataFrame:
+        frame = self._load_dataset().copy()
+        if frame.empty or not filters:
+            return frame
+
+        mapping = {
+            "market": "Market",
+            "order_region": "Order Region",
+            "order_country": "Order Country",
+            "shipping_mode": "Shipping Mode",
+            "category": "Category Name",
+            "department": "Department Name",
+            "segment": "Customer Segment",
+            "status": "Order Status",
+        }
+        for key, column in mapping.items():
+            value = filters.get(key)
+            if value and column in frame.columns:
+                frame = frame[frame[column].astype(str) == str(value)]
+
+        risk_level = str(filters.get("risk_level") or "").lower()
+        if risk_level in {"late", "high", "1"}:
+            frame = frame[frame["Late_delivery_risk"] == 1]
+        elif risk_level in {"on time", "low", "0"}:
+            frame = frame[frame["Late_delivery_risk"] == 0]
+
+        dates = pd.to_datetime(frame.get("order date (DateOrders)"), errors="coerce")
+        if filters.get("start_date"):
+            start = pd.to_datetime(filters["start_date"], errors="coerce")
+            if pd.notna(start):
+                frame = frame[dates >= start]
+                dates = dates[dates >= start]
+        if filters.get("end_date"):
+            end = pd.to_datetime(filters["end_date"], errors="coerce")
+            if pd.notna(end):
+                frame = frame[dates < end + pd.Timedelta(days=1)]
+
+        return frame
 
     def _empty_summary(self) -> dict[str, Any]:
         return {
@@ -182,117 +458,14 @@ class DashboardService:
         values = frame[column].dropna().astype(str).sort_values().unique()
         return [value for value in values[:limit] if value]
 
-    async def _mongo_summary(self, db: AsyncIOMotorDatabase) -> dict[str, Any]:
-        pipeline = [
-            {
-                "$group": {
-                    "_id": None,
-                    "total_orders": {"$sum": 1},
-                    "total_sales": {"$sum": {"$ifNull": ["$sales_per_customer", 0]}},
-                    "total_profit": {"$sum": {"$ifNull": ["$order_profit_per_order", 0]}},
-                    "late_rate": {"$avg": {"$ifNull": ["$late_delivery_risk", 0]}},
-                    "avg_shipping_delay": {
-                        "$avg": {
-                            "$subtract": [
-                                {"$ifNull": ["$days_for_shipping_real", 0]},
-                                {"$ifNull": ["$days_for_shipment_scheduled", 0]},
-                            ]
-                        }
-                    },
-                    "high_risk_shipments": {"$sum": {"$ifNull": ["$late_delivery_risk", 0]}},
-                    "avg_discount_rate": {"$avg": {"$ifNull": ["$order_item_discount_rate", 0]}},
-                    "categories": {"$addToSet": "$category_name"},
-                    "markets": {"$addToSet": "$market"},
-                }
-            }
-        ]
-        rows = await db.orders.aggregate(pipeline).to_list(length=1)
-        if not rows:
-            return self._empty_summary()
-        row = rows[0]
+    def _csv_date_range(self, frame: pd.DataFrame) -> dict[str, str | None]:
+        dates = pd.to_datetime(frame.get("order date (DateOrders)"), errors="coerce").dropna()
+        if dates.empty:
+            return {"start": None, "end": None}
         return {
-            "source": "mongodb",
-            "total_orders": int(row.get("total_orders", 0)),
-            "total_rows": int(row.get("total_orders", 0)),
-            "total_sales": round(float(row.get("total_sales", 0)), 2),
-            "total_profit": round(float(row.get("total_profit", 0)), 2),
-            "late_rate": round(float(row.get("late_rate", 0)), 4),
-            "avg_shipping_delay": round(float(row.get("avg_shipping_delay", 0)), 2),
-            "high_risk_shipments": int(row.get("high_risk_shipments", 0)),
-            "avg_discount_rate": round(float(row.get("avg_discount_rate", 0)), 4),
-            "total_categories": len(row.get("categories", [])),
-            "total_markets": len(row.get("markets", [])),
+            "start": dates.min().date().isoformat(),
+            "end": dates.max().date().isoformat(),
         }
-
-    async def _mongo_risk_by_market(self, db: AsyncIOMotorDatabase) -> list[dict[str, Any]]:
-        pipeline = [
-            {
-                "$group": {
-                    "_id": "$market",
-                    "total_orders": {"$sum": 1},
-                    "late_orders": {"$sum": {"$ifNull": ["$late_delivery_risk", 0]}},
-                    "late_rate": {"$avg": {"$ifNull": ["$late_delivery_risk", 0]}},
-                }
-            },
-            {"$sort": {"late_rate": -1}},
-        ]
-        rows = await db.orders.aggregate(pipeline).to_list(length=None)
-        return [
-            {
-                "market": row.get("_id") or "Unknown",
-                "total_orders": int(row.get("total_orders", 0)),
-                "late_orders": int(row.get("late_orders", 0)),
-                "late_rate": round(float(row.get("late_rate", 0)), 4),
-            }
-            for row in rows
-        ]
-
-    async def _mongo_sales_by_category(self, db: AsyncIOMotorDatabase, limit: int) -> list[dict[str, Any]]:
-        pipeline = [
-            {
-                "$group": {
-                    "_id": "$category_name",
-                    "total_sales": {"$sum": {"$ifNull": ["$sales_per_customer", 0]}},
-                    "order_count": {"$sum": 1},
-                }
-            },
-            {"$sort": {"total_sales": -1}},
-            {"$limit": limit},
-        ]
-        rows = await db.orders.aggregate(pipeline).to_list(length=limit)
-        return [
-            {
-                "category_name": row.get("_id") or "Unknown",
-                "total_sales": round(float(row.get("total_sales", 0)), 2),
-                "order_count": int(row.get("order_count", 0)),
-            }
-            for row in rows
-        ]
-
-    async def _mongo_shipping_performance(self, db: AsyncIOMotorDatabase) -> list[dict[str, Any]]:
-        pipeline = [
-            {
-                "$group": {
-                    "_id": "$shipping_mode",
-                    "order_count": {"$sum": 1},
-                    "late_rate": {"$avg": {"$ifNull": ["$late_delivery_risk", 0]}},
-                    "avg_shipping_days": {"$avg": "$days_for_shipping_real"},
-                    "avg_scheduled_days": {"$avg": "$days_for_shipment_scheduled"},
-                }
-            },
-            {"$sort": {"order_count": -1}},
-        ]
-        rows = await db.orders.aggregate(pipeline).to_list(length=None)
-        return [
-            {
-                "shipping_mode": row.get("_id") or "Unknown",
-                "order_count": int(row.get("order_count", 0)),
-                "late_rate": round(float(row.get("late_rate", 0)), 4),
-                "avg_shipping_days": round(float(row.get("avg_shipping_days", 0) or 0), 2),
-                "avg_scheduled_days": round(float(row.get("avg_scheduled_days", 0) or 0), 2),
-            }
-            for row in rows
-        ]
 
 
 dashboard_service = DashboardService()

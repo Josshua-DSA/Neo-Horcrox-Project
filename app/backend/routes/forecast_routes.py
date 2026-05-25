@@ -1,68 +1,60 @@
-"""FastAPI routes for demand forecasting."""
+from fastapi import APIRouter, HTTPException
+from backend.schemas.forecast_schema import ForecastInput, ForecastResponse
+from backend.services.forecast_service import predict_forecast
+from backend.core.model_registry import model_registry
 
-from __future__ import annotations
-
-from fastapi import APIRouter, Depends, HTTPException, status
-from motor.motor_asyncio import AsyncIOMotorDatabase
-
-from ..core.database import get_db
-from ..schemas.db_models import ForecastLogDocument
-from ..schemas.forecast_schema import ForecastInput, ForecastResponse
-from ..services.forecast_service import forecast_service
-
-router = APIRouter(prefix="/forecast", tags=["Forecast"])
+router = APIRouter()
 
 
-@router.get("/health", summary="Forecast feature health")
-def health() -> dict:
-    return forecast_service.health()
-
-
-@router.get("/categories", summary="Known forecast categories")
-def list_categories() -> dict:
-    return {"categories": forecast_service.categories()}
-
-
-@router.get("/markets", summary="Known forecast markets")
-def list_markets() -> dict:
-    return {"markets": forecast_service.markets()}
-
-
-@router.get("/metadata", summary="Forecast metadata")
-def metadata() -> dict:
-    return forecast_service.metadata()
-
-
-@router.get("/options", summary="Forecast categories and markets for frontend controls")
-def options() -> dict:
+@router.get("/health", summary="Forecast model health")
+def forecast_health():
     return {
-        "categories": forecast_service.categories(),
-        "markets": forecast_service.markets(),
-        "metadata": forecast_service.metadata(),
+        "status": "ok" if model_registry.forecast_model is not None else "degraded",
+        "model_loaded": model_registry.forecast_model is not None,
+        "metadata_loaded": bool(model_registry.forecast_metadata),
     }
 
 
-@router.post("/predict", response_model=ForecastResponse, summary="Predict daily demand")
-async def predict(
-    payload: ForecastInput,
-    db: AsyncIOMotorDatabase | None = Depends(get_db),
-) -> ForecastResponse:
+@router.post("/predict", response_model=ForecastResponse, summary="Prediksi demand sales harian")
+def forecast_demand(payload: ForecastInput):
+    if model_registry.forecast_model is None:
+        raise HTTPException(status_code=503, detail="Forecast model belum di-load.")
     try:
-        result = forecast_service.predict(payload)
-    except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
-    except RuntimeError as exc:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
-    except Exception as exc:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)) from exc
+        return predict_forecast(payload)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    if db is not None:
-        doc = ForecastLogDocument(
-            category_name=result.category_name,
-            market=result.market,
-            periods=result.periods,
-            forecast_result=[item.model_dump() for item in result.forecast],
-            model_version=result.model_version,
-        )
-        await db.forecast_logs.insert_one(doc.model_dump())
-    return result
+@router.get("/categories")
+def list_categories():
+    meta = model_registry.forecast_metadata
+    if meta is None:
+        raise HTTPException(status_code=503, detail="Forecast model belum di-load.")
+    return {"categories": meta.get("categories", [])}
+
+@router.get("/markets")
+def list_markets():
+    meta = model_registry.forecast_metadata
+    if meta is None:
+        raise HTTPException(status_code=503, detail="Forecast model belum di-load.")
+    return {"markets": meta.get("markets", [])}
+
+
+@router.get("/options")
+def list_options():
+    meta = model_registry.forecast_metadata or {}
+    return {
+        "categories": meta.get("categories", []),
+        "markets": meta.get("markets", []),
+    }
+
+
+@router.get("/metadata")
+def forecast_metadata():
+    meta = model_registry.forecast_metadata
+    if meta is None:
+        raise HTTPException(status_code=503, detail="Forecast model belum di-load.")
+    return meta

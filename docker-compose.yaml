@@ -1,46 +1,44 @@
 services:
-  mongo:
-    image: mongo:7.0
-    container_name: neo_horcrox_mongo
+  postgres:
+    image: postgres:16-alpine
+    container_name: neo_horcrox_postgres
     ports:
-      - "27017:27017"
+      - "5417:5432"
     volumes:
-      - mongo_data:/data/db
+      - postgres_data:/var/lib/postgresql/data
+      - ./app/database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     environment:
-      MONGO_INITDB_DATABASE: neo_horcrox
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: neo_horcrox
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d neo_horcrox"]
       interval: 15s
       timeout: 5s
       retries: 5
 
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     container_name: neo_horcrox_api
     ports:
-      - "8000:8000"
+      - "8017:8017"
+    volumes:
+      - ./model/artifacts:/app/model/artifacts:ro
+      - ./model/dataset:/app/model/dataset:ro
     environment:
-      APP_NAME: Neo Horcrox Supply Chain API
       DEBUG: "false"
       LOG_LEVEL: INFO
-      MODEL_ROOT: /project/model
-      MONGODB_ENABLED: "true"
-      MONGODB_REQUIRED: "false"
-      MONGODB_URI: mongodb://mongo:27017
-      MONGODB_DB_NAME: neo_horcrox
-      ALLOWED_ORIGINS: "*"
-    volumes:
-      - ./model/artifacts:/project/model/artifacts:ro
-      - ./model/dataset:/project/model/dataset:ro
+      MODEL_ROOT: /app/model
+      ARTIFACTS_DIR: /app/model/artifacts
+      RAW_SUPPLY_CHAIN_DATASET_PATH: /app/model/dataset/raw/DataCoSupplyChainDataset.csv
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/neo_horcrox
     depends_on:
-      mongo:
+      postgres:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8017/api/v1/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -48,17 +46,18 @@ services:
   frontend:
     image: node:20-alpine
     container_name: neo_horcrox_frontend
-    working_dir: /frontend
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    working_dir: /app
     ports:
-      - "5173:5173"
-    environment:
-      VITE_API_BASE_URL: http://localhost:8000/api
+      - "5117:5117"
     volumes:
-      - ./app/frontend:/frontend
+      - ./app/frontend:/app
+    environment:
+      VITE_API_BASE_URL: http://localhost:8017/api/v1
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5117"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     restart: unless-stopped
 
 volumes:
-  mongo_data:
+  postgres_data:

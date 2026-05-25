@@ -28,6 +28,7 @@ async function init() {
   await loadForecastOptions();
   predictButton?.addEventListener("click", predictRisk);
   forecastButton?.addEventListener("click", runForecast);
+  await runForecast();
 }
 
 function readSelectedCandidate() {
@@ -124,16 +125,23 @@ function renderShippingModes() {
 }
 
 async function loadForecastOptions() {
+  const profileMarket = getForecastInput().market;
   try {
     forecastOptions = await apiGet("/forecast/options");
     const markets = forecastOptions.markets || [];
-    forecastMarket.innerHTML = markets.map((market) => `<option value="${escapeAttribute(market)}">${text(market)}</option>`).join("");
-    const profileMarket = selected?.dataset_profile?.forecast_input?.market;
-    if (profileMarket && markets.includes(profileMarket)) {
+    const optionMarkets = profileMarket && !markets.includes(profileMarket)
+      ? [profileMarket, ...markets]
+      : (markets.length ? markets : [profileMarket].filter(Boolean));
+    forecastMarket.innerHTML = optionMarkets.map((market) => `<option value="${escapeAttribute(market)}">${text(market)}</option>`).join("");
+    if (profileMarket && optionMarkets.includes(profileMarket)) {
       forecastMarket.value = profileMarket;
     }
   } catch (error) {
     forecastSummary.textContent = error.message;
+    if (profileMarket) {
+      forecastMarket.innerHTML = `<option value="${escapeAttribute(profileMarket)}">${text(profileMarket)}</option>`;
+      forecastMarket.value = profileMarket;
+    }
   }
 }
 
@@ -165,7 +173,7 @@ async function predictRisk() {
 }
 
 async function runForecast() {
-  const forecastInput = selected?.dataset_profile?.forecast_input || {};
+  const forecastInput = getForecastInput();
   const category = forecastInput.category_name;
   const market = forecastMarket.value || forecastInput.market;
   if (!category || !market) {
@@ -188,6 +196,10 @@ async function runForecast() {
   } finally {
     forecastButton.disabled = false;
   }
+}
+
+function getForecastInput() {
+  return selected?.forecast_input || selected?.dataset_profile?.forecast_input || {};
 }
 
 function renderForecast(response) {
