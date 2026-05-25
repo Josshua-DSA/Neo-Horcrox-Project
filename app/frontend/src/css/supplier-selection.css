@@ -222,14 +222,6 @@
   overflow-wrap: anywhere;
 }
 
-.floating-action {
-  width: 200px;
-  text-decoration: none;
-  display: flex;
-  justify-content:center;
-  margin: 20px 0 auto auto;
-}
-
 .floating-action.is-disabled {
   opacity: 0.55;
   pointer-events: none;
