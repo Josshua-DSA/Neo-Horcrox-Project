@@ -27,6 +27,22 @@
     </aside>
   </div>
 
+  <!-- Floating Vertical Slide Indicator -->
+  <nav class="slide-indicator" id="slideIndicator">
+    <button class="indicator-dot active" data-slide="0" aria-label="Slide 1">
+      <span class="indicator-tooltip">01. Beranda</span>
+    </button>
+    <button class="indicator-dot" data-slide="1" aria-label="Slide 2">
+      <span class="indicator-tooltip">02. Pilar Utama</span>
+    </button>
+    <button class="indicator-dot" data-slide="2" aria-label="Slide 3">
+      <span class="indicator-tooltip">03. Alur Kerja</span>
+    </button>
+    <button class="indicator-dot" data-slide="3" aria-label="Slide 4">
+      <span class="indicator-tooltip">04. Arsitektur</span>
+    </button>
+  </nav>
+
   <main class="landing-page animate-in">
     <!-- HERO SECTION -->
     <section class="landing-hero">
@@ -142,6 +158,46 @@
   </main>
 
   <script src="../js/navbar.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const dots = document.querySelectorAll(".indicator-dot");
+      const slides = [
+        document.querySelector(".landing-hero"),
+        ...document.querySelectorAll(".landing-section")
+      ];
+
+      // Click handler for dots
+      dots.forEach(dot => {
+        dot.addEventListener("click", () => {
+          const slideIndex = parseInt(dot.dataset.slide);
+          const targetSlide = slides[slideIndex];
+          if (targetSlide) {
+            targetSlide.scrollIntoView({ behavior: "smooth" });
+          }
+        });
+      });
+
+      // Observer to update active dot on scroll
+      const slideObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const slideIndex = slides.indexOf(entry.target);
+            if (slideIndex !== -1) {
+              dots.forEach((dot, idx) => {
+                dot.classList.toggle("active", idx === slideIndex);
+              });
+            }
+          }
+        });
+      }, {
+        threshold: 0.5 // Mark active when 50% of the slide is in view
+      });
+
+      slides.forEach(slide => {
+        if (slide) slideObserver.observe(slide);
+      });
+    });
+  </script>
 
 </body>
 </html>
