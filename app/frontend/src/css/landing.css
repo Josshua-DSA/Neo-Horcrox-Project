@@ -160,3 +160,31 @@
     margin-top: 2rem;
   }
 }
+
+/* ── FULL SCREEN SCROLL SNAP (Desktop & Tablet) ── */
+@media (min-width: 769px) {
+  html {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+  }
+
+  .landing-page {
+    padding: 0;
+    width: min(1200px, calc(100% - 80px));
+  }
+
+  .landing-hero,
+  .landing-section {
+    height: 100vh;
+    min-height: 100vh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative;
+  }
+}
+
