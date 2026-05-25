@@ -373,17 +373,6 @@ h1, h2, h3 {
   margin: 70px 0 auto auto;
 }
 
-.neo-btn-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.3rem;
-  padding: 0;
-}
-
 /* ── ORNATE DIVIDER ── */
 .divider-ornate {
   display: flex;
