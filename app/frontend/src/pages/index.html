@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Supply Chain Analysis</title>
+  <title>Supply Chain Intelligence - End-to-End MLOps Platform</title>
 
   <link rel="stylesheet" href="../css/shared.css">
   <link rel="stylesheet" href="../css/landing.css">
@@ -13,110 +13,135 @@
   <!-- NAVBAR  -->
   <div class="navbar-wrap">
     <nav class="navbar">
-      <!-- Tombol garis 3 -->
+      <!-- Tombol Menu Sidebar -->
       <button class="menu-btn" id="menuBtn">
         <img class="menu-icon" src="../artifact/navbar.png" alt="Menu">
       </button>
-
     </nav>
 
-    <!-- Sidebar -->
+    <!-- Sidebar Menu Overlay -->
     <aside class="sidebar" id="sidebar">
       <a href="index.html">Home</a>
-      <a href="Dashboard.html">
-        Dashboard
-      </a>
-      <a href="SupplierSelection.html">
-        Supplier Selection
-      </a>
+      <a href="Dashboard.html">Dashboard</a>
+      <a href="SupplierSelection.html">Supplier Selection</a>
     </aside>
   </div>
 
-  <main class="landing-page">
+  <main class="landing-page animate-in">
+    <!-- HERO SECTION -->
     <section class="landing-hero">
-      <p class="label-caps">Supply Chain Intelligence</p>
-      <h1 class="headline-xl">Supply Chain<br>Analysis</h1>
+      <p class="label-caps">Tugas Akhir - End-to-End MLOps Platform</p>
+      <h1 class="headline-xl">Supply Chain<br>Intelligence</h1>
       <p class="body-serif hero-copy">
-        Platform analitik ini membantu membaca performa rantai pasok dari sisi pesanan,
-        pengiriman, risiko keterlambatan, profitabilitas, serta rekomendasi produk dan supplier.
-        Alur pengalaman dimulai dari ringkasan bisnis, dilanjutkan ke pemilihan produk, lalu
-        masuk ke profiling produk untuk melihat tren dan estimasi risiko.
+        Sebuah platform analitik cerdas berbasis data terintegrasi untuk mendiagnosis performa rantai pasok secara komprehensif. Platform ini menggabungkan kekuatan **Machine Learning**, **Analisis Deret Waktu (Timeseries Forecasting)**, dan **Sistem Pengambilan Keputusan Multikriteria (MCDM)** untuk meminimalkan risiko logistik dan mengoptimalkan profitabilitas bisnis.
       </p>
+      <a class="neo-btn" href="Dashboard.html" style="margin-top: 1rem;">
+        Mulai Analisis
+      </a>
     </section>
 
     <div class="divider-ornate"><span class="ornament">✦ ✦ ✦</span></div>
     
+    <!-- 3 PILLARS / ENGINES SECTION -->
     <section class="landing-section">
       <div class="section-heading">
-        <p class="label-caps">Project Summary</p>
-        <h2 class="section-title">What This System Covers</h2>
+        <p class="label-caps">Core Engines</p>
+        <h2 class="section-title">3 Pilar Utama Sistem</h2>
       </div>
 
       <div class="summary-grid">
+        <!-- Engine 1 -->
         <article class="neo-card summary-card">
-          <span class="summary-index">01</span>
-          <h3>Executive Dashboard</h3>
+          <div class="summary-index">01</div>
+          <h3>Late Delivery Predictor</h3>
           <p>
-            Menampilkan metrik utama dari dataset seperti total orders, total sales,
-            shipment delay, risk count, profit, dan discount rate.
+            Menggunakan model **Machine Learning Champion** (XGBoost/CatBoost) untuk mengklasifikasikan estimasi risiko keterlambatan pengiriman pesanan secara real-time berdasarkan rute geografis, metode pengiriman, dan profil transaksi pelanggan.
           </p>
         </article>
 
+        <!-- Engine 2 -->
         <article class="neo-card summary-card">
-          <span class="summary-index">02</span>
-          <h3>Interactive Filtering</h3>
+          <div class="summary-index">02</div>
+          <h3>Demand Forecaster</h3>
           <p>
-            Sidebar filter disiapkan untuk membaca data berdasarkan tanggal, market,
-            region, country, shipping mode, category, department, segment, status, dan risk level.
+            Model analisis prediktif deret waktu (*timeseries forecasting*) yang memproyeksikan estimasi kebutuhan inventori produk harian (*daily product demand*) hingga 14 hari ke depan berdasarkan kategori produk dan wilayah pasar (*market*).
           </p>
         </article>
 
+        <!-- Engine 3 -->
         <article class="neo-card summary-card">
-          <span class="summary-index">03</span>
-          <h3>Supplier Selection</h3>
+          <div class="summary-index">03</div>
+          <h3>AHP Sourcing Engine</h3>
           <p>
-            Produk dipilih berdasarkan kategori, kemudian kandidat terbaik dapat diarahkan
-            menuju halaman profiling produk.
+            Sistem pemilihan produk dan supplier terbaik menggunakan metode **Analytical Hierarchy Process (AHP)**, yang membobotkan kriteria volume penjualan, tingkat margin laba, kecepatan kirim, dan rasio risiko keterlambatan secara matematis.
           </p>
         </article>
 
+        <!-- Pillar 4 -->
         <article class="neo-card summary-card">
-          <span class="summary-index">04</span>
-          <h3>Product Profiling</h3>
+          <div class="summary-index">04</div>
+          <h3>Real-time BI Dashboard</h3>
           <p>
-            Halaman profiling menyajikan tren produk, sales, revenue, shipping mode, dan
-            estimasi late delivery risk.
+            Dashboard eksekutif interaktif yang terhubung langsung dengan basis data **PostgreSQL** untuk menyajikan ringkasan KPI performa bisnis secara dinamis, dilengkapi dengan filter multi-dimensi berskala besar.
           </p>
         </article>
       </div>
     </section>
 
-    <section class="landing-section team-section">
+    <!-- SYSTEM WORKFLOW SECTION -->
+    <section class="landing-section">
       <div class="section-heading">
-        <p class="label-caps">Team Context</p>
-        <h2 class="section-title">Analysis Focus</h2>
+        <p class="label-caps">System Workflow</p>
+        <h2 class="section-title">Alur Navigasi Pengguna</h2>
       </div>
 
-      <div class="narrative-card">
-        <p>
-          Tim berfokus membangun pengalaman analitik yang mudah dibaca oleh pengguna bisnis:
-          mulai dari ringkasan performa, penyaringan data, pemilihan kandidat produk dan supplier,
-          sampai halaman profiling untuk melihat konteks produk secara lebih rinci.
-        </p>
-        <p>
-          Struktur halaman dibuat bertahap agar pengguna tidak langsung masuk ke detail teknis.
-          Landing page memberi gambaran besar, dashboard memberi kondisi dataset, supplier
-          selection membantu memilih produk, dan product profiling menjadi area analisis akhir.
-        </p>
+      <div class="narrative-card neo-card">
+        <div>
+          <h3 style="margin-bottom: 1rem; color: var(--primary);">1. Ringkasan & Filtrasi</h3>
+          <p style="margin-bottom: 1.5rem;">
+            Mulai dari halaman **Dashboard** untuk memantau performa agregat bisnis, tren keterlambatan pengiriman per wilayah (*market*), dan profitabilitas produk. Gunakan *Interactive Sidebar Filter* untuk mempersempit cakupan analisis Anda ke area spesifik.
+          </p>
+          <h3 style="margin-bottom: 1rem; color: var(--primary);">2. Perankingan Supplier (AHP)</h3>
+          <p>
+            Masuk ke halaman **Supplier Selection** untuk mencari produk dan supplier terbaik di kelasnya. AHP Engine akan menyaring kandidat berdasarkan pembobotan objektif terhadap laba, efisiensi logistik, dan keamanan pengiriman.
+          </p>
+        </div>
+        <div>
+          <h3 style="margin-bottom: 1rem; color: var(--primary);">3. Profiling & Simulasi ML</h3>
+          <p style="margin-bottom: 1.5rem;">
+            Setelah memilih produk di perankingan, Anda akan diarahkan ke halaman **Product Profiling**. Di sini, Anda dapat memvisualisasikan grafik tren historis produk tersebut secara detail.
+          </p>
+          <h3 style="margin-bottom: 1rem; color: var(--primary);">4. Prediksi & Forecasting</h3>
+          <p>
+            Di halaman profiling akhir, Anda dapat menjalankan simulasi model ML: memprediksi probabilitas ketepatan waktu berdasarkan mode pengiriman yang dipilih (*Predict Late Risk*), serta memproyeksikan tren permintaan masa depan (*Run Forecast*).
+          </p>
+        </div>
       </div>
     </section>
 
-    <a class="neo-btn floating-action" href="Dashboard.html">
-    Start 
-    </a>
+    <!-- MLOPS TECH STACK BADGES -->
+    <section class="landing-section">
+      <div class="section-heading" style="align-items: center; text-align: center;">
+        <p class="label-caps">Technology Stack</p>
+        <h2 class="section-title" style="background: linear-gradient(135deg, #ffffff 0%, #00f2fe 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Sistem Berbasis MLOps Modern</h2>
+      </div>
+
+      <div class="narrative-card neo-card" style="grid-template-columns: 1fr; text-align: center; padding: 2rem;">
+        <p style="max-width: 800px; margin: 0 auto 1.5rem;">
+          Platform ini dirancang dengan arsitektur MLOps (*Machine Learning Operations*) yang andal untuk memastikan skalabilitas, efisiensi, dan kemudahan dalam pemantauan siklus hidup model.
+        </p>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+          <span style="padding: 0.5rem 1.25rem; border-radius: 50px; background: rgba(255,255,255,0.04); border: var(--border-glass); font-size: 0.8rem; font-weight: 600; color: var(--primary);">FastAPI Backend</span>
+          <span style="padding: 0.5rem 1.25rem; border-radius: 50px; background: rgba(255,255,255,0.04); border: var(--border-glass); font-size: 0.8rem; font-weight: 600; color: var(--primary);">PostgreSQL DB</span>
+          <span style="padding: 0.5rem 1.25rem; border-radius: 50px; background: rgba(255,255,255,0.04); border: var(--border-glass); font-size: 0.8rem; font-weight: 600; color: var(--primary);">Docker Containers</span>
+          <span style="padding: 0.5rem 1.25rem; border-radius: 50px; background: rgba(255,255,255,0.04); border: var(--border-glass); font-size: 0.8rem; font-weight: 600; color: var(--primary);">Vite & JS Frontend</span>
+          <span style="padding: 0.5rem 1.25rem; border-radius: 50px; background: rgba(255,255,255,0.04); border: var(--border-glass); font-size: 0.8rem; font-weight: 600; color: var(--primary);">MLflow Tracked Models</span>
+          <span style="padding: 0.5rem 1.25rem; border-radius: 50px; background: rgba(255,255,255,0.04); border: var(--border-glass); font-size: 0.8rem; font-weight: 600; color: var(--primary);">XGBoost & CatBoost</span>
+        </div>
+      </div>
+    </section>
 
   </main>
-
 
   <script src="../js/navbar.js"></script>
 
