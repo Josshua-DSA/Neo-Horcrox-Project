@@ -1,12 +1,12 @@
-"""Order CRUD routes backed by MongoDB."""
+"""Order CRUD routes backed by PostgreSQL."""
 
 from __future__ import annotations
 
+from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..core.database import get_db
-from ..schemas.db_models import OrderDocument
 from ..services.order_service import order_service
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
@@ -19,10 +19,8 @@ async def list_orders(
     market: str | None = None,
     late_delivery_risk: int | None = Query(None, ge=0, le=1),
     shipping_mode: str | None = None,
-    db: AsyncIOMotorDatabase | None = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ) -> dict:
-    if db is None:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="MongoDB is not connected.")
     orders = await order_service.get_orders(
         db,
         skip=skip,
@@ -41,9 +39,7 @@ async def list_orders(
 
 
 @router.get("/{order_id}", summary="Get one order with items")
-async def get_order(order_id: int, db: AsyncIOMotorDatabase | None = Depends(get_db)) -> dict:
-    if db is None:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="MongoDB is not connected.")
+async def get_order(order_id: int, db: AsyncSession = Depends(get_db)) -> dict:
     order = await order_service.get_order_by_id(db, order_id)
     if order is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Order {order_id} was not found.")
@@ -52,20 +48,16 @@ async def get_order(order_id: int, db: AsyncIOMotorDatabase | None = Depends(get
 
 
 @router.post("", status_code=status.HTTP_201_CREATED, summary="Insert one order")
-async def create_order(order: OrderDocument, db: AsyncIOMotorDatabase | None = Depends(get_db)) -> dict:
-    if db is None:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="MongoDB is not connected.")
+async def create_order(order: dict[str, Any], db: AsyncSession = Depends(get_db)) -> dict:
     inserted_id = await order_service.insert_order(db, order)
-    return {"inserted_id": inserted_id, "order_id": order.order_id}
+    return {"inserted_id": inserted_id, "order_id": order.get("order_id")}
 
 
 @router.post("/bulk", status_code=status.HTTP_201_CREATED, summary="Insert orders in bulk")
 async def create_orders_bulk(
-    orders: list[OrderDocument],
-    db: AsyncIOMotorDatabase | None = Depends(get_db),
+    orders: list[dict[str, Any]],
+    db: AsyncSession = Depends(get_db),
 ) -> dict:
-    if db is None:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="MongoDB is not connected.")
     if not orders:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="orders list is empty.")
     if len(orders) > 5000:

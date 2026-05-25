@@ -55,7 +55,9 @@ class Settings(BaseSettings):
 
     RAW_SUPPLY_CHAIN_DATASET_PATH: Path | None = None
 
-    MONGODB_ENABLED: bool = True
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/neo_horcrox"
+
+    MONGODB_ENABLED: bool = False
     MONGODB_REQUIRED: bool = False
     MONGODB_URI: str = "mongodb://localhost:27017"
     MONGODB_DB_NAME: str = "neo_horcrox"

@@ -1,34 +1,73 @@
-"""Dashboard aggregation service with MongoDB-first and CSV fallback paths."""
+"""Dashboard aggregation service with PostgreSQL-first and CSV fallback paths."""
 
 from __future__ import annotations
 
+import logging
 from typing import Any
-
 import pandas as pd
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, func, distinct
 
 from ..config import settings
 from .dashboard_dataset import dashboard_dataset_repository
+from ..schemas.db_models import Order, OrderItem
+
+logger = logging.getLogger(__name__)
 
 
 class DashboardService:
-    """Computes dashboard data on the backend so the frontend stays simple."""
+    """Computes dashboard data on the backend using PostgreSQL first, falling back to CSV."""
 
     def __init__(self) -> None:
         self._dataset: pd.DataFrame | None = None
 
-    async def summary(self, db: AsyncIOMotorDatabase | None) -> dict[str, Any]:
+    async def summary(self, db: AsyncSession | None) -> dict[str, Any]:
         if db is not None:
-            result = await self._mongo_summary(db)
-            if result["total_orders"] > 0:
-                return result
+            try:
+                # Query metrics from PostgreSQL
+                q = select(
+                    func.count(Order.id).label("total_orders"),
+                    func.sum(func.coalesce(Order.sales_per_customer, 0)).label("total_sales"),
+                    func.sum(func.coalesce(Order.order_profit_per_order, 0)).label("total_profit"),
+                    func.avg(func.coalesce(Order.late_delivery_risk, 0)).label("late_rate"),
+                    func.avg(func.coalesce(Order.days_for_shipping_real, 0) - func.coalesce(Order.days_for_shipment_scheduled, 0)).label("avg_shipping_delay"),
+                    func.sum(func.coalesce(Order.late_delivery_risk, 0)).label("high_risk_shipments"),
+                    func.count(distinct(Order.category_name)).label("total_categories"),
+                    func.count(distinct(Order.market)).label("total_markets")
+                )
+                res = await db.execute(q)
+                row = res.fetchone()
+                
+                if row and row.total_orders > 0:
+                    # Get avg discount rate from OrderItem
+                    q_discount = select(func.avg(func.coalesce(OrderItem.order_item_discount_rate, 0)))
+                    res_discount = await db.execute(q_discount)
+                    avg_discount = res_discount.scalar() or 0.0
+
+                    return {
+                        "source": "postgresql",
+                        "total_orders": int(row.total_orders),
+                        "total_rows": int(row.total_orders),
+                        "total_sales": round(float(row.total_sales), 2),
+                        "total_profit": round(float(row.total_profit), 2),
+                        "late_rate": round(float(row.late_rate), 4),
+                        "avg_shipping_delay": round(float(row.avg_shipping_delay), 2),
+                        "high_risk_shipments": int(row.high_risk_shipments),
+                        "avg_discount_rate": round(float(avg_discount), 4),
+                        "total_categories": int(row.total_categories),
+                        "total_markets": int(row.total_markets),
+                    }
+            except Exception as e:
+                logger.warning(f"PostgreSQL dashboard summary query failed: {e}")
+
+        # Fallback to CSV
         frame = self._load_dataset()
         if frame.empty:
             return self._empty_summary()
         return {
             "source": "csv",
             "total_orders": int(frame["Order Id"].nunique()),
-            "total_rows": int(len(frame)),
+            "total_rows": int(frame["Order Id"].nunique()),
             "total_sales": round(float(frame["Sales"].sum()), 2),
             "total_profit": round(float(frame["Order Profit Per Order"].sum()), 2),
             "late_rate": round(float(frame["Late_delivery_risk"].mean()), 4),
@@ -39,7 +78,29 @@ class DashboardService:
             "total_markets": int(frame["Market"].nunique()),
         }
 
-    async def filters(self, db: AsyncIOMotorDatabase | None) -> dict[str, list[str]]:
+    async def filters(self, db: AsyncSession | None) -> dict[str, list[str]]:
+        if db is not None:
+            try:
+                # Query unique values directly from Postgres
+                async def get_distinct(column):
+                    q = select(distinct(column)).where(column != None).order_by(column)
+                    res = await db.execute(q)
+                    return [str(v) for v in res.scalars().all() if v]
+
+                return {
+                    "markets": await get_distinct(Order.market),
+                    "order_regions": await get_distinct(Order.order_region),
+                    "order_countries": await get_distinct(Order.order_country),
+                    "shipping_modes": await get_distinct(Order.shipping_mode),
+                    "categories": await get_distinct(Order.category_name),
+                    "departments": await get_distinct(Order.department_name),
+                    "segments": await get_distinct(Order.customer_segment),
+                    "statuses": await get_distinct(Order.order_status),
+                }
+            except Exception as e:
+                logger.warning(f"PostgreSQL dashboard filters query failed: {e}")
+
+        # Fallback to CSV
         frame = self._load_dataset()
         if frame.empty:
             return {
@@ -63,11 +124,35 @@ class DashboardService:
             "statuses": self._unique_values(frame, "Order Status"),
         }
 
-    async def risk_by_market(self, db: AsyncIOMotorDatabase | None) -> list[dict[str, Any]]:
+    async def risk_by_market(self, db: AsyncSession | None) -> list[dict[str, Any]]:
         if db is not None:
-            result = await self._mongo_risk_by_market(db)
-            if result:
-                return result
+            try:
+                q = (
+                    select(
+                        Order.market,
+                        func.count(Order.id).label("total_orders"),
+                        func.sum(func.coalesce(Order.late_delivery_risk, 0)).label("late_orders"),
+                        func.avg(func.coalesce(Order.late_delivery_risk, 0)).label("late_rate")
+                    )
+                    .group_by(Order.market)
+                    .order_by(func.avg(func.coalesce(Order.late_delivery_risk, 0)).desc())
+                )
+                res = await db.execute(q)
+                rows = res.all()
+                if rows:
+                    return [
+                        {
+                            "market": str(row.market or "Unknown"),
+                            "total_orders": int(row.total_orders),
+                            "late_orders": int(row.late_orders),
+                            "late_rate": round(float(row.late_rate), 4),
+                        }
+                        for row in rows
+                    ]
+            except Exception as e:
+                logger.warning(f"PostgreSQL dashboard risk_by_market query failed: {e}")
+
+        # Fallback to CSV
         frame = self._load_dataset()
         if frame.empty:
             return []
@@ -87,11 +172,34 @@ class DashboardService:
             for index, row in grouped.sort_values("late_rate", ascending=False).iterrows()
         ]
 
-    async def sales_by_category(self, db: AsyncIOMotorDatabase | None, limit: int = 20) -> list[dict[str, Any]]:
+    async def sales_by_category(self, db: AsyncSession | None, limit: int = 20) -> list[dict[str, Any]]:
         if db is not None:
-            result = await self._mongo_sales_by_category(db, limit)
-            if result:
-                return result
+            try:
+                q = (
+                    select(
+                        Order.category_name,
+                        func.sum(func.coalesce(Order.sales_per_customer, 0)).label("total_sales"),
+                        func.count(Order.id).label("order_count")
+                    )
+                    .group_by(Order.category_name)
+                    .order_by(func.sum(func.coalesce(Order.sales_per_customer, 0)).desc())
+                    .limit(limit)
+                )
+                res = await db.execute(q)
+                rows = res.all()
+                if rows:
+                    return [
+                        {
+                            "category_name": str(row.category_name or "Unknown"),
+                            "total_sales": round(float(row.total_sales), 2),
+                            "order_count": int(row.order_count),
+                        }
+                        for row in rows
+                    ]
+            except Exception as e:
+                logger.warning(f"PostgreSQL dashboard sales_by_category query failed: {e}")
+
+        # Fallback to CSV
         frame = self._load_dataset()
         if frame.empty:
             return []
@@ -109,11 +217,37 @@ class DashboardService:
             for index, row in grouped.iterrows()
         ]
 
-    async def shipping_performance(self, db: AsyncIOMotorDatabase | None) -> list[dict[str, Any]]:
+    async def shipping_performance(self, db: AsyncSession | None) -> list[dict[str, Any]]:
         if db is not None:
-            result = await self._mongo_shipping_performance(db)
-            if result:
-                return result
+            try:
+                q = (
+                    select(
+                        Order.shipping_mode,
+                        func.count(Order.id).label("order_count"),
+                        func.avg(func.coalesce(Order.late_delivery_risk, 0)).label("late_rate"),
+                        func.avg(Order.days_for_shipping_real).label("avg_shipping_days"),
+                        func.avg(Order.days_for_shipment_scheduled).label("avg_scheduled_days")
+                    )
+                    .group_by(Order.shipping_mode)
+                    .order_by(func.count(Order.id).desc())
+                )
+                res = await db.execute(q)
+                rows = res.all()
+                if rows:
+                    return [
+                        {
+                            "shipping_mode": str(row.shipping_mode or "Unknown"),
+                            "order_count": int(row.order_count),
+                            "late_rate": round(float(row.late_rate), 4),
+                            "avg_shipping_days": round(float(row.avg_shipping_days or 0), 2),
+                            "avg_scheduled_days": round(float(row.avg_scheduled_days or 0), 2),
+                        }
+                        for row in rows
+                    ]
+            except Exception as e:
+                logger.warning(f"PostgreSQL dashboard shipping_performance query failed: {e}")
+
+        # Fallback to CSV
         frame = self._load_dataset()
         if frame.empty:
             return []
@@ -181,118 +315,6 @@ class DashboardService:
             return []
         values = frame[column].dropna().astype(str).sort_values().unique()
         return [value for value in values[:limit] if value]
-
-    async def _mongo_summary(self, db: AsyncIOMotorDatabase) -> dict[str, Any]:
-        pipeline = [
-            {
-                "$group": {
-                    "_id": None,
-                    "total_orders": {"$sum": 1},
-                    "total_sales": {"$sum": {"$ifNull": ["$sales_per_customer", 0]}},
-                    "total_profit": {"$sum": {"$ifNull": ["$order_profit_per_order", 0]}},
-                    "late_rate": {"$avg": {"$ifNull": ["$late_delivery_risk", 0]}},
-                    "avg_shipping_delay": {
-                        "$avg": {
-                            "$subtract": [
-                                {"$ifNull": ["$days_for_shipping_real", 0]},
-                                {"$ifNull": ["$days_for_shipment_scheduled", 0]},
-                            ]
-                        }
-                    },
-                    "high_risk_shipments": {"$sum": {"$ifNull": ["$late_delivery_risk", 0]}},
-                    "avg_discount_rate": {"$avg": {"$ifNull": ["$order_item_discount_rate", 0]}},
-                    "categories": {"$addToSet": "$category_name"},
-                    "markets": {"$addToSet": "$market"},
-                }
-            }
-        ]
-        rows = await db.orders.aggregate(pipeline).to_list(length=1)
-        if not rows:
-            return self._empty_summary()
-        row = rows[0]
-        return {
-            "source": "mongodb",
-            "total_orders": int(row.get("total_orders", 0)),
-            "total_rows": int(row.get("total_orders", 0)),
-            "total_sales": round(float(row.get("total_sales", 0)), 2),
-            "total_profit": round(float(row.get("total_profit", 0)), 2),
-            "late_rate": round(float(row.get("late_rate", 0)), 4),
-            "avg_shipping_delay": round(float(row.get("avg_shipping_delay", 0)), 2),
-            "high_risk_shipments": int(row.get("high_risk_shipments", 0)),
-            "avg_discount_rate": round(float(row.get("avg_discount_rate", 0)), 4),
-            "total_categories": len(row.get("categories", [])),
-            "total_markets": len(row.get("markets", [])),
-        }
-
-    async def _mongo_risk_by_market(self, db: AsyncIOMotorDatabase) -> list[dict[str, Any]]:
-        pipeline = [
-            {
-                "$group": {
-                    "_id": "$market",
-                    "total_orders": {"$sum": 1},
-                    "late_orders": {"$sum": {"$ifNull": ["$late_delivery_risk", 0]}},
-                    "late_rate": {"$avg": {"$ifNull": ["$late_delivery_risk", 0]}},
-                }
-            },
-            {"$sort": {"late_rate": -1}},
-        ]
-        rows = await db.orders.aggregate(pipeline).to_list(length=None)
-        return [
-            {
-                "market": row.get("_id") or "Unknown",
-                "total_orders": int(row.get("total_orders", 0)),
-                "late_orders": int(row.get("late_orders", 0)),
-                "late_rate": round(float(row.get("late_rate", 0)), 4),
-            }
-            for row in rows
-        ]
-
-    async def _mongo_sales_by_category(self, db: AsyncIOMotorDatabase, limit: int) -> list[dict[str, Any]]:
-        pipeline = [
-            {
-                "$group": {
-                    "_id": "$category_name",
-                    "total_sales": {"$sum": {"$ifNull": ["$sales_per_customer", 0]}},
-                    "order_count": {"$sum": 1},
-                }
-            },
-            {"$sort": {"total_sales": -1}},
-            {"$limit": limit},
-        ]
-        rows = await db.orders.aggregate(pipeline).to_list(length=limit)
-        return [
-            {
-                "category_name": row.get("_id") or "Unknown",
-                "total_sales": round(float(row.get("total_sales", 0)), 2),
-                "order_count": int(row.get("order_count", 0)),
-            }
-            for row in rows
-        ]
-
-    async def _mongo_shipping_performance(self, db: AsyncIOMotorDatabase) -> list[dict[str, Any]]:
-        pipeline = [
-            {
-                "$group": {
-                    "_id": "$shipping_mode",
-                    "order_count": {"$sum": 1},
-                    "late_rate": {"$avg": {"$ifNull": ["$late_delivery_risk", 0]}},
-                    "avg_shipping_days": {"$avg": "$days_for_shipping_real"},
-                    "avg_scheduled_days": {"$avg": "$days_for_shipment_scheduled"},
-                }
-            },
-            {"$sort": {"order_count": -1}},
-        ]
-        rows = await db.orders.aggregate(pipeline).to_list(length=None)
-        return [
-            {
-                "shipping_mode": row.get("_id") or "Unknown",
-                "order_count": int(row.get("order_count", 0)),
-                "late_rate": round(float(row.get("late_rate", 0)), 4),
-                "avg_shipping_days": round(float(row.get("avg_shipping_days", 0) or 0), 2),
-                "avg_scheduled_days": round(float(row.get("avg_scheduled_days", 0) or 0), 2),
-            }
-            for row in rows
-        ]
 
 
 dashboard_service = DashboardService()

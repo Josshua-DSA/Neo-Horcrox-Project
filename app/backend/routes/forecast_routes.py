@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..core.database import get_db
-from ..schemas.db_models import ForecastLogDocument
 from ..schemas.forecast_schema import ForecastInput, ForecastResponse
 from ..services.forecast_service import forecast_service
 
@@ -45,7 +44,7 @@ def options() -> dict:
 @router.post("/predict", response_model=ForecastResponse, summary="Predict daily demand")
 async def predict(
     payload: ForecastInput,
-    db: AsyncIOMotorDatabase | None = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ) -> ForecastResponse:
     try:
         result = forecast_service.predict(payload)
@@ -57,12 +56,17 @@ async def predict(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)) from exc
 
     if db is not None:
-        doc = ForecastLogDocument(
-            category_name=result.category_name,
-            market=result.market,
-            periods=result.periods,
-            forecast_result=[item.model_dump() for item in result.forecast],
-            model_version=result.model_version,
-        )
-        await db.forecast_logs.insert_one(doc.model_dump())
+        try:
+            from ..schemas.db_models import ForecastLog
+            log_obj = ForecastLog(
+                category_name=result.category_name,
+                market=result.market,
+                periods=result.periods,
+                forecast_result=[item.model_dump() for item in result.forecast],
+                model_version=result.model_version,
+            )
+            db.add(log_obj)
+            await db.commit()
+        except Exception:
+            pass
     return result

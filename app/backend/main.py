@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
-from .core.database import mongodb
+from .core.database import database
 from .core.model_registry import model_registry
 from .routes import dashboard_routes, forecast_routes, health, orders, risk_predict_routes, supplier_selection_routes
 
@@ -18,9 +18,9 @@ from .routes import dashboard_routes, forecast_routes, health, orders, risk_pred
 async def lifespan(app: FastAPI):
     logging.basicConfig(level=settings.LOG_LEVEL)
     model_registry.load_all()
-    await mongodb.connect()
+    await database.connect()
     yield
-    await mongodb.disconnect()
+    await database.disconnect()
     model_registry.clear()
 
 

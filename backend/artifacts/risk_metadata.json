@@ -1,9 +1,0 @@
-{
-  "model_name": "CatBoost",
-  "auc": 0.8002,
-  "f1_weighted": 0.7308,
-  "n_features": 53,
-  "train_size": 126758,
-  "test_size": 27167,
-  "trained_at": "2026-05-15T01:54:24.920562"
-}

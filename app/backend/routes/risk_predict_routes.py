@@ -3,12 +3,10 @@
 from __future__ import annotations
 
 from typing import Any
-
 from fastapi import APIRouter, Depends, HTTPException, status
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..core.database import get_db
-from ..schemas.db_models import PredictionLogDocument
 from ..schemas.risk_predict_schema import RiskModelInfo, RiskPredictionResponse, normalize_records
 from ..services.order_service import order_service
 from ..services.risk_predict_service import risk_prediction_service
@@ -24,7 +22,7 @@ def model_info() -> RiskModelInfo:
 @router.post("/predict", response_model=RiskPredictionResponse, summary="Predict late delivery risk")
 async def predict_risk(
     payload: dict[str, Any],
-    db: AsyncIOMotorDatabase | None = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ) -> RiskPredictionResponse:
     try:
         result = risk_prediction_service.predict(payload)
@@ -40,36 +38,34 @@ async def predict_risk(
     return result
 
 
-@router.get("/logs", summary="Prediction logs from MongoDB")
+@router.get("/logs", summary="Prediction logs from PostgreSQL")
 async def prediction_logs(
     skip: int = 0,
     limit: int = 50,
     prediction: int | None = None,
-    db: AsyncIOMotorDatabase | None = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ) -> dict[str, Any]:
-    if db is None:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="MongoDB is not connected.")
     logs = await order_service.get_prediction_logs(db, skip=skip, limit=limit, prediction=prediction)
     return {"total": len(logs), "data": logs}
 
 
 async def _log_predictions(
-    db: AsyncIOMotorDatabase,
+    db: AsyncSession,
     payload: dict[str, Any],
     result: RiskPredictionResponse,
 ) -> None:
     records = normalize_records(payload)
     for item in result.predictions:
         snapshot = records[item.index] if item.index < len(records) else {}
-        doc = PredictionLogDocument(
-            order_id=_extract_order_id(snapshot),
-            prediction=item.late_delivery_risk,
-            probability_late=item.late_probability,
-            probability_on_time=item.on_time_probability,
-            label=item.risk_label,
-            model_version=str(result.model_version or "unknown"),
-            input_snapshot=snapshot,
-        )
+        doc = {
+            "order_id": _extract_order_id(snapshot),
+            "prediction": item.late_delivery_risk,
+            "probability_late": item.late_probability,
+            "probability_on_time": item.on_time_probability,
+            "label": item.risk_label,
+            "model_version": str(result.model_version or "unknown"),
+            "input_snapshot": snapshot,
+        }
         await order_service.log_prediction(db, doc)
 
 
@@ -83,4 +79,3 @@ def _extract_order_id(snapshot: dict[str, Any]) -> int | None:
         except (TypeError, ValueError):
             return None
     return None
-
