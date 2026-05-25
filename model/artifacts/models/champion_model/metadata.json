@@ -1,0 +1,20 @@
+{
+    "model_name": "Late Shipment Risk Model",
+    "alias": "champion",
+    "version": 1,
+    "run_id": "60c3f9a1cf934db3898d0d8552c83fec",
+    "threshold": 0.47624850862608875,
+    "features": [
+        "Latitude",
+        "geo_distance_proxy",
+        "order_hour",
+        "order_period",
+        "scheduled_days",
+        "scheduled_by_mode",
+        "expected_scheduled_days_by_mode",
+        "is_first_class_mode",
+        "is_second_class_mode",
+        "is_medium_shipping"
+    ],
+    "target": "Late_delivery_risk"
+}

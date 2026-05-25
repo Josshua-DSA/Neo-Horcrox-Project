@@ -1,0 +1,343 @@
+/* ═══════════════════════════════════════════════
+   shared.css  —  Supply Chain Analysis
+   Variables · Reset · Typography · Neo Components
+   Shared across index.html & dashboard.html
+═══════════════════════════════════════════════ */
+
+/* ── GOOGLE FONTS ── */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+
+/* ── CSS VARIABLES ── */
+:root {
+  --bg:         #d1cabc;
+  --bg-dark:    #b7ac94;
+  --surface:    #d1cabc;
+  --surface2:   #b1a995;
+  --ink:        #1a1814;
+  --ink2:       #3a3630;
+  --ink3:       #6b6560;
+
+  --shadow-out-1: 4px 4px 10px rgba(192, 186, 175, 0.4), 
+                  -4px -4px 10px rgba(164, 155, 140, 0.8);
+                  
+  --shadow-out-2: 6px 6px 15px rgba(165, 160, 150, 0.3), 
+                  -6px -6px 15px rgba(178, 169, 152, 0.7);
+
+  /* Bayangan Dalam (Inset) yang lebih halus */
+  --shadow-in:    inset 4px 4px 8px rgba(165, 160, 150, 0.35), 
+                  inset -4px -4px 8px rgba(196, 185, 161, 0.7);
+                  
+  --shadow-in2:   inset 6px 6px 12px rgba(165, 160, 150, 0.3), 
+                  inset -6px -6px 12px rgba(200, 190, 169, 0.6);
+
+  --border:     1px solid rgba(26,24,20,0.12);
+  --radius:     25px;
+  --radius-sm:  8px;
+  --transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* NAVBAR */
+
+.navbar {
+  position: fixed;
+  height: 90px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px;
+  z-index: 1000;
+}
+
+/* BUTTON */
+.menu-icon {
+  width: 27px;
+  height: 27px;
+  margin: auto;
+}
+
+.menu-btn {
+  right: 30px;
+  position: fixed;
+  width: 60px;
+  height: 60px;
+  margin: 50px 3px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 10px 15px;
+  justify-content: right;
+  z-index: 2000;
+}
+
+.menu-btn:hover .menu-icon {
+  transform: scale(1.1);
+  transition: var(--transition);
+}
+
+/* SIDEBAR */
+.sidebar {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  width: 300px;
+  height: 300px;
+  background: 
+    /* Layer 2: Efek noda lusuh/vignette yang lebih nyata */
+    radial-gradient(
+      circle, 
+      rgba(224, 204, 180, 0.2) 50%, 
+      rgba(221, 203, 176, 0.2) 97%, 
+      rgba(168, 142, 110, 0.35) 100%
+    ),
+    /* Layer 1: Warna dasar kertas */
+    var(--bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 55px 3px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-out-1);
+  z-index: 999;
+  /* ANIMASI */
+  opacity: 0;
+  transform:
+    translateY(-70px);
+  transform-origin: top;
+  pointer-events: none;
+  transition:
+    transform 0.4s ease;
+}
+
+/* Saat aktif */
+.sidebar.active {
+  opacity: 1;
+  transform:
+    scale(1)
+    translateY(0)
+    translateX(0);
+  pointer-events: auto;
+}
+
+/* LINK */
+.sidebar a {
+  color: var(--ink2);
+  text-decoration: none;
+  padding: 20px 30px;
+  font-size: 0.9rem;
+  transition: 0.3s;
+  text-align: left;
+  border-radius: 36px;
+}
+
+.sidebar a:hover {
+  background-color: none;
+  color: var(--ink2);
+  transition: var(--transition);
+  padding: 20px 30px;
+  font-size: 1.1rem;
+  border-radius: 36px;
+}
+
+/* ── RESET ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  background: 
+    /* Layer 2: Efek noda lusuh/vignette yang lebih nyata */
+    radial-gradient(
+      circle, 
+      rgba(224, 204, 180, 0.2) 50%, 
+      rgba(221, 203, 176, 0.2) 97%, 
+      rgba(168, 142, 110, 0.35) 100%
+    ),
+    /* Layer 1: Warna dasar kertas */
+    var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Paper texture noise overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.05; /* Sangat tipis saja */
+  background-image: url("https://www.transparenttextures.com/patterns/felt.png"); 
+}
+
+/* ── TYPOGRAPHY ── */
+h1, h2, h3 {
+  font-family: 'Playfair Display', 'Times New Roman', serif;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.headline-xl {
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.0;
+}
+
+.section-title {
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.label-caps {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--ink3);
+}
+
+.body-serif {
+  font-family: 'IM Fell English', 'Georgia', serif;
+  font-size: 0.93rem;
+  line-height: 1.75;
+  color: var(--ink2);
+}
+
+.ornament {
+  font-family: 'Playfair Display', serif;
+  color: var(--ink3);
+  font-size: 1.2rem;
+  letter-spacing: 0.5em;
+  display: block;
+  text-align: center;
+}
+
+/* ── NEOMORPHISM COMPONENTS ── */
+.neo-card {
+  background: var(--bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-out-1);
+}
+
+.neo-card-sm {
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-out-1);
+}
+
+.neo-inset {
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-in);
+}
+
+.neo-inset2 {
+  background: var(--surface2);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-in2);
+}
+
+/* ── BUTTON ── */
+.neo-btn {
+  background: var(--bg);
+  border: none;
+  border-radius: 50px;
+  box-shadow: var(--shadow-out-1);
+  cursor: pointer;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--ink2);
+  transition: var(--transition);
+  padding: 0.75rem 2rem;
+}
+
+.neo-btn:hover {
+  box-shadow: var(--shadow-out-1);
+  transform: translateY(-1px);
+}
+
+.neo-btn:active {
+  box-shadow: var(--shadow-in);
+  transform: translateY(1px);
+}
+
+.neo-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.neo-btn-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  padding: 0;
+}
+
+/* ── ORNATE DIVIDER ── */
+.divider-ornate {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2.5rem 0;
+  padding: 0 2rem;
+}
+
+.divider-ornate::before,
+.divider-ornate::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(26,24,20,0.2), transparent);
+}
+
+/* ── LOADING SPINNER ── */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(26,24,20,0.15);
+  border-top-color: var(--ink2);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 0.4rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── RISK COLOR CLASSES ── */
+.risk-low  { color: #4a6741 !important; }
+.risk-mid  { color: #7a6030 !important; }
+.risk-high { color: #7a3030 !important; }
+
+/* ── FADE-UP ANIMATION ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+  animation: fadeUp 0.6s ease forwards;
+
+
+}

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Supply Chain Analysis</title>
+  <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+
+  <!-- NAVBAR  -->
+  <nav class="navbar">
+    <!-- Tombol garis 3 -->
+    <button class="menu-btn" id="menuBtn">
+      <img class="menu-icon" src="../artifact/navbar.png" alt="Menu">
+    </button>
+
+  </nav>
+  
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <a href="index.html">Home</a>
+    <a href="Dashboard.html">
+      Dashboard
+    </a>
+    <a href="SupplierSelection.html">
+      Supplier Selection
+    </a>
+  </aside>
+  
+  <main class="dashboard-shell">
+
+    <aside class="filter-sidebar neo-card">
+      <div class="sidebar-heading">
+        <p class="label-caps">Interactive Filter</p>
+        <h2>Dataset View</h2>
+      </div>
+
+      <form class="filter-form" id="dashboard-filters">
+        <label class="filter-field">
+          <span>Date Range</span>
+          <input type="date" aria-label="Start date">
+          <input type="date" aria-label="End date">
+        </label>
+        <label class="filter-field"><span>Market</span><select data-filter="markets"><option>All Market</option></select></label>
+        <label class="filter-field"><span>Order Region</span><select data-filter="order_regions"><option>All Region</option></select></label>
+        <label class="filter-field"><span>Order Country</span><select data-filter="order_countries"><option>All Country</option></select></label>
+        <label class="filter-field"><span>Shipping Mode</span><select data-filter="shipping_modes"><option>All Shipping Mode</option></select></label>
+        <label class="filter-field"><span>Category Name</span><select data-filter="categories"><option>All Category</option></select></label>
+        <label class="filter-field"><span>Department Name</span><select data-filter="departments"><option>All Department</option></select></label>
+        <label class="filter-field"><span>Customer Segment</span><select data-filter="segments"><option>All Segment</option></select></label>
+        <label class="filter-field"><span>Order Status</span><select data-filter="statuses"><option>All Status</option></select></label>
+      </form>
+    </aside>
+
+    <section class="dashboard-content">
+      <header class="dashboard-header">
+        <div>
+          <p class="label-caps">Executive Summary</p>
+          <h1>Supply Chain Dashboard</h1>
+        </div>
+      </header>
+
+      <p class="dashboard-status" data-status>Loading dashboard data...</p>
+
+      <section class="kpi-grid" aria-label="Executive summary metrics" data-dashboard-summary>
+        <article class="neo-card kpi-card"><span class="label-caps">Total Orders</span><strong>0</strong><p>All recorded order transactions.</p></article>
+        <article class="neo-card kpi-card"><span class="label-caps">Total Sales</span><strong>$0</strong><p>Gross sales from selected scope.</p></article>
+        <article class="neo-card kpi-card"><span class="label-caps">Late Shipment Rate</span><strong>0%</strong><p>Shipment ratio marked as late.</p></article>
+        <article class="neo-card kpi-card"><span class="label-caps">Average Shipping Delay</span><strong>0 days</strong><p>Average delivery delay duration.</p></article>
+        <article class="neo-card kpi-card"><span class="label-caps">High Risk Shipment Count</span><strong>0</strong><p>Shipments classified as high risk.</p></article>
+        <article class="neo-card kpi-card"><span class="label-caps">Total Profit</span><strong>$0</strong><p>Profit after selected filters.</p></article>
+        <article class="neo-card kpi-card"><span class="label-caps">Average Discount Rate</span><strong>0%</strong><p>Average discount across orders.</p></article>
+      </section>
+
+      <section class="dashboard-panels">
+        <article class="neo-card panel-card wide-panel">
+          <div>
+            <p class="label-caps">Dataset Signal</p>
+            <h2>Late Shipment by Market</h2>
+          </div>
+          <div class="table-panel">
+            <table class="mini-table">
+              <thead><tr><th>Market</th><th>Orders</th><th>Late</th><th>Rate</th></tr></thead>
+              <tbody data-risk-by-market><tr><td colspan="4">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="neo-card panel-card">
+          <p class="label-caps">Shipping</p>
+          <h2>Mode Performance</h2>
+          <table class="mini-table">
+            <thead><tr><th>Mode</th><th>Orders</th><th>Rate</th><th>Days</th></tr></thead>
+            <tbody data-shipping-performance><tr><td colspan="4">Loading...</td></tr></tbody>
+          </table>
+        </article>
+      </section>
+
+      <section class="neo-card panel-card category-panel">
+        <p class="label-caps">Category</p>
+        <h2>Top Sales by Category</h2>
+        <table class="mini-table">
+          <thead><tr><th>Category</th><th>Total Sales</th><th>Orders</th></tr></thead>
+          <tbody data-sales-by-category><tr><td colspan="3">Loading...</td></tr></tbody>
+        </table>
+      </section>
+      <a class="neo-btn floating-action" href="./SupplierSelection.html">
+            Choose your Product
+      </a>
+    </section>
+
+
+  </main>
+
+  <script type="module" src="../js/pages/dashboardPage.js"></script>
+  <script src="../js/navbar.js"></script>
+
+</body>
+</html>

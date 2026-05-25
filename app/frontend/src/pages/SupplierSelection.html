@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supplier Selection - Supply Chain Analysis</title>
+  <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="../css/supplier-selection.css">
+</head>
+<body>
+
+  <!-- NAVBAR  -->
+  <nav class="navbar">
+    <!-- Tombol garis 3 -->
+    <button class="menu-btn" id="menuBtn">
+      <img class="menu-icon" src="../artifact/navbar.png" alt="Menu">
+    </button>
+
+  </nav>
+  
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <a href="index.html">Home</a>
+    <a href="Dashboard.html">
+      Dashboard
+    </a>
+    <a href="SupplierSelection.html">
+      Supplier Selection
+    </a>
+  </aside>
+
+  <main class="supplier-page">
+    <header class="supplier-header">
+      <div>
+        <p class="label-caps">Supplier Selection</p>
+        <h1>Choose Product by Category</h1>
+      </div>
+    </header>
+
+    <section class="neo-card chose-body">
+      <div class="field-group">
+        <span class="label-caps">Product Category</span>
+        <div class="neo-select-wrap">
+          <select class="neo-select" id="category-select" data-category-select>
+            <option value="">Loading categories...</option>
+          </select>
+          <span class="neo-select-arrow">v</span>
+        </div>
+      </div>
+
+      <div class="table-label">
+        <div>
+          <p class="label-caps">Candidate List</p>
+          <h2 class="section-title">Top Product</h2>
+        </div>
+        <span class="hint" data-status>choose one product for profiling</span>
+      </div>
+
+      <div class="neo-table-wrap">
+        <table class="neo-table" id="products-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Product Name</th>
+              <th>Supplier</th>
+              <th>Risk Level</th>
+              <th>TOPSIS</th>
+              <th>Late Rate</th>
+              <th>Total Sales</th>
+            </tr>
+          </thead>
+          <tbody id="products-tbody" data-product-table>
+            <tr class="empty-row">
+              <td colspan="7">Select a category to view product candidates</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="neo-card detail-panel" data-product-detail>
+      <p class="label-caps">Selected Product Detail</p>
+      <p class="body-serif">
+        Detail kandidat akan muncul setelah produk dipilih. Area ini disiapkan untuk data supplier,
+        skor rekomendasi, tingkat risiko, penjualan, dan performa keterlambatan.
+      </p>
+    </section>
+    <a class="neo-btn floating-action" id="btn-next" href="./Product-Profiling.html">
+      Product profiling
+    </a>
+  </main>
+
+  <script type="module" src="../js/pages/suplier_selectionPage.js"></script>
+  <script src="../js/navbar.js"></script>
+</body>
+</html>

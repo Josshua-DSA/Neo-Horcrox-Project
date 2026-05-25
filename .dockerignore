@@ -2,13 +2,6 @@
 .git
 .gitignore
 
-# Data & notebooks (not needed in API container)
-dataset/
-notebook/
-reports/
-frontend/
-database/
-
 # Python
 __pycache__
 *.pyc
@@ -18,6 +11,7 @@ __pycache__
 dist
 build
 *.egg
+.pytest_cache
 
 # Environment
 .env
@@ -39,6 +33,16 @@ Thumbs.db
 docker-compose.yaml
 Dockerfile
 .dockerignore
+
+# App and Model specific ignores for Docker build
+app/frontend/node_modules
+app/frontend/dist
+model/dataset
+model/artifacts/mlflow
+model/artifacts/logs
+model/notebooks
+zfitur-old
+Project-TA.txt
 
 # Misc
 *.md

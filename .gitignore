@@ -1,29 +1,161 @@
-# Python cache
+# =========================
+# Python
+# =========================
 __pycache__/
 *.py[cod]
-.ipynb_checkpoints/
+*$py.class
+*.pyo
+*.pyd
 
-# Environment
+# Virtual environments
 .venv/
 venv/
 env/
-.conda/
-*.env
+ENV/
+.python-version
 
-# Logs
-logs/
-*.log
+# Python build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+pip-wheel-metadata/
 
-# MLflow local tracking
+# Test / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.cache/
+
+# =========================
+# Jupyter Notebook
+# =========================
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# =========================
+# Environment / Secrets
+# =========================
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+secrets/
+credentials/
+config.local.*
+
+# =========================
+# Dataset
+# =========================
+model/dataset/processed/*
+model/dataset/engineered/*
+
+!model/dataset/processed/.gitkeep
+!model/dataset/engineered/.gitkeep
+
+# =========================
+# Model Artifacts / MLflow
+# =========================
+model/artifacts/mlflow/*
+model/artifacts/logs/*
+!model/artifacts/mlflow/.gitkeep
+!model/artifacts/logs/.gitkeep
+
 mlruns/
 mlartifacts/
+catboost_info/
+*.joblib
+*.sav
+*.ubj
+*.onnx
+*.h5
+*.pt
+*.pth
 
-# Model artifacts
-artifacts/model/*.pkl
-artifacts/model/*.joblib
-artifacts/preprocessing/*.pkl
-artifacts/preprocessing/*.joblib
+# =========================
+# Reports / Generated Output
+# =========================
+model/reports/*.html
+model/reports/*.pdf
+model/reports/*.png
+model/reports/*.jpg
+model/reports/*.jpeg
+model/reports/*.svg
 
-# dataset
-notebook/dataset_engineered/data_engineered.csv
-notebooks/dataset_engineered/*.parquet
+# =========================
+# Logs
+# =========================
+*.log
+logs/
+*.out
+*.err
+
+# =========================
+# Database Runtime Files
+# =========================
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+
+# Keep SQL source files
+!app/database/*.sql
+!app/database/*.pgerd
+
+# =========================
+# Frontend
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+dist/
+build/
+.next/
+.nuxt/
+.vite/
+
+# =========================
+# OS / Editor
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+.idea/
+*.swp
+*.swo
+
+# =========================
+# Temporary Files
+# =========================
+tmp/
+temp/
+*.tmp
+*.bak
+*.old
+*.orig
+
+# =========================
+# Project-Specific Old Folders
+# =========================
+notebook/
+dataset_engineered/
+supplier_selection_outputs/
+mlflow_artifacts/
+Project-TA.txt
+zfitur-old/
