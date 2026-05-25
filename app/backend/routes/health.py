@@ -5,7 +5,7 @@ from __future__ import annotations
 from fastapi import APIRouter
 
 from ..config import settings
-from ..core.database import mongodb
+from ..core.database import database
 from ..core.model_registry import model_registry
 
 router = APIRouter(tags=["Health"])
@@ -18,5 +18,5 @@ def health() -> dict:
         "service": settings.APP_NAME,
         "version": settings.APP_VERSION,
         "models": model_registry.status(),
-        "mongodb": mongodb.status(),
+        "database": "connected" if database.engine is not None else "disconnected",
     }
