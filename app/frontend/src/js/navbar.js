@@ -22,4 +22,22 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
   });
+
+  // ── SCROLL REVEAL OBSERVER ──
+  const revealCallback = (entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+      }
+    });
+  };
+
+  const revealObserver = new IntersectionObserver(revealCallback, {
+    root: null,
+    threshold: 0.1,
+    rootMargin: "0px 0px -50px 0px"
+  });
+
+  const revealElements = document.querySelectorAll(".scroll-reveal");
+  revealElements.forEach(el => revealObserver.observe(el));
 });
