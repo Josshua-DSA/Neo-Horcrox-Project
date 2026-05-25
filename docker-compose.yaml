@@ -33,7 +33,7 @@ services:
       DEBUG: "false"
       LOG_LEVEL: INFO
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/neo_horcrox
-      ALLOWED_ORIGINS: "*"
+      ALLOWED_ORIGINS: '["*"]'
     volumes:
       - ./model/artifacts:/project/model/artifacts:ro
       - ./model/dataset:/project/model/dataset:ro
