@@ -5,10 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Supply Chain Analysis</title>
 
-  <link rel="stylesheet" href="./src/css/shared.css">
-  <link rel="stylesheet" href="./src/css/landing.css">
+  <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="../css/landing.css">
 </head>
 <body>
+
+  <!-- NAVBAR  -->
+  <div class="navbar-wrap">
+    <nav class="navbar">
+      <!-- Tombol garis 3 -->
+      <button class="menu-btn" id="menuBtn">
+        <img class="menu-icon" src="../artifact/navbar.png" alt="Menu">
+      </button>
+
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <a href="index.html">Home</a>
+      <a href="Dashboard.html">
+        Dashboard
+      </a>
+      <a href="SupplierSelection.html">
+        Supplier Selection
+      </a>
+    </aside>
+  </div>
+
   <main class="landing-page">
     <section class="landing-hero">
       <p class="label-caps">Supply Chain Intelligence</p>
@@ -21,8 +44,8 @@
       </p>
     </section>
 
-    <div class="divider-ornate"><span class="ornament">***</span></div>
-
+    <div class="divider-ornate"><span class="ornament">✦ ✦ ✦</span></div>
+    
     <section class="landing-section">
       <div class="section-heading">
         <p class="label-caps">Project Summary</p>
@@ -74,7 +97,7 @@
         <h2 class="section-title">Analysis Focus</h2>
       </div>
 
-      <div class="neo-card narrative-card">
+      <div class="narrative-card">
         <p>
           Tim berfokus membangun pengalaman analitik yang mudah dibaca oleh pengguna bisnis:
           mulai dari ringkasan performa, penyaringan data, pemilihan kandidat produk dan supplier,
@@ -87,11 +110,15 @@
         </p>
       </div>
     </section>
+
+    <a class="neo-btn floating-action" href="Dashboard.html">
+    Start 
+    </a>
+
   </main>
 
-  <a class="neo-btn floating-action" href="./src/pages/Dashboard.html">
-    Try your experience
-  </a>
+
+  <script src="../js/navbar.js"></script>
 
 </body>
 </html>

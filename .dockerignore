@@ -1,18 +1,45 @@
+# Git
 .git
+.gitignore
+
+# Data & notebooks (not needed in API container)
+dataset/
+notebook/
+reports/
+frontend/
+database/
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+.eggs
+dist
+build
+*.egg
+
+# Environment
+.env
 .venv
 venv
 env
-__pycache__
-*.pyc
-.pytest_cache
 
-app/frontend/node_modules
-app/frontend/dist
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
 
-model/dataset
-model/artifacts/mlflow
-model/artifacts/logs
-model/notebooks
-zfitur-old
+# OS
+.DS_Store
+Thumbs.db
 
-Project-TA.txt
+# Docker
+docker-compose.yaml
+Dockerfile
+.dockerignore
+
+# Misc
+*.md
+*.log

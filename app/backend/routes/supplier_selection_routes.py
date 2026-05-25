@@ -1,77 +1,42 @@
-"""Read-only supplier selection ranking routes."""
-
-
-from __future__ import annotations
-
 from fastapi import APIRouter, HTTPException, Query, status
+from typing import Optional
+from backend.schemas.forecast_supplier import SupplierInput, SupplierResponse
+from backend.services.supplier_service import recommend_supplier
+from backend.core.model_registry import model_registry
 
-from ..services.supplier_selection_service import supplier_selection_service
+router = APIRouter()
 
-router = APIRouter(prefix="/supplier-selection", tags=["Supplier Selection"])
-
-
-
-@router.get("/health", summary="Supplier selection artifact health")
-def health() -> dict:
-    return supplier_selection_service.health()
-
-
-
-@router.get("/categories", summary="Supplier selection categories")
-def categories() -> dict:
-    items = [item.model_dump() for item in supplier_selection_service.categories()]
-    return {"total": len(items), "data": items}
-
-
-@router.get("/columns", summary="Supplier selection CSV columns")
-def columns() -> dict:
-    return supplier_selection_service.columns()
-
-
-@router.get("/categories/{category_id}/products", summary="Ranked products/suppliers by category")
-def products_by_category(
-    category_id: str,
-    limit: int = Query(20, ge=1, le=100),
-    include_rejected: bool = Query(False),
-) -> dict:
+@router.post("/recommend", response_model=SupplierResponse, summary="Rekomendasi supplier terbaik")
+def get_supplier_recommendation(payload: SupplierInput):
+    if model_registry.supplier_model is None:
+        raise HTTPException(status_code=503, detail="Supplier model belum di-load.")
     try:
-        items = supplier_selection_service.products_by_category(
-            category_id=category_id,
-            limit=limit,
-            include_rejected=include_rejected,
-        )
-    except LookupError as exc:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
-    data = [item.model_dump() for item in items]
-    return {"total": len(data), "data": data}
+        return recommend_supplier(payload)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/leaderboard")
+def supplier_leaderboard(
+    market: Optional[str] = Query(None),
+    shipping_mode: Optional[str] = Query(None),
+    top_n: int = Query(20, ge=1, le=100),
+):
+    lookup = model_registry.supplier_lookup
+    if lookup is None:
+        raise HTTPException(status_code=503, detail="Supplier model belum di-load.")
+    results = lookup
+    if market:
+        results = [r for r in results if r.get("Market") == market]
+    if shipping_mode:
+        results = [r for r in results if r.get("Shipping Mode") == shipping_mode]
+    results = sorted(results, key=lambda r: r.get("supplier_score", 0), reverse=True)[:top_n]
+    return {"total": len(results), "data": results}
 
-@router.get("/categories/{category_id}/preview", summary="Raw supplier selection preview by category")
-def preview_by_category(
-    category_id: str,
-    limit: int = Query(5, ge=1, le=50),
-) -> dict:
-    try:
-        return supplier_selection_service.preview_by_category(category_id, limit=limit)
-    except LookupError as exc:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
-
-
-@router.get("/products/{candidate_id}", summary="Supplier/product candidate detail")
-def product_profile(candidate_id: str) -> dict:
-    try:
-        return supplier_selection_service.product_profile(candidate_id)
-    except LookupError as exc:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
-
-
-@router.get("/summary", summary="Supplier selection summary")
-def summary() -> dict:
-    return supplier_selection_service.summary()
-
-
-@router.get("/weights", summary="Supplier selection AHP weights")
-def weights() -> dict:
-    data = supplier_selection_service.weights()
-    return {"total": len(data), "data": data}
-
+@router.get("/metadata")
+def supplier_metadata():
+    meta = model_registry.supplier_metadata
+    if meta is None:
+        raise HTTPException(status_code=503, detail="Supplier model belum di-load.")
+    return meta

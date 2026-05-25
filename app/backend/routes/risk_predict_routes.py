@@ -1,86 +1,81 @@
-"""FastAPI routes for the business risk feature."""
+"""
+routers/risk.py
+---------------
+POST /api/v1/risk/predict          → single prediction (+ log ke PostgreSQL)
+POST /api/v1/risk/predict/batch    → batch prediction
+GET  /api/v1/risk/logs             → lihat history prediksi dari DB
+"""
 
-from __future__ import annotations
+from fastapi import APIRouter, HTTPException, Depends, Query, status
+from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Optional
 
-from typing import Any
+from backend.schemas.risk import RiskInput, RiskResponse, BatchRiskInput, BatchRiskResponse
+from backend.services.prediction import predict_single, predict_batch
+from backend.services.order_service import log_prediction, get_prediction_logs
+from backend.core.database import get_db
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from motor.motor_asyncio import AsyncIOMotorDatabase
-
-from ..core.database import get_db
-from ..schemas.db_models import PredictionLogDocument
-from ..schemas.risk_predict_schema import RiskModelInfo, RiskPredictionResponse, normalize_records
-from ..services.order_service import order_service
-from ..services.risk_predict_service import risk_prediction_service
-
-router = APIRouter(prefix="/risk", tags=["Risk"])
-
-
-@router.get("/model", response_model=RiskModelInfo, summary="Production risk model metadata")
-def model_info() -> RiskModelInfo:
-    return risk_prediction_service.get_model_info()
+router = APIRouter()
 
 
-@router.post("/predict", response_model=RiskPredictionResponse, summary="Predict late delivery risk")
+@router.post(
+    "/predict",
+    response_model=RiskResponse,
+    summary="Predict late delivery risk (hasil di-log ke PostgreSQL)",
+)
 async def predict_risk(
-    payload: dict[str, Any],
-    db: AsyncIOMotorDatabase | None = Depends(get_db),
-) -> RiskPredictionResponse:
+    order: RiskInput,
+    db: AsyncSession = Depends(get_db),
+):
     try:
-        result = risk_prediction_service.predict(payload)
-    except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
-    except RuntimeError as exc:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
-    except Exception as exc:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)) from exc
+        result = predict_single(order)
+    except RuntimeError as e:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    if db is not None:
-        await _log_predictions(db, payload, result)
+    # Log ke PostgreSQL
+    log_data = {
+        "order_id": order.dict(by_alias=True).get("Order Id"),
+        "prediction": result.prediction,
+        "probability_late": result.probability_late,
+        "probability_on_time": result.probability_on_time,
+        "label": result.label,
+        "model_version": result.model_version,
+        "input_snapshot": order.dict(by_alias=True),
+    }
+    await log_prediction(db, log_data)
+
     return result
 
 
-@router.get("/logs", summary="Prediction logs from MongoDB")
+@router.post(
+    "/predict/batch",
+    response_model=BatchRiskResponse,
+    summary="Batch prediction (tanpa log individual)",
+)
+async def predict_risk_batch(payload: BatchRiskInput):
+    if not payload.orders:
+        raise HTTPException(status_code=400, detail="orders list kosong")
+    if len(payload.orders) > 1000:
+        raise HTTPException(status_code=400, detail="Max batch size 1000")
+    try:
+        return predict_batch(payload.orders)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get(
+    "/logs",
+    summary="Lihat history log prediksi dari PostgreSQL",
+)
 async def prediction_logs(
-    skip: int = 0,
-    limit: int = 50,
-    prediction: int | None = None,
-    db: AsyncIOMotorDatabase | None = Depends(get_db),
-) -> dict[str, Any]:
-    if db is None:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="MongoDB is not connected.")
-    logs = await order_service.get_prediction_logs(db, skip=skip, limit=limit, prediction=prediction)
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    prediction: Optional[int] = Query(None, ge=0, le=1, description="0=on-time, 1=late"),
+    db: AsyncSession = Depends(get_db),
+):
+    logs = await get_prediction_logs(db, skip=skip, limit=limit, prediction=prediction)
     return {"total": len(logs), "data": logs}
-
-
-async def _log_predictions(
-    db: AsyncIOMotorDatabase,
-    payload: dict[str, Any],
-    result: RiskPredictionResponse,
-) -> None:
-    records = normalize_records(payload)
-    for item in result.predictions:
-        snapshot = records[item.index] if item.index < len(records) else {}
-        doc = PredictionLogDocument(
-            order_id=_extract_order_id(snapshot),
-            prediction=item.late_delivery_risk,
-            probability_late=item.late_probability,
-            probability_on_time=item.on_time_probability,
-            label=item.risk_label,
-            model_version=str(result.model_version or "unknown"),
-            input_snapshot=snapshot,
-        )
-        await order_service.log_prediction(db, doc)
-
-
-def _extract_order_id(snapshot: dict[str, Any]) -> int | None:
-    for key in ("Order Id", "order_id", "orderId"):
-        value = snapshot.get(key)
-        if value in (None, ""):
-            continue
-        try:
-            return int(value)
-        except (TypeError, ValueError):
-            return None
-    return None
-

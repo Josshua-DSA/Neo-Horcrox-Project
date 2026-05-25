@@ -223,11 +223,11 @@
 }
 
 .floating-action {
-  position: fixed;
-  right: 2rem;
-  bottom: 2rem;
-  z-index: 20;
+  width: 200px;
   text-decoration: none;
+  display: flex;
+  justify-content:center;
+  margin: 20px 0 auto auto;
 }
 
 .floating-action.is-disabled {

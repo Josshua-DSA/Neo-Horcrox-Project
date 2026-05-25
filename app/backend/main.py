@@ -1,84 +1,45 @@
-"""FastAPI backend application entry point."""
-
-from __future__ import annotations
-
-import logging
-from contextlib import asynccontextmanager
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 
-from .config import settings
-from .core.database import mongodb
-from .core.model_registry import model_registry
-from .routes import dashboard_routes, forecast_routes, health, orders, risk_predict_routes, supplier_selection_routes
+from backend.routers import risk, forecast, supplier, health, orders
+from backend.core.config import settings
+from backend.core.database import database
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logging.basicConfig(level=settings.LOG_LEVEL)
+    # Startup
+    await database.connect()
+    from backend.core.model_registry import model_registry
     model_registry.load_all()
-    await mongodb.connect()
     yield
-    await mongodb.disconnect()
+    # Shutdown
+    await database.disconnect()
     model_registry.clear()
 
 
-def create_app() -> FastAPI:
-    app = FastAPI(
-        title=settings.APP_NAME,
-        version=settings.APP_VERSION,
-        description=(
-            "Supply Chain Analytics API for late delivery risk, demand forecasting, "
-            "supplier selection ranking, dashboard metrics, and MongoDB-backed orders."
-        ),
-        lifespan=lifespan,
-    )
+app = FastAPI(
+    title="Neo-Horcrox Supply Chain API",
+    description=(
+        "Backend API for Supply Chain Analytics — "
+        "Late Delivery Risk prediction, Demand Forecasting, dan Supplier Selection. "
+        "Database: PostgreSQL."
+    ),
+    version="0.1.0",
+    lifespan=lifespan,
+)
 
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.ALLOWED_ORIGINS,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-    _include_routes(app, settings.API_PREFIX, include_in_schema=True)
-    _include_routes(app, settings.API_V1_PREFIX, include_in_schema=False)
-
-    @app.get("/", include_in_schema=False)
-    def index() -> dict:
-        return {
-            "service": settings.APP_NAME,
-            "status": "ok",
-            "docs": "/docs",
-            "health": f"{settings.API_PREFIX}/health",
-        }
-
-
-    return app
-
-
-def _include_routes(app: FastAPI, prefix: str, include_in_schema: bool) -> None:
-    app.include_router(health.router, prefix=prefix, include_in_schema=include_in_schema)
-    app.include_router(risk_predict_routes.router, prefix=prefix, include_in_schema=include_in_schema)
-    app.include_router(forecast_routes.router, prefix=prefix, include_in_schema=include_in_schema)
-    app.include_router(supplier_selection_routes.router, prefix=prefix, include_in_schema=include_in_schema)
-    app.include_router(dashboard_routes.router, prefix=prefix, include_in_schema=include_in_schema)
-    app.include_router(orders.router, prefix=prefix, include_in_schema=include_in_schema)
-
-
-app = create_app()
-
-
-if __name__ == "__main__":
-
-    import uvicorn
-
-    uvicorn.run(
-        "app.backend.main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=settings.DEBUG,
-    )
-
+app.include_router(health.router,   prefix="/api/v1",           tags=["Health"])
+app.include_router(orders.router,   prefix="/api/v1/orders",    tags=["Orders"])
+app.include_router(risk.router,     prefix="/api/v1/risk",      tags=["Late Delivery Risk"])
+app.include_router(forecast.router, prefix="/api/v1/forecast",  tags=["Demand Forecast"])
+app.include_router(supplier.router, prefix="/api/v1/supplier",  tags=["Supplier Selection"])
