@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional, List
 
 
@@ -20,6 +20,8 @@ class ForecastPoint(BaseModel):
 
 
 class ForecastResponse(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+
     category_name: str
     market: str
     periods: int

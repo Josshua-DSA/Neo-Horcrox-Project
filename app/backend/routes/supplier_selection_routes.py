@@ -1,42 +1,61 @@
-from fastapi import APIRouter, HTTPException, Query, status
-from typing import Optional
-from backend.schemas.forecast_supplier import SupplierInput, SupplierResponse
-from backend.services.supplier_service import recommend_supplier
-from backend.core.model_registry import model_registry
+"""Supplier selection read-only routes."""
+
+from __future__ import annotations
+
+from fastapi import APIRouter, HTTPException, Query
+
+from backend.schemas.supplier_selection_schema import (
+    SupplierCandidateDetail,
+    SupplierHealth,
+)
+from backend.services.supplier_selection_service import supplier_selection_service
 
 router = APIRouter()
 
-@router.post("/recommend", response_model=SupplierResponse, summary="Rekomendasi supplier terbaik")
-def get_supplier_recommendation(payload: SupplierInput):
-    if model_registry.supplier_model is None:
-        raise HTTPException(status_code=503, detail="Supplier model belum di-load.")
-    try:
-        return recommend_supplier(payload)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/leaderboard")
-def supplier_leaderboard(
-    market: Optional[str] = Query(None),
-    shipping_mode: Optional[str] = Query(None),
-    top_n: int = Query(20, ge=1, le=100),
+@router.get("/health", response_model=SupplierHealth, summary="Supplier selection data health")
+def health():
+    return supplier_selection_service.health()
+
+
+@router.get("/categories", summary="List product categories")
+def categories():
+    data = supplier_selection_service.categories()
+    return {"total": len(data), "data": data}
+
+
+@router.get("/categories/{category_id}/products", summary="List ranked products by category")
+def products(
+    category_id: str,
+    limit: int = Query(25, ge=1, le=100),
+    include_rejected: bool = Query(True),
 ):
-    lookup = model_registry.supplier_lookup
-    if lookup is None:
-        raise HTTPException(status_code=503, detail="Supplier model belum di-load.")
-    results = lookup
-    if market:
-        results = [r for r in results if r.get("Market") == market]
-    if shipping_mode:
-        results = [r for r in results if r.get("Shipping Mode") == shipping_mode]
-    results = sorted(results, key=lambda r: r.get("supplier_score", 0), reverse=True)[:top_n]
-    return {"total": len(results), "data": results}
+    data = supplier_selection_service.products(
+        category_id=category_id,
+        limit=limit,
+        include_rejected=include_rejected,
+    )
+    return {"total": len(data), "data": data}
 
-@router.get("/metadata")
-def supplier_metadata():
-    meta = model_registry.supplier_metadata
-    if meta is None:
-        raise HTTPException(status_code=503, detail="Supplier model belum di-load.")
-    return meta
+
+@router.get(
+    "/products/{candidate_id}",
+    response_model=SupplierCandidateDetail,
+    summary="Product candidate detail with forecast and risk inputs",
+)
+def product_detail(candidate_id: str):
+    detail = supplier_selection_service.product_detail(candidate_id)
+    if detail is None:
+        raise HTTPException(status_code=404, detail=f"Candidate {candidate_id} tidak ditemukan")
+    return detail
+
+
+@router.get("/summary", summary="Supplier selection summary")
+def summary():
+    return supplier_selection_service.summary()
+
+
+@router.get("/weights", summary="Supplier selection AHP weights")
+def weights():
+    data = supplier_selection_service.weights()
+    return {"total": len(data), "data": data}

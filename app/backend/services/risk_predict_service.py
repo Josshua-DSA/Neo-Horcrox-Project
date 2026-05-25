@@ -1,65 +1,91 @@
-"""
-services/risk_predict_service.py
--------------------------------
-Wraps risk prediction logic.
-Keeps routers thin — all ML logic lives here.
-"""
+"""Late shipment risk prediction service."""
 
-import pandas as pd
+from __future__ import annotations
+
+from typing import Any
+
 import numpy as np
-import logging
+import pandas as pd
 
 from backend.core.model_registry import model_registry
-from backend.services.preprocessing import preprocess_for_risk
-from backend.schemas.risk_predict_schema import RiskInput, RiskResponse, BatchRiskResponse
+from backend.schemas.risk_predict_schema import (
+    RiskModelInfo,
+    RiskPredictionItem,
+    RiskPredictionResponse,
+)
+from model.src.features.build_features import build_late_shipment_features
 
-logger = logging.getLogger(__name__)
 
 MODEL_NOT_READY_MSG = (
-    "Risk model artifact not loaded. "
-    "Please train the model in the notebook and export artifacts first."
+    "Risk model artifact is not loaded. "
+    "Make sure model/artifacts/models/champion_model is available."
 )
 
 
-def _input_to_df(order: RiskInput) -> pd.DataFrame:
-    """Convert a single RiskInput to a one-row DataFrame using original column names."""
-    data = order.dict(by_alias=True)
-    return pd.DataFrame([data])
+def get_model_info() -> RiskModelInfo:
+    metadata = model_registry.champion_metadata or {}
+    return RiskModelInfo(
+        model_loaded=model_registry.champion_model is not None,
+        metadata_loaded=bool(metadata),
+        target=metadata.get("target", "Late_delivery_risk"),
+        threshold=float(metadata.get("threshold", 0.5)),
+        features=list(metadata.get("features", [])),
+        metadata=metadata,
+    )
 
 
-def predict_single(order: RiskInput) -> RiskResponse:
-    model  = model_registry.risk_model
-    scaler = model_registry.risk_scaler
-    freq_maps = model_registry.risk_freq_maps
-    features  = model_registry.risk_features
-
+def predict_records(records: list[dict[str, Any]]) -> RiskPredictionResponse:
+    model = model_registry.champion_model
+    metadata = model_registry.champion_metadata or {}
     if model is None:
         raise RuntimeError(MODEL_NOT_READY_MSG)
 
-    df = _input_to_df(order)
-    X  = preprocess_for_risk(df, scaler, freq_maps or {}, features or list(df.columns))
+    features = list(metadata.get("features", []))
+    if not features:
+        raise RuntimeError("Risk model metadata does not define feature order.")
 
-    pred = int(model.predict(X)[0])
-    proba = model.predict_proba(X)[0]  # [p_on_time, p_late]
+    feature_rows = build_late_shipment_features(records, features)
+    frame = pd.DataFrame(feature_rows, columns=features)
+    threshold = float(metadata.get("threshold", 0.5))
 
-    p_late    = float(proba[1])
-    p_on_time = float(proba[0])
+    probabilities = _late_probabilities(model, frame)
+    predictions: list[RiskPredictionItem] = []
 
-    return RiskResponse(
-        prediction=pred,
-        probability_late=round(p_late, 4),
-        probability_on_time=round(p_on_time, 4),
-        label="Late Delivery Risk" if pred == 1 else "On Time",
+    for index, probability_late in enumerate(probabilities):
+        late_probability = float(probability_late)
+        on_time_probability = float(1.0 - late_probability)
+        late_delivery_risk = int(late_probability >= threshold)
+        risk_label = "yes" if late_delivery_risk else "no"
+
+        predictions.append(
+            RiskPredictionItem(
+                index=index,
+                late_delivery_risk=late_delivery_risk,
+                risk_label=risk_label,
+                delivery_label="Late Delivery Risk" if late_delivery_risk else "On Time",
+                late_probability=round(late_probability, 6),
+                on_time_probability=round(on_time_probability, 6),
+                risk_probability=round(late_probability, 6),
+                risk_percentage=round(late_probability * 100, 2),
+                threshold=threshold,
+            )
+        )
+
+    return RiskPredictionResponse(
+        count=len(predictions),
+        target=metadata.get("target", "Late_delivery_risk"),
+        model_name=metadata.get("model_name"),
+        model_version=metadata.get("version"),
+        predictions=predictions,
     )
 
 
-def predict_batch(orders: list[RiskInput]) -> BatchRiskResponse:
-    results = [predict_single(o) for o in orders]
-    late_count    = sum(1 for r in results if r.prediction == 1)
-    on_time_count = len(results) - late_count
-    return BatchRiskResponse(
-        results=results,
-        total=len(results),
-        late_count=late_count,
-        on_time_count=on_time_count,
-    )
+def _late_probabilities(model: Any, frame: pd.DataFrame) -> np.ndarray:
+    if hasattr(model, "predict_proba"):
+        probabilities = np.asarray(model.predict_proba(frame))
+        if probabilities.ndim == 2 and probabilities.shape[1] > 1:
+            return probabilities[:, 1]
+        return probabilities.reshape(-1)
+
+    predictions = np.asarray(model.predict(frame)).reshape(-1)
+    return predictions.astype(float)

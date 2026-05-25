@@ -20,6 +20,8 @@ class RiskPredictionItem(BaseModel):
 
 
 class RiskPredictionResponse(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+
     count: int
     target: str = "Late_delivery_risk"
     model_name: str | None = None
@@ -28,6 +30,8 @@ class RiskPredictionResponse(BaseModel):
 
 
 class RiskModelInfo(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+
     model_loaded: bool
     metadata_loaded: bool
     target: str = "Late_delivery_risk"

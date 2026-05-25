@@ -2,7 +2,7 @@
 schemas/db_models.py
 ---------------------
 SQLAlchemy ORM models untuk PostgreSQL.
-Menggantikan Pydantic-only models yang sebelumnya dipakai untuk MongoDB.
+Menggantikan model dokumen dari versi database sebelumnya.
 """
 
 from sqlalchemy import (

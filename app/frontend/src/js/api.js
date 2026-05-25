@@ -1,6 +1,6 @@
 const viteEnv = import.meta.env || {};
 
-export const apiBaseUrl = viteEnv.VITE_API_BASE_URL || "http://localhost:8000/api";
+export const apiBaseUrl = viteEnv.VITE_API_BASE_URL || "http://localhost:8017/api/v1";
 
 export const numberFormatter = new Intl.NumberFormat("id-ID", {
   maximumFractionDigits: 2,

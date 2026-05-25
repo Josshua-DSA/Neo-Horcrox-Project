@@ -11,15 +11,28 @@ init();
 async function init() {
   if (!summaryTarget || !riskTarget || !salesTarget || !shippingTarget) return;
   try {
-    const [filters, summary, risk, sales, shipping] = await Promise.all([
-      apiGet("/dashboard/filters"),
-      apiGet("/dashboard/summary"),
-      apiGet("/dashboard/risk-by-market"),
-      apiGet("/dashboard/sales-by-category"),
-      apiGet("/dashboard/shipping-performance"),
+    const filters = await apiGet("/dashboard/filters");
+    ensureRiskLevelFilter();
+    applyDateRange(filters.date_range || {});
+    renderFilters(filters);
+    bindFilters();
+    await loadDashboard();
+  } catch (error) {
+    setStatus(error.message);
+  }
+}
+
+async function loadDashboard() {
+  try {
+    setStatus("Loading dashboard data...");
+    const query = buildDashboardQuery();
+    const [summary, risk, sales, shipping] = await Promise.all([
+      apiGet(withQuery("/dashboard/summary", query)),
+      apiGet(withQuery("/dashboard/risk-by-market", query)),
+      apiGet(withQuery("/dashboard/sales-by-category", query)),
+      apiGet(withQuery("/dashboard/shipping-performance", query)),
     ]);
 
-    renderFilters(filters);
     renderSummary(summary);
     riskTarget.innerHTML = renderRows(risk.data || [], ["market", "total_orders", "late_orders", "late_rate"]);
     salesTarget.innerHTML = renderRows(sales.data || [], ["category_name", "total_sales", "order_count"]);
@@ -28,6 +41,67 @@ async function init() {
   } catch (error) {
     setStatus(error.message);
   }
+}
+
+function ensureRiskLevelFilter() {
+  const form = document.querySelector("#dashboard-filters");
+  if (!form || form.querySelector("[data-filter='risk_levels']")) return;
+  form.insertAdjacentHTML("beforeend", `
+    <label class="filter-field">
+      <span>Risk Level</span>
+      <select data-filter="risk_levels"><option>All Risk Level</option></select>
+    </label>
+  `);
+}
+
+function applyDateRange(range) {
+  const inputs = document.querySelectorAll("#dashboard-filters input[type='date']");
+  if (inputs[0] && range.start) {
+    inputs[0].min = range.start;
+    inputs[0].value = range.start;
+  }
+  if (inputs[1] && range.end) {
+    inputs[1].max = range.end;
+    inputs[1].value = range.end;
+  }
+}
+
+function bindFilters() {
+  const form = document.querySelector("#dashboard-filters");
+  if (!form) return;
+  form.querySelectorAll("select, input[type='date']").forEach((field) => {
+    field.addEventListener("change", loadDashboard);
+  });
+}
+
+function buildDashboardQuery() {
+  const params = new URLSearchParams();
+  const selectMap = {
+    markets: "market",
+    order_regions: "order_region",
+    order_countries: "order_country",
+    shipping_modes: "shipping_mode",
+    categories: "category",
+    departments: "department",
+    segments: "segment",
+    statuses: "status",
+    risk_levels: "risk_level",
+  };
+
+  document.querySelectorAll("[data-filter]").forEach((select) => {
+    const param = selectMap[select.dataset.filter];
+    if (param && select.value) params.set(param, select.value);
+  });
+
+  const dates = document.querySelectorAll("#dashboard-filters input[type='date']");
+  if (dates[0]?.value) params.set("start_date", dates[0].value);
+  if (dates[1]?.value) params.set("end_date", dates[1].value);
+
+  return params.toString();
+}
+
+function withQuery(path, query) {
+  return query ? `${path}?${query}` : path;
 }
 
 function renderSummary(summary) {

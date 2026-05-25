@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from typing import List
 
 from backend.core.model_registry import model_registry
-from backend.schemas.forecast_supplier import ForecastInput, ForecastResponse, ForecastPoint
+from backend.schemas.forecast_schema import ForecastInput, ForecastResponse, ForecastPoint
 
 logger = logging.getLogger(__name__)
 

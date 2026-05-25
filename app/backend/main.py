@@ -1,45 +1,62 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
-from backend.routers import risk, forecast, supplier, health, orders
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from backend.core.config import settings
 from backend.core.database import database
+from backend.routes import (
+    dashboard_routes,
+    forecast_routes,
+    health,
+    orders,
+    risk_predict_routes,
+    supplier_selection_routes,
+)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
     await database.connect()
     from backend.core.model_registry import model_registry
+
     model_registry.load_all()
     yield
-    # Shutdown
     await database.disconnect()
     model_registry.clear()
 
 
 app = FastAPI(
-    title="Neo-Horcrox Supply Chain API",
+    title=settings.APP_NAME,
     description=(
-        "Backend API for Supply Chain Analytics — "
-        "Late Delivery Risk prediction, Demand Forecasting, dan Supplier Selection. "
-        "Database: PostgreSQL."
+        "Backend API for Supply Chain Analytics: Late Delivery Risk, "
+        "Demand Forecasting, Supplier Selection, and PostgreSQL dashboard data."
     ),
-    version="0.1.0",
+    version=settings.APP_VERSION,
     lifespan=lifespan,
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origins=settings.allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.include_router(health.router,   prefix="/api/v1",           tags=["Health"])
-app.include_router(orders.router,   prefix="/api/v1/orders",    tags=["Orders"])
-app.include_router(risk.router,     prefix="/api/v1/risk",      tags=["Late Delivery Risk"])
-app.include_router(forecast.router, prefix="/api/v1/forecast",  tags=["Demand Forecast"])
-app.include_router(supplier.router, prefix="/api/v1/supplier",  tags=["Supplier Selection"])
+
+def include_api(prefix: str) -> None:
+    app.include_router(health.router, prefix=prefix, tags=["Health"])
+    app.include_router(orders.router, prefix=f"{prefix}/orders", tags=["Orders"])
+    app.include_router(risk_predict_routes.router, prefix=f"{prefix}/risk", tags=["Late Delivery Risk"])
+    app.include_router(forecast_routes.router, prefix=f"{prefix}/forecast", tags=["Demand Forecast"])
+    app.include_router(
+        supplier_selection_routes.router,
+        prefix=f"{prefix}/supplier-selection",
+        tags=["Supplier Selection"],
+    )
+    app.include_router(dashboard_routes.router, prefix=f"{prefix}/dashboard", tags=["Dashboard"])
+
+
+include_api(settings.API_V1_PREFIX)
+include_api(settings.API_PREFIX)

@@ -38,6 +38,9 @@ class SupplierCandidate(BaseModel):
 class SupplierCandidateDetail(BaseModel):
     candidate: dict[str, Any]
     related_candidates: list[SupplierCandidate] = Field(default_factory=list)
+    dataset_profile: dict[str, Any] = Field(default_factory=dict)
+    forecast_input: dict[str, Any] = Field(default_factory=dict)
+    risk_input: dict[str, Any] = Field(default_factory=dict)
 
 
 class SupplierHealth(BaseModel):

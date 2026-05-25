@@ -1,112 +1,849 @@
-# Supply Chain Analytics
+# Neo Horcrox Supply Chain Analytics
 
-Project TA untuk analitik supply chain:
+Neo Horcrox adalah aplikasi analitik supply chain berbasis web yang membantu stakeholder melihat kondisi operasional, memilih produk/supplier terbaik, memprediksi risiko keterlambatan pengiriman, dan menjalankan demand forecast berdasarkan produk yang dipilih.
 
-1. Late delivery risk prediction
-2. Demand forecasting
-3. Supplier selection ranking
-4. Dashboard analytics
+Project ini disusun sebagai sistem end-to-end:
 
-## Struktur Project
+- Frontend interaktif untuk stakeholder dan user bisnis.
+- Backend FastAPI untuk API, business logic, dan model serving.
+- PostgreSQL untuk database transaksional dan logging.
+- CSV/JSON/model artifact untuk dashboard fallback, supplier ranking, risk model, dan forecast model.
+- Docker Compose agar aplikasi dapat dijalankan secara konsisten di environment lokal.
+
+## Executive Summary
+
+Supply chain memiliki banyak titik keputusan: produk mana yang performanya terbaik, supplier mana yang paling aman, market mana yang memiliki risiko pengiriman tinggi, serta bagaimana proyeksi demand produk ke depan. Neo Horcrox menggabungkan dashboard analytics, supplier selection ranking, risk prediction, dan forecasting dalam satu alur pengguna yang sederhana.
+
+Alur utama aplikasi:
+
+1. Stakeholder membuka landing page.
+2. User masuk ke dashboard dan membaca executive summary.
+3. User memilih produk melalui Supplier Selection.
+4. Sistem menampilkan kandidat produk/supplier terbaik berdasarkan ranking CSV/JSON.
+5. User memilih produk.
+6. Product Profiling otomatis menampilkan tren, menjalankan forecast demand, dan dapat memanggil prediksi risiko keterlambatan.
+
+## Business Objective
+
+Tujuan bisnis project ini adalah menjadi decision support system untuk supply chain analytics.
+
+Fokus keputusan yang dibantu:
+
+- Mengetahui total order, total sales, profit, discount rate, dan late shipment rate.
+- Mengidentifikasi market, kategori, dan shipping mode dengan risiko keterlambatan tinggi.
+- Memilih produk/supplier terbaik berdasarkan ranking multi-kriteria.
+- Melihat profil historis produk yang dipilih.
+- Menghasilkan demand forecast otomatis dari konteks produk terpilih.
+- Memperkirakan risiko keterlambatan pengiriman menggunakan model machine learning.
+
+## Current Application Scope
+
+Fitur yang tersedia saat ini:
+
+- Landing page sebagai pintu masuk aplikasi.
+- Dashboard executive summary dengan filter interaktif.
+- Supplier Selection berbasis kategori dan ranking produk.
+- Product Profiling berbasis produk yang dipilih.
+- Late shipment risk prediction via API.
+- Demand forecast via API.
+- PostgreSQL database service.
+- Docker Compose untuk menjalankan full stack.
+- API prefix utama `/api/v1` dan alias kompatibilitas `/api`.
+
+## User Journey
+
+```text
+Landing Page
+  |
+  | Try your experience
+  v
+Dashboard
+  |
+  | Executive Summary:
+  | - Total Orders
+  | - Total Sales
+  | - Late Shipment Rate
+  | - Average Shipping Delay
+  | - High Risk Shipment Count
+  | - Total Profit
+  | - Average Discount Rate
+  |
+  | Filters:
+  | - Date Range
+  | - Market
+  | - Order Region
+  | - Order Country
+  | - Shipping Mode
+  | - Category Name
+  | - Department Name
+  | - Customer Segment
+  | - Order Status
+  | - Risk Level
+  |
+  | Choose your Product
+  v
+Supplier Selection
+  |
+  | GET /api/v1/supplier-selection/categories
+  | User selects category
+  | GET /api/v1/supplier-selection/categories/{category_id}/products
+  | User selects product
+  | GET /api/v1/supplier-selection/products/{candidate_id}
+  v
+Product Profiling
+  |
+  | Uses selected product detail from localStorage
+  | Uses forecast_input from backend response
+  | POST /api/v1/forecast/predict
+  | Optional: POST /api/v1/risk/predict
+  v
+Forecast, Trend, and Risk Insight
+```
+
+## High-Level Architecture
+
+```text
+Browser
+  |
+  | http://localhost:5117
+  v
+Vite Frontend
+  |
+  | REST API calls
+  | http://localhost:8017/api/v1
+  v
+FastAPI Backend
+  |
+  | SQLAlchemy async
+  v
+PostgreSQL
+
+FastAPI Backend
+  |
+  | Reads artifacts
+  v
+model/artifacts/
+
+FastAPI Backend
+  |
+  | Reads raw dataset fallback
+  v
+model/dataset/raw/DataCoSupplyChainDataset.csv
+```
+
+## Technology Stack
+
+| Layer | Technology | Purpose |
+| --- | --- | --- |
+| Frontend | HTML, CSS, JavaScript, Vite | Web interface and page routing |
+| Backend | FastAPI, Uvicorn | API server and model serving |
+| Database | PostgreSQL 16 | Transactional database and prediction logs |
+| ORM | SQLAlchemy AsyncIO, asyncpg | PostgreSQL connection and queries |
+| Data Processing | pandas, numpy | Dataset aggregation and feature preparation |
+| ML Runtime | scikit-learn, xgboost, lightgbm | Risk and forecast artifact loading |
+| Container | Docker, Docker Compose | Local full-stack orchestration |
+
+## Runtime Ports
+
+Ports are intentionally moved away from common defaults to avoid conflicts.
+
+| Service | Host URL / Port | Internal Container Port | Notes |
+| --- | --- | --- | --- |
+| Frontend | `http://localhost:5117` | `5117` | Vite dev server |
+| API | `http://localhost:8017` | `8017` | FastAPI/Uvicorn |
+| API Docs | `http://localhost:8017/docs` | `8017` | Swagger UI |
+| API Health | `http://localhost:8017/api/v1/health` | `8017` | Backend health check |
+| PostgreSQL | `localhost:5417` | `5432` | Host uses 5417, Docker network still uses 5432 |
+
+Important note:
+
+- `0.0.0.0:8017` in Uvicorn logs means the server listens on all network interfaces.
+- Browser users should open `localhost`, not `0.0.0.0`.
+
+## Repository Structure
 
 ```text
 Project TA/
-|-- app/
-|   |-- backend/
-|   |   |-- core/       # MongoDB connection dan ModelRegistry
-|   |   |-- routes/     # FastAPI routers
-|   |   |-- schemas/    # Pydantic schemas
-|   |   |-- services/   # Business logic
-|   |   `-- main.py     # FastAPI entry point
-|   |-- frontend/       # Vite frontend
-|   `-- database/       # SQL/ERD references
-|-- model/
-|   |-- artifacts/
-|   |   |-- models/champion_model/   # production risk model
-|   |   |-- models/forecast/         # forecast model artifacts
-|   |   |-- models/risk/             # legacy/experiment risk candidate
-|   |   `-- metrics/supplier_selection_outputs/
-|   `-- dataset/
+|-- .dockerignore
+|-- .env.example
+|-- .gitignore
 |-- Dockerfile
-`-- docker-compose.yaml
+|-- docker-compose.yaml
+|-- README.md
+|-- app/
+|   |-- __init__.py
+|   |-- requirements.txt
+|   |-- backend/
+|   |   |-- __init__.py
+|   |   |-- config.py
+|   |   |-- dashboard.py
+|   |   |-- main.py
+|   |   |-- model_loader.py
+|   |   |-- core/
+|   |   |   |-- config.py
+|   |   |   |-- database.py
+|   |   |   `-- model_registry.py
+|   |   |-- routes/
+|   |   |   |-- __init__.py
+|   |   |   |-- dashboard_routes.py
+|   |   |   |-- forecast_routes.py
+|   |   |   |-- health.py
+|   |   |   |-- orders.py
+|   |   |   |-- risk_predict_routes.py
+|   |   |   `-- supplier_selection_routes.py
+|   |   |-- schemas/
+|   |   |   |-- __init__.py
+|   |   |   |-- db_models.py
+|   |   |   |-- forecast_schema.py
+|   |   |   |-- risk_predict_schema.py
+|   |   |   `-- supplier_selection_schema.py
+|   |   |-- services/
+|   |   |   |-- __init__.py
+|   |   |   |-- dashboard_dataset.py
+|   |   |   |-- dashboard_service.py
+|   |   |   |-- forecast_service.py
+|   |   |   |-- order_service.py
+|   |   |   |-- preprocessing.py
+|   |   |   |-- risk_predict_service.py
+|   |   |   `-- supplier_selection_service.py
+|   |   `-- utils/
+|   |       `-- helpers.py
+|   |-- database/
+|   |   |-- ERD.pgerd
+|   |   |-- init.sql
+|   |   `-- schema.sql
+|   `-- frontend/
+|       |-- index.html
+|       |-- package.json
+|       `-- src/
+|           |-- artifact/
+|           |   `-- navbar.png
+|           |-- css/
+|           |   |-- dashboard.css
+|           |   |-- landing.css
+|           |   |-- product-profiling.css
+|           |   |-- shared.css
+|           |   `-- supplier-selection.css
+|           |-- js/
+|           |   |-- api.js
+|           |   |-- dashboard.js
+|           |   |-- data.js
+|           |   |-- main.js
+|           |   |-- navbar.js
+|           |   |-- product-profiling.js
+|           |   `-- pages/
+|           |       |-- dashboardPage.js
+|           |       |-- product_profilingPage.js
+|           |       `-- suplier_selectionPage.js
+|           `-- pages/
+|               |-- Dashboard.html
+|               |-- Product-Profiling.html
+|               |-- SupplierSelection.html
+|               `-- index.html
+`-- model/
+    |-- requirements.txt
+    |-- artifacts/
+    |   |-- models/
+    |   |   |-- champion_model/
+    |   |   |   |-- late_shipment_model.pkl
+    |   |   |   `-- metadata.json
+    |   |   `-- forecast/
+    |   |       |-- forecast_cat_encoder.pkl
+    |   |       |-- forecast_group_stats.json
+    |   |       |-- forecast_metadata.json
+    |   |       |-- forecast_mkt_encoder.pkl
+    |   |       `-- forecast_model.pkl
+    |   `-- metrics/
+    |       `-- supplier_selection_outputs/
+    |           |-- supplier_selection_ahp_weights.csv
+    |           |-- supplier_selection_by_category_full_result.csv
+    |           |-- supplier_selection_by_category_summary.json
+    |           `-- supplier_selection_primary_per_category.csv
+    |-- dataset/
+    |   |-- processed/
+    |   |   `-- .gitkeep
+    |   `-- raw/
+    |       |-- DataCoSupplyChainDataset.csv
+    |       |-- DescriptionDataCoSupplyChain.csv
+    |       `-- tokenized_access_logs.csv
+    |-- notebooks/
+    |   |-- eda/
+    |   |   |-- autoEDA.ipynb
+    |   |   `-- supplychain_eda.ipynb
+    |   |-- feature_engineering/
+    |   |   `-- preprocessing_risk.ipynb
+    |   |-- modeling/
+    |   |   |-- mlops_risk.ipynb
+    |   |   |-- mlops_supplier_selection.ipynb
+    |   |   `-- mlops_trend.ipynb
+    |   `-- pipeline/
+    |       `-- pipeline_full.ipynb
+    `-- src/
+        |-- data/
+        |   |-- __init__.py
+        |   |-- clean_data.py
+        |   |-- load_data.py
+        |   `-- split_data.py
+        |-- features/
+        |   |-- __init__.py
+        |   |-- build_features.py
+        |   |-- encoding.py
+        |   |-- feature_selection.py
+        |   `-- preprocessing.py
+        |-- inference/
+        |   |-- __init__.py
+        |   |-- batch_predict.py
+        |   `-- predict_late_shipment.py
+        |-- training/
+        |   |-- __init__.py
+        |   |-- evaluate.py
+        |   |-- train_late_shipment.py
+        |   `-- train_supplier_selection.py
+        `-- utils/
+            |-- __init__.py
+            |-- config.py
+            `-- constants.py
 ```
 
-## Backend
+Generated artifact folders such as MLflow run directories and training logs may contain many additional generated files. They are intentionally not expanded above to keep this stakeholder document readable.
 
-Install dependency:
+## Main Components
 
-```bash
-pip install -r app/requirements.txt
-```
+### Frontend
 
+The frontend is a Vite-based static web application.
 
+Important pages:
 
-Run API:
+- `app/frontend/src/pages/index.html`: landing page.
+- `app/frontend/src/pages/Dashboard.html`: executive dashboard.
+- `app/frontend/src/pages/SupplierSelection.html`: category and product selection.
+- `app/frontend/src/pages/Product-Profiling.html`: product trend, forecast, and risk interaction.
 
-```bash
-uvicorn app.backend.main:app --host 0.0.0.0 --port 8000 --reload
-```
+Important JavaScript files:
 
-Docs:
+- `app/frontend/src/js/api.js`: API base URL and fetch helpers.
+- `app/frontend/src/js/pages/dashboardPage.js`: dashboard API integration and filters.
+- `app/frontend/src/js/pages/suplier_selectionPage.js`: supplier category/product selection.
+- `app/frontend/src/js/pages/product_profilingPage.js`: product profile, forecast, and risk prediction integration.
+
+### Backend
+
+The backend is a FastAPI application.
+
+Entry point:
 
 ```text
-http://localhost:8000/docs
+app/backend/main.py
 ```
 
-## Docker
+Runtime command in Docker:
 
 ```bash
+uvicorn backend.main:app --host 0.0.0.0 --port 8017
+```
+
+Backend responsibilities:
+
+- Serve REST API.
+- Connect to PostgreSQL.
+- Load ML artifacts.
+- Aggregate dashboard data.
+- Read supplier ranking CSV/JSON artifacts.
+- Prepare forecast and risk model inputs.
+- Log risk predictions into PostgreSQL.
+
+### PostgreSQL
+
+PostgreSQL is used for:
+
+- Orders data tables.
+- Order item tables.
+- Prediction logs.
+- Forecast logs.
+
+Initialization script:
+
+```text
+app/database/init.sql
+```
+
+Host connection:
+
+```text
+postgresql://postgres:postgres@localhost:5417/neo_horcrox
+```
+
+Docker internal connection:
+
+```text
+postgresql+asyncpg://postgres:postgres@postgres:5432/neo_horcrox
+```
+
+### Model Artifacts
+
+Risk model:
+
+```text
+model/artifacts/models/champion_model/late_shipment_model.pkl
+model/artifacts/models/champion_model/metadata.json
+```
+
+Forecast model:
+
+```text
+model/artifacts/models/forecast/forecast_model.pkl
+model/artifacts/models/forecast/forecast_cat_encoder.pkl
+model/artifacts/models/forecast/forecast_mkt_encoder.pkl
+model/artifacts/models/forecast/forecast_metadata.json
+model/artifacts/models/forecast/forecast_group_stats.json
+```
+
+Supplier selection:
+
+```text
+model/artifacts/metrics/supplier_selection_outputs/supplier_selection_by_category_full_result.csv
+model/artifacts/metrics/supplier_selection_outputs/supplier_selection_primary_per_category.csv
+model/artifacts/metrics/supplier_selection_outputs/supplier_selection_by_category_summary.json
+model/artifacts/metrics/supplier_selection_outputs/supplier_selection_ahp_weights.csv
+```
+
+## Data Flow
+
+### Dashboard
+
+```text
+Dashboard page
+  -> GET /api/v1/dashboard/filters
+  -> GET /api/v1/dashboard/summary
+  -> GET /api/v1/dashboard/risk-by-market
+  -> GET /api/v1/dashboard/sales-by-category
+  -> GET /api/v1/dashboard/shipping-performance
+```
+
+Dashboard data source behavior:
+
+- If PostgreSQL has order data, dashboard reads from PostgreSQL.
+- If PostgreSQL is empty, dashboard falls back to `model/dataset/raw/DataCoSupplyChainDataset.csv`.
+
+### Supplier Selection
+
+```text
+SupplierSelection.html
+  -> GET /api/v1/supplier-selection/categories
+  -> User selects category
+  -> GET /api/v1/supplier-selection/categories/{category_id}/products
+  -> User selects product
+  -> GET /api/v1/supplier-selection/products/{candidate_id}
+```
+
+Supplier Selection does not run inference. It reads ranking outputs from CSV/JSON artifacts.
+
+### Product Profiling and Forecast
+
+```text
+Supplier product detail response
+  -> includes forecast_input
+  -> frontend stores detail in localStorage
+  -> Product-Profiling.html reads localStorage
+  -> POST /api/v1/forecast/predict
+```
+
+Forecast input example:
+
+```json
+{
+  "category_name": "Accessories",
+  "market": "LATAM",
+  "periods": 14,
+  "order_year": 2017,
+  "order_month": 4
+}
+```
+
+### Risk Prediction
+
+```text
+Product profile/risk action
+  -> POST /api/v1/risk/predict
+  -> FastAPI builds model features
+  -> XGBoost champion model predicts late shipment probability
+  -> Result is returned to frontend
+  -> Prediction is logged to PostgreSQL
+```
+
+## API Reference
+
+The primary API prefix is:
+
+```text
+/api/v1
+```
+
+Compatibility alias:
+
+```text
+/api
+```
+
+### Health
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | `/api/v1/health` | Check API, database, and artifact status |
+
+### Dashboard
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | `/api/v1/dashboard/filters` | Filter options for dashboard sidebar |
+| GET | `/api/v1/dashboard/summary` | Executive summary metrics |
+| GET | `/api/v1/dashboard/risk-by-market` | Late shipment risk by market |
+| GET | `/api/v1/dashboard/sales-by-category` | Sales aggregation by category |
+| GET | `/api/v1/dashboard/shipping-performance` | Shipping mode performance |
+
+Supported dashboard query filters:
+
+```text
+start_date
+end_date
+market
+order_region
+order_country
+shipping_mode
+category
+department
+segment
+status
+risk_level
+```
+
+### Supplier Selection
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | `/api/v1/supplier-selection/health` | Check supplier ranking artifact availability |
+| GET | `/api/v1/supplier-selection/categories` | List product categories |
+| GET | `/api/v1/supplier-selection/categories/{category_id}/products` | List ranked products in a category |
+| GET | `/api/v1/supplier-selection/products/{candidate_id}` | Product detail, dataset profile, risk input, and forecast input |
+| GET | `/api/v1/supplier-selection/summary` | Supplier selection summary |
+| GET | `/api/v1/supplier-selection/weights` | AHP criteria weights |
+
+### Forecast
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | `/api/v1/forecast/health` | Forecast model health |
+| GET | `/api/v1/forecast/options` | Category and market options |
+| GET | `/api/v1/forecast/categories` | Forecast category list |
+| GET | `/api/v1/forecast/markets` | Forecast market list |
+| GET | `/api/v1/forecast/metadata` | Forecast model metadata |
+| POST | `/api/v1/forecast/predict` | Demand forecast prediction |
+
+### Risk
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | `/api/v1/risk/model` | Risk model metadata |
+| POST | `/api/v1/risk/predict` | Single or batch late shipment risk prediction |
+| POST | `/api/v1/risk/predict/batch` | Batch risk prediction alias |
+| GET | `/api/v1/risk/logs` | Prediction logs from PostgreSQL |
+
+### Orders
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | `/api/v1/orders` | List orders with pagination and filters |
+| GET | `/api/v1/orders/{order_id}` | Order detail |
+| GET | `/api/v1/orders/analytics/risk` | Risk summary from PostgreSQL |
+| GET | `/api/v1/orders/analytics/sales` | Sales by category from PostgreSQL |
+| POST | `/api/v1/orders` | Insert one order |
+| POST | `/api/v1/orders/bulk` | Insert many orders |
+
+## Setup and Run
+
+### Prerequisites
+
+- Docker Desktop installed and running.
+- Git installed.
+- Stable internet connection for first build because Python packages and Docker images must be downloaded.
+
+### Run with Docker Compose
+
+From project root:
+
+```powershell
+cd "D:\PENS-EEPIS\SDT A Semester 4 2026\Project TA"
 docker compose up --build
 ```
 
-Services:
+Open:
 
-- API: `http://localhost:8000`
-- Frontend: `http://localhost:5173`
-- MongoDB: `localhost:27017`
+```text
+Frontend: http://localhost:5117
+API Docs: http://localhost:8017/docs
+Health:   http://localhost:8017/api/v1/health
+```
 
-## API Utama
+### Stop Without Removing Containers
 
-Health:
+```powershell
+docker compose stop
+```
 
-- `GET /api/health`
+Start again:
 
-Risk:
+```powershell
+docker compose start
+```
 
-- `GET /api/risk/model`
-- `POST /api/risk/predict`
-- Alias v1 juga tersedia: `/api/v1/risk/...`
+### Stop and Remove Containers
 
-Forecast:
+This removes containers and Docker network, but keeps PostgreSQL volume data.
 
-- `GET /api/forecast/health`
-- `GET /api/forecast/categories`
-- `GET /api/forecast/markets`
-- `POST /api/forecast/predict`
+```powershell
+docker compose down --remove-orphans
+```
 
-Supplier Selection:
+### Full Database Reset
 
-- `GET /api/supplier-selection/health`
-- `GET /api/supplier-selection/categories`
-- `GET /api/supplier-selection/categories/{category_id}/products`
-- `GET /api/supplier-selection/products/{candidate_id}`
-- `GET /api/supplier-selection/summary`
-- `GET /api/supplier-selection/weights`
+Only use this if the PostgreSQL data can be deleted.
 
-Dashboard:
+```powershell
+docker compose down -v --remove-orphans
+docker compose up --build
+```
 
-- `GET /api/dashboard/summary`
-- `GET /api/dashboard/risk-by-market`
-- `GET /api/dashboard/sales-by-category`
-- `GET /api/dashboard/shipping-performance`
+## Local Backend Run Without Docker
 
-## Artifact Policy
+Install dependencies:
 
-- Risk production memakai `model/artifacts/models/champion_model/late_shipment_model.pkl`.
-- Metadata production ada di `model/artifacts/models/champion_model/metadata.json`.
-- Folder `model/artifacts/models/risk/` tetap disimpan sebagai kandidat lama/eksperimen.
-- Supplier Selection tidak memakai model inference. Backend membaca ranking dari CSV/JSON di `model/artifacts/metrics/supplier_selection_outputs/`.
+```powershell
+pip install -r app/requirements.txt
+```
 
-## Environment
+Run API:
 
-Lihat `.env.example` untuk override path artifact, dataset, CORS, dan MongoDB.
+```powershell
+$env:PYTHONPATH="app;."
+uvicorn backend.main:app --host 0.0.0.0 --port 8017 --reload
+```
+
+API Docs:
+
+```text
+http://localhost:8017/docs
+```
+
+## Local Frontend Run Without Docker
+
+```powershell
+cd app/frontend
+npm install
+$env:VITE_API_BASE_URL="http://localhost:8017/api/v1"
+npm run dev -- --host 0.0.0.0 --port 5117
+```
+
+Open:
+
+```text
+http://localhost:5117
+```
+
+## Environment Configuration
+
+`.env.example` contains the baseline environment values.
+
+Important variables:
+
+| Variable | Default / Example | Purpose |
+| --- | --- | --- |
+| `APP_NAME` | `Neo Horcrox Supply Chain API` | API display name |
+| `APP_VERSION` | `0.1.0` | API version |
+| `DEBUG` | `false` | Enables SQLAlchemy echo/debug behavior |
+| `LOG_LEVEL` | `INFO` | Logging level |
+| `API_PREFIX` | `/api` | Compatibility API prefix |
+| `API_V1_PREFIX` | `/api/v1` | Primary API prefix |
+| `ALLOWED_ORIGINS` | `*` | CORS origins |
+| `DATABASE_URL` | `postgresql+asyncpg://postgres:postgres@localhost:5417/neo_horcrox` | Local PostgreSQL URL outside Docker |
+| `MODEL_ROOT` | `./model` | Model and dataset root |
+| `CHAMPION_MODEL_PATH` | Optional override | Risk model pickle path |
+| `FORECAST_MODEL_DIR` | Optional override | Forecast model artifact directory |
+| `SUPPLIER_SELECTION_OUTPUT_DIR` | Optional override | Supplier selection output directory |
+| `RAW_SUPPLY_CHAIN_DATASET_PATH` | Optional override | Raw dataset path |
+
+## Current Progress
+
+### Completed
+
+- Project structure separated into `app`, `model`, and `database` layers.
+- Docker Compose includes PostgreSQL, API, and frontend services.
+- Ports have been moved to avoid common local conflicts:
+  - API `8017`
+  - Frontend `5117`
+  - PostgreSQL host port `5417`
+- Backend migrated away from MongoDB runtime paths.
+- PostgreSQL connection uses SQLAlchemy async and asyncpg.
+- FastAPI routes are aligned under `/api/v1`.
+- Compatibility alias `/api` is available.
+- Dashboard APIs compute summary, risk, sales, and shipping performance.
+- Dashboard filters are available from backend.
+- Dashboard can fallback to raw CSV if PostgreSQL order tables are empty.
+- Supplier Selection reads ranking artifacts from CSV/JSON.
+- Product detail endpoint returns `forecast_input`, `risk_input`, and `dataset_profile`.
+- Product Profiling can automatically run forecast based on selected product.
+- Risk model loads champion artifact and can predict late shipment risk.
+- README and environment documentation are aligned with current ports and architecture.
+
+### Verified During Development
+
+- Backend syntax check with `python -m compileall app/backend`.
+- Docker Compose configuration validation with `docker compose config --quiet`.
+- Supplier Selection service can read category and product detail artifacts.
+- Dashboard service can aggregate from CSV fallback.
+- Risk model can produce prediction from raw dataset record.
+- Frontend JS touched during API alignment passes syntax check.
+
+### Known Warnings
+
+- PostgreSQL Alpine image may show `sh: locale: not found`. This is not fatal.
+- Uvicorn logs `0.0.0.0:8017`; open `localhost:8017` in the browser.
+- Legacy risk artifacts may be reported as missing. They are optional experiment artifacts, not required for the champion risk model.
+- First Docker build can be slow because `xgboost` is a large dependency.
+
+## Current Limitations
+
+- PostgreSQL init creates schema, but does not automatically import the entire raw CSV into orders and order_items.
+- Dashboard uses PostgreSQL if populated, otherwise CSV fallback.
+- Supplier Selection uses precomputed CSV/JSON ranking, not live model inference.
+- Forecast quality depends on the exported artifact and available metadata.
+- Frontend is currently a Vite app with static HTML pages and page-level JS.
+- Authentication, user roles, and access control are not implemented yet.
+- Production deployment hardening is not included yet.
+
+## Future Roadmap
+
+Potential next development stages:
+
+1. Data ingestion pipeline
+   - Import raw CSV into PostgreSQL automatically.
+   - Add scheduled refresh jobs.
+   - Validate schema and data quality before insert.
+
+2. Production dashboard
+   - Persist filter state.
+   - Add charts and drill-down views.
+   - Add export to PDF/CSV.
+
+3. Supplier decision support
+   - Add explainability for ranking criteria.
+   - Compare multiple products/suppliers side by side.
+   - Add threshold-based recommendation rules.
+
+4. Forecasting enhancement
+   - Add confidence interval visualization.
+   - Add market/category scenario simulation.
+   - Add retraining pipeline and model registry metadata.
+
+5. Risk prediction enhancement
+   - Add SHAP or feature contribution explanation.
+   - Add batch upload prediction.
+   - Add monitoring dashboard for prediction logs.
+
+6. MLOps maturity
+   - Standardize training pipeline.
+   - Add experiment tracking workflow.
+   - Add model versioning and deployment approval.
+
+7. Enterprise readiness
+   - Add authentication.
+   - Add role-based permissions.
+   - Add CI/CD.
+   - Add cloud deployment option.
+   - Add observability with logs, metrics, and alerts.
+
+## Troubleshooting
+
+### Browser Cannot Open `0.0.0.0:8017`
+
+Use:
+
+```text
+http://localhost:8017/docs
+```
+
+Do not use:
+
+```text
+http://0.0.0.0:8017
+```
+
+### Port Already in Use
+
+Check running containers:
+
+```powershell
+docker compose ps
+```
+
+Stop without deleting:
+
+```powershell
+docker compose stop
+```
+
+Stop and remove containers:
+
+```powershell
+docker compose down --remove-orphans
+```
+
+### Docker Build Fails While Downloading `xgboost`
+
+`xgboost` is large. Retry:
+
+```powershell
+docker compose build api
+docker compose up
+```
+
+Avoid `--no-cache` unless necessary because Dockerfile uses pip cache layers to reduce repeated downloads.
+
+### API Healthy but Frontend Not Open
+
+Open:
+
+```text
+http://localhost:5117
+```
+
+Check frontend logs:
+
+```powershell
+docker compose logs -f frontend
+```
+
+### API Logs Show Missing Legacy Risk Artifacts
+
+This is expected if `model/artifacts/models/risk/` is not present. The active production risk model is:
+
+```text
+model/artifacts/models/champion_model/late_shipment_model.pkl
+```
+
+## Stakeholder Summary
+
+Neo Horcrox is currently a working local decision-support prototype for supply chain analytics. It already connects frontend, backend, database, dataset artifacts, supplier ranking outputs, risk prediction, and demand forecast into one navigable application.
+
+The current stage is best described as:
+
+```text
+Functional local prototype with integrated analytics and ML artifacts.
+```
+
+With further development, this project can evolve into:
+
+```text
+Operational supply chain intelligence platform with automated ingestion,
+model monitoring, decision explainability, and enterprise deployment.
+```
