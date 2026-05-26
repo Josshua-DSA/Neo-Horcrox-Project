@@ -14,7 +14,7 @@
 
 .filter-sidebar {
   top: 1.5rem;
-  overflow: auto;
+  overflow: visible;
   padding: 1.35rem;
   height: max-content;
 }
@@ -57,7 +57,7 @@
   -webkit-backdrop-filter: blur(7px);
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
     inset 0 -1px 0 rgba(255, 255, 255, 0.1),
@@ -68,6 +68,16 @@
   font-size: 0.9rem;
   padding: 0.72rem 0.85rem;
   outline: none;
+}
+
+.filter-field .glass-select__button {
+  min-height: 44px;
+  padding: 0.72rem 0.85rem;
+  font-size: 0.9rem;
+}
+
+.filter-field .glass-select__menu {
+  max-height: min(260px, 44vh);
 }
 
 .dashboard-content {
@@ -104,24 +114,57 @@
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
+  gap: 1.1rem;
 }
 
 .kpi-card {
   min-height: 170px;
-  padding: 1.25rem;
+  padding: 1.25rem 1.35rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 0.75rem;
+  position: relative;
+  isolation: isolate;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  border-radius: 20px;
+  box-shadow:
+    0 16px 42px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.54),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+
+.kpi-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.03)),
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.2), transparent 42%);
+}
+
+.kpi-card .label-caps {
+  min-height: 2.1em;
+  display: flex;
+  align-items: flex-start;
 }
 
 .kpi-card strong {
   display: block;
   font-family: 'Playfair Display', serif;
-  font-size: clamp(1.7rem, 3vw, 2.45rem);
-  line-height: 1;
+  font-size: clamp(1.75rem, 2.45vw, 2.45rem);
+  line-height: 0.98;
   color: var(--ink);
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: clip;
+  letter-spacing: 0;
 }
 
 .kpi-card p,

@@ -36,6 +36,7 @@
   position: relative;
   padding: 2.5rem 2rem 2.2rem;
   z-index: 0;
+  overflow: visible;
 }
 
 .chose-body::before {
@@ -60,6 +61,7 @@
 
 .neo-select-wrap {
   position: relative;
+  z-index: 20;
 }
 
 .neo-select {
@@ -77,6 +79,29 @@
   cursor: pointer;
   outline: none;
   transition: var(--transition);
+}
+
+.neo-select.native-select-hidden ~ .neo-select-arrow {
+  display: none;
+}
+
+.neo-select-wrap .glass-select__button {
+  min-height: 58px;
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--radius-sm);
+  color: var(--ink2);
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.52),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 18px 7px rgba(255, 255, 255, 0.08);
+}
+
+.neo-select-wrap .glass-select__menu {
+  max-height: min(420px, 58vh);
+  border-radius: var(--radius-sm);
+  background: rgba(79, 86, 84, 0.86);
 }
 
 .neo-select:focus {
@@ -121,7 +146,7 @@
   -webkit-backdrop-filter: blur(16px);
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(201, 200, 200, 0.5),
     inset 0 -1px 0 rgba(255, 255, 255, 0.1),
