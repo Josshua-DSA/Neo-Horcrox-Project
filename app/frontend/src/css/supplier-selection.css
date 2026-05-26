@@ -36,6 +36,7 @@
   position: relative;
   padding: 2.5rem 2rem 2.2rem;
   z-index: 0;
+  overflow: visible;
 }
 
 .chose-body::before {
@@ -60,6 +61,7 @@
 
 .neo-select-wrap {
   position: relative;
+  z-index: 20;
 }
 
 .neo-select {
@@ -77,6 +79,29 @@
   cursor: pointer;
   outline: none;
   transition: var(--transition);
+}
+
+.neo-select.native-select-hidden ~ .neo-select-arrow {
+  display: none;
+}
+
+.neo-select-wrap .glass-select__button {
+  min-height: 58px;
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--radius-sm);
+  color: var(--ink2);
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.52),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 18px 7px rgba(255, 255, 255, 0.08);
+}
+
+.neo-select-wrap .glass-select__menu {
+  max-height: min(420px, 58vh);
+  border-radius: var(--radius-sm);
+  background: rgba(79, 86, 84, 0.86);
 }
 
 .neo-select:focus {
@@ -115,14 +140,21 @@
   font-style: italic;
 }
 
-.neo-table-wrap {
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-in2);
+.glass-table-wrap {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(201, 200, 200, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 2px 1px rgba(255, 255, 255, 0.1);
   overflow: auto;
-  background: var(--bg);
 }
 
-.neo-table {
+.glass-table {
   width: 100%;
   min-width: 760px;
   border-collapse: collapse;
@@ -130,11 +162,11 @@
   font-size: 0.9rem;
 }
 
-.neo-table thead tr {
+.glass-table thead tr {
   background: rgba(26, 24, 20, 0.06);
 }
 
-.neo-table th {
+.glass-table th {
   padding: 0.8rem 1rem;
   text-align: left;
   font-family: 'Cormorant Garamond', serif;
@@ -146,7 +178,7 @@
   border-bottom: 1px solid rgba(26, 24, 20, 0.1);
 }
 
-.neo-table td {
+.glass-table td {
   padding: 0.78rem 1rem;
   border-bottom: 1px solid rgba(26, 24, 20, 0.06);
   color: var(--ink2);
@@ -154,22 +186,22 @@
   transition: background 0.2s ease;
 }
 
-.neo-table tbody tr:hover td {
+.glass-table tbody tr:hover td {
   background: rgba(26, 24, 20, 0.04);
 }
 
-.neo-table tbody tr.selected td,
-.neo-table tbody tr.is-active td {
+.glass-table tbody tr.selected td,
+.glass-table tbody tr.is-active td {
   background: rgba(26, 24, 20, 0.09);
   font-weight: 700;
   color: var(--ink);
 }
 
-.neo-table tbody tr:last-child td {
+.glass-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-.neo-table .empty-row td {
+.glass-table .empty-row td {
   text-align: center;
   color: var(--ink3);
   font-style: italic;
@@ -220,14 +252,6 @@
   font-family: 'IM Fell English', Georgia, serif;
   color: var(--ink);
   overflow-wrap: anywhere;
-}
-
-.floating-action {
-  width: 200px;
-  text-decoration: none;
-  display: flex;
-  justify-content:center;
-  margin: 20px 0 auto auto;
 }
 
 .floating-action.is-disabled {

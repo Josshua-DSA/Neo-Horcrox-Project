@@ -13,14 +13,14 @@
   <div class="navbar-wrap">
     <nav class="navbar">
       <!-- Tombol garis 3 -->
-      <button class="menu-btn" id="menuBtn">
-        <img class="menu-icon" src="../artifact/navbar.png" alt="Menu">
+      <button class="glass-btn menu-btn" id="menuBtn">
+        <img class="menu-icon" src="../assets/navbar.png" alt="Menu">
       </button>
 
     </nav>
 
     <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
+    <aside class="glass-card sidebar" id="sidebar">
       <a href="index.html">Home</a>
       <a href="Dashboard.html">
         Dashboard
@@ -40,20 +40,20 @@
       <a class="text-link" href="./SupplierSelection.html">Choose product</a>
     </header>
 
-    <div class="neo-inset product-badge" id="product-badge">
+    <div class="glass-inset product-badge" id="product-badge">
       <span>No product selected</span>
     </div>
 
     <div class="metrics-row">
       <div class="metrics-col">
-        <div class="neo-card metric-card">
+        <div class="glass-card metric-card">
           <span class="label-caps">Total Revenue</span>
           <div class="metric-value">
             <span id="total-revenue">$0</span>
           </div>
         </div>
 
-        <div class="neo-card metric-card">
+        <div class="glass-card metric-card">
           <span class="label-caps">Total Quantity</span>
           <div class="metric-value">
             <span id="total-sales">0</span>
@@ -62,7 +62,7 @@
         </div>
       </div>
 
-      <div class="neo-card chart-area">
+      <div class="glass-card chart-area">
         <div class="panel-heading-row">
           <span class="label-caps">Historical Sales Trend</span>
           <small id="trend-status">waiting for product</small>
@@ -71,7 +71,7 @@
       </div>
     </div>
 
-    <section class="neo-card forecast-panel">
+    <section class="glass-card forecast-panel">
       <div class="panel-heading-row">
         <div>
           <p class="label-caps">Forecast</p>
@@ -79,7 +79,7 @@
         </div>
         <div class="forecast-controls">
           <select id="forecast-market" aria-label="Forecast market"></select>
-          <button class="neo-btn" id="btn-forecast" type="button">Run forecast</button>
+          <button class="glass-btn forecast-btn" id="btn-forecast" type="button">Run forecast</button>
         </div>
       </div>
       <div class="forecast-summary" id="forecast-summary">Forecast will use the registered backend model.</div>
@@ -88,24 +88,24 @@
 
     <div class="shipping-section">
       <span class="label-caps">Shipping Mode</span>
-      <div class="tab-group" id="shipping-tabs">
+      <div class="glass-card tab-group" id="shipping-tabs">
         <span class="tab-group-label">Choose Mode</span>
       </div>
     </div>
 
     <div class="predict-row">
-      <button class="neo-btn predict-btn" id="btn-predict" type="button">
+      <button class="glass-btn predict-btn" id="btn-predict" type="button">
         Predict Late Risk
       </button>
     </div>
 
     <div class="results-row">
-      <div class="neo-card result-card">
+      <div class="glass-card result-card">
         <div class="result-value" id="result-days">0</div>
         <div class="result-label">Days - Estimation</div>
       </div>
 
-      <div class="neo-card result-card">
+      <div class="glass-card result-card">
         <div class="result-value" id="result-risk">0%</div>
         <div class="result-label">Late Risk</div>
       </div>

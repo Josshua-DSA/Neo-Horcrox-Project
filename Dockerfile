@@ -16,7 +16,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --index-url https://pypi.org/simple --prefer-binary --retries 10 --timeout 300 --progress-bar off -r requirements.txt
 
-COPY app ./app
+COPY app/__init__.py ./app/__init__.py
+COPY app/backend ./app/backend
 COPY model ./model
 
 ENV PYTHONPATH=/app/app:/app

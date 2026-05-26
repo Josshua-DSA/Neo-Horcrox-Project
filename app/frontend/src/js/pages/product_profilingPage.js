@@ -62,7 +62,9 @@ function renderTrend() {
   const points = selected?.dataset_profile?.trend || [];
   if (!chartCanvas) return;
   const context = chartCanvas.getContext("2d");
-  context.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
+  const width = chartCanvas.width;
+  const height = chartCanvas.height;
+  context.clearRect(0, 0, width, height);
 
   if (!points.length) {
     trendStatus.textContent = "no trend data";
@@ -73,26 +75,103 @@ function renderTrend() {
   }
 
   trendStatus.textContent = `${points.length} monthly points`;
-  const padding = 28;
-  const maxRevenue = Math.max(...points.map((item) => Number(item.revenue) || 0), 1);
-  const barWidth = (chartCanvas.width - padding * 2) / points.length - 8;
-  context.strokeStyle = "rgba(26,24,20,0.18)";
+  const padding = { top: 22, right: 22, bottom: 34, left: 54 };
+  const chartWidth = width - padding.left - padding.right;
+  const chartHeight = height - padding.top - padding.bottom;
+  const values = points.map((item) => Number(item.revenue) || 0);
+  const maxRevenue = Math.max(...values, 1);
+  const minRevenue = Math.min(...values, 0);
+  const range = Math.max(maxRevenue - minRevenue, 1);
+  const coordinates = points.map((point, index) => {
+    const x = padding.left + (points.length === 1 ? chartWidth / 2 : (chartWidth * index) / (points.length - 1));
+    const y = padding.top + chartHeight - (((Number(point.revenue) || 0) - minRevenue) / range) * chartHeight;
+    return { x, y, point };
+  });
+
+  drawTrendGrid(context, width, height, padding, chartHeight, chartWidth, maxRevenue, minRevenue);
+
+  const gradient = context.createLinearGradient(0, padding.top, 0, height - padding.bottom);
+  gradient.addColorStop(0, "rgba(26,24,20,0.24)");
+  gradient.addColorStop(1, "rgba(26,24,20,0.02)");
+
   context.beginPath();
-  context.moveTo(padding, chartCanvas.height - padding);
-  context.lineTo(chartCanvas.width - padding, chartCanvas.height - padding);
+  coordinates.forEach(({ x, y }, index) => {
+    if (index === 0) context.moveTo(x, y);
+    else context.lineTo(x, y);
+  });
+  context.lineTo(coordinates[coordinates.length - 1].x, height - padding.bottom);
+  context.lineTo(coordinates[0].x, height - padding.bottom);
+  context.closePath();
+  context.fillStyle = gradient;
+  context.fill();
+
+  context.beginPath();
+  coordinates.forEach(({ x, y }, index) => {
+    if (index === 0) context.moveTo(x, y);
+    else context.lineTo(x, y);
+  });
+  context.lineWidth = 3;
+  context.lineCap = "round";
+  context.lineJoin = "round";
+  context.strokeStyle = "rgba(26,24,20,0.82)";
   context.stroke();
 
-  points.forEach((point, index) => {
-    const value = Number(point.revenue) || 0;
-    const height = ((chartCanvas.height - padding * 2) * value) / maxRevenue;
-    const x = padding + index * (barWidth + 8);
-    const y = chartCanvas.height - padding - height;
-    context.fillStyle = "rgba(26,24,20,0.72)";
-    context.fillRect(x, y, Math.max(8, barWidth), height);
-    context.fillStyle = "#6b6560";
-    context.font = "10px serif";
-    context.fillText(String(point.date).slice(5), x, chartCanvas.height - 10);
+  coordinates.forEach(({ x, y, point }, index) => {
+    context.beginPath();
+    context.arc(x, y, 4.5, 0, Math.PI * 2);
+    context.fillStyle = "#f7f0e6";
+    context.fill();
+    context.lineWidth = 2;
+    context.strokeStyle = "rgba(26,24,20,0.82)";
+    context.stroke();
+
+    if (index === 0 || index === coordinates.length - 1 || index % 3 === 0) {
+      context.fillStyle = "#6b6560";
+      context.font = "10px serif";
+      context.textAlign = "center";
+      context.fillText(String(point.date).slice(5), x, height - 12);
+    }
   });
+
+  const last = coordinates[coordinates.length - 1];
+  context.fillStyle = "rgba(26,24,20,0.88)";
+  context.font = "bold 12px serif";
+  context.textAlign = "right";
+  context.fillText(formatMetric(last.point.revenue, "currency"), width - padding.right, Math.max(16, last.y - 10));
+}
+
+function drawTrendGrid(context, width, height, padding, chartHeight, chartWidth, maxRevenue, minRevenue) {
+  context.strokeStyle = "rgba(26,24,20,0.1)";
+  context.lineWidth = 1;
+  context.fillStyle = "#8b827a";
+  context.font = "10px serif";
+  context.textAlign = "right";
+
+  for (let index = 0; index <= 4; index += 1) {
+    const ratio = index / 4;
+    const y = padding.top + chartHeight * ratio;
+    const value = maxRevenue - (maxRevenue - minRevenue) * ratio;
+
+    context.beginPath();
+    context.moveTo(padding.left, y);
+    context.lineTo(width - padding.right, y);
+    context.stroke();
+    context.fillText(compactCurrency(value), padding.left - 10, y + 3);
+  }
+
+  context.strokeStyle = "rgba(26,24,20,0.22)";
+  context.beginPath();
+  context.moveTo(padding.left, padding.top);
+  context.lineTo(padding.left, height - padding.bottom);
+  context.lineTo(padding.left + chartWidth, height - padding.bottom);
+  context.stroke();
+}
+
+function compactCurrency(value) {
+  const number = Number(value) || 0;
+  if (Math.abs(number) >= 1000000) return `$${(number / 1000000).toFixed(1)}m`;
+  if (Math.abs(number) >= 1000) return `$${Math.round(number / 1000)}k`;
+  return `$${Math.round(number)}`;
 }
 
 function renderShippingModes() {

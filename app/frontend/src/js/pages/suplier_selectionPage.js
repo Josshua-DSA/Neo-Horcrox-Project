@@ -1,4 +1,5 @@
 import { apiGet, formatMetric, text } from "../api.js";
+import { enhanceGlassSelect, refreshGlassSelect } from "../glassSelect.js";
 
 const state = {
   categories: [],
@@ -27,10 +28,12 @@ async function init() {
     setStatus(`${formatMetric(categories.total || 0)} categories loaded from metrics CSV`);
     if (state.categories.length) {
       categorySelect.value = state.categories[0].category_id;
+      refreshGlassSelect(categorySelect);
       await loadProducts(state.categories[0].category_id);
     }
   } catch (error) {
     categorySelect.innerHTML = `<option value="">Failed loading categories</option>`;
+    enhanceGlassSelect(categorySelect);
     renderEmpty(error.message);
     setStatus(error.message);
   }
@@ -48,6 +51,7 @@ function renderCategoryOptions(categories) {
       `<option value="${escapeAttribute(category.category_id)}">${text(category.category_name)} (${formatMetric(category.total_candidates)})</option>`
     )),
   ].join("");
+  enhanceGlassSelect(categorySelect);
 }
 
 async function loadProducts(categoryId) {
