@@ -1,34 +1,14 @@
 /* ═══════════════════════════════════════════════
    shared.css  —  Supply Chain Analysis
-   Variables · Reset · Typography · Neo Components
+   Variables · Reset · Typography · Glass Components
    Shared across index.html & dashboard.html
 ═══════════════════════════════════════════════ */
 
-/* ── GOOGLE FONTS ── */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
-
 /* ── CSS VARIABLES ── */
 :root {
-  --bg:         #d1cabc;
-  --bg-dark:    #b7ac94;
-  --surface:    #d1cabc;
-  --surface2:   #b1a995;
-  --ink:        #1a1814;
-  --ink2:       #3a3630;
-  --ink3:       #6b6560;
-
-  --shadow-out-1: 4px 4px 10px rgba(192, 186, 175, 0.4), 
-                  -4px -4px 10px rgba(164, 155, 140, 0.8);
-                  
-  --shadow-out-2: 6px 6px 15px rgba(165, 160, 150, 0.3), 
-                  -6px -6px 15px rgba(178, 169, 152, 0.7);
-
-  /* Bayangan Dalam (Inset) yang lebih halus */
-  --shadow-in:    inset 4px 4px 8px rgba(165, 160, 150, 0.35), 
-                  inset -4px -4px 8px rgba(196, 185, 161, 0.7);
-                  
-  --shadow-in2:   inset 6px 6px 12px rgba(165, 160, 150, 0.3), 
-                  inset -6px -6px 12px rgba(200, 190, 169, 0.6);
+  --ink:        #f5f5f5;
+  --ink2:       #dfdfdf;
+  --ink3:       #cecece;
 
   --border:     1px solid rgba(26,24,20,0.12);
   --radius:     25px;
@@ -82,22 +62,10 @@
   right: 30px;
   width: 300px;
   height: 300px;
-  background: 
-    /* Layer 2: Efek noda lusuh/vignette yang lebih nyata */
-    radial-gradient(
-      circle, 
-      rgba(224, 204, 180, 0.2) 50%, 
-      rgba(221, 203, 176, 0.2) 97%, 
-      rgba(168, 142, 110, 0.35) 100%
-    ),
-    /* Layer 1: Warna dasar kertas */
-    var(--bg);
   display: flex;
   flex-direction: column;
   justify-content: center;
   margin: 55px 3px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-out-1);
   z-index: 999;
   /* ANIMASI */
   opacity: 0;
@@ -121,22 +89,30 @@
 
 /* LINK */
 .sidebar a {
-  color: var(--ink2);
+  color: var(--ink);
   text-decoration: none;
   padding: 20px 30px;
   font-size: 0.9rem;
-  transition: 0.3s;
+  transition: 0.2s;
   text-align: left;
-  border-radius: 36px;
+  border-radius: 20px;
+  margin: 0 10px;
 }
 
 .sidebar a:hover {
-  background-color: none;
-  color: var(--ink2);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 2px 1px rgba(255, 255, 255, 0.1);
   transition: var(--transition);
   padding: 20px 30px;
   font-size: 1.1rem;
-  border-radius: 36px;
+  margin: 0 10px;
 }
 
 /* ── RESET ── */
@@ -149,31 +125,38 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Libre Baskerville', Georgia, serif;
-  background: 
-    /* Layer 2: Efek noda lusuh/vignette yang lebih nyata */
-    radial-gradient(
-      circle, 
-      rgba(224, 204, 180, 0.2) 50%, 
-      rgba(221, 203, 176, 0.2) 97%, 
-      rgba(168, 142, 110, 0.35) 100%
-    ),
-    /* Layer 1: Warna dasar kertas */
-    var(--bg);
+  margin: 0;
+  font-family: 'Libre Baskerville', 'Georgia', serif;
   color: var(--ink);
+  background-image: url(../assets/bg.jpg);
   min-height: 100vh;
-  overflow-x: hidden;
+  background-size: cover;
+  background-attachment: scroll;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
 }
 
-/* Paper texture noise overlay */
 body::before {
-  content: '';
+  content: "";
   position: fixed;
   inset: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: -1;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle,
+      transparent 5%,
+      rgba(0,0,0,0.3) 90%
+    );
   pointer-events: none;
-  z-index: 999;
-  opacity: 0.05; /* Sangat tipis saja */
-  background-image: url("https://www.transparenttextures.com/patterns/felt.png"); 
+  z-index: -1;
 }
 
 /* ── TYPOGRAPHY ── */
@@ -223,72 +206,171 @@ h1, h2, h3 {
   text-align: center;
 }
 
-/* ── NEOMORPHISM COMPONENTS ── */
-.neo-card {
-  background: var(--bg);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-out-1);
+/* ── GLASS COMPONENTS ── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.19);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0px 0px rgba(255, 255, 255, 0);
+  overflow: hidden;
 }
 
-.neo-card-sm {
-  background: var(--surface2);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-out-1);
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.8),
+    transparent
+  );
 }
 
-.neo-inset {
-  background: var(--surface2);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-in);
+.glass-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.8),
+    transparent,
+    rgba(255, 255, 255, 0.3)
+  );
 }
 
-.neo-inset2 {
-  background: var(--surface2);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-in2);
+
+/* GLASS INSET */
+.glass-inset {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(27px);
+  -webkit-backdrop-filter: blur(27px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 42px 21px rgba(255, 255, 255, 2.1);
+  overflow: hidden;
+}
+
+.glass-inset::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.8),
+    transparent
+  );
+}
+
+.glass-inset::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.8),
+    transparent,
+    rgba(255, 255, 255, 0.3)
+  );
 }
 
 /* ── BUTTON ── */
-.neo-btn {
-  background: var(--bg);
-  border: none;
-  border-radius: 50px;
-  box-shadow: var(--shadow-out-1);
-  cursor: pointer;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: var(--ink2);
+.glass-btn {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0px 0px rgba(255, 255, 255, 0);
+  overflow: hidden;
+}
+
+.glass-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.8),
+    transparent
+  );
+}
+
+.glass-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.8),
+    transparent,
+    rgba(255, 255, 255, 0.3)
+  );
+}
+
+.glass-btn:hover {
   transition: var(--transition);
-  padding: 0.75rem 2rem;
+  scale: 1.05;
 }
 
-.neo-btn:hover {
-  box-shadow: var(--shadow-out-1);
-  transform: translateY(-1px);
-}
-
-.neo-btn:active {
-  box-shadow: var(--shadow-in);
+.glass-btn:active {
   transform: translateY(1px);
 }
 
-.neo-btn:disabled {
+.glass-btn:disabled {
   opacity: 0.65;
   cursor: not-allowed;
   transform: none;
 }
 
-.neo-btn-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
+.glass-btn:disabled:hover {
+  transform: none;
+  scale: 1;
+}
+
+.floating-action {
+  color: var(--ink);
+  width: 200px;
+  height: 48px;
+  text-decoration: none;
   display: flex;
-  align-items: center;
   justify-content: center;
-  font-size: 1.3rem;
-  padding: 0;
+  border-radius: 20px;
+  padding: 0.75rem 1rem;
+  margin: 70px 0 auto auto;
 }
 
 /* ── ORNATE DIVIDER ── */
@@ -326,9 +408,9 @@ h1, h2, h3 {
 }
 
 /* ── RISK COLOR CLASSES ── */
-.risk-low  { color: #4a6741 !important; }
+/* .risk-low  { color: #4a6741 !important; }
 .risk-mid  { color: #7a6030 !important; }
-.risk-high { color: #7a3030 !important; }
+.risk-high { color: #8b4848 !important; } */
 
 /* ── FADE-UP ANIMATION ── */
 @keyframes fadeUp {
