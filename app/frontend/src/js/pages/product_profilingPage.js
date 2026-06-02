@@ -226,24 +226,66 @@ async function loadForecastOptions() {
 
 async function predictRisk() {
   const riskInput = { ...(selected?.dataset_profile?.risk_input || {}) };
-  if (!Object.keys(riskInput).length) {
+  if (!riskInput || (!riskInput["Latitude"] && !riskInput["Longitude"])) {
     setStatus("Risk input is unavailable for this product.");
     return;
   }
 
+  // Override Shipping Mode and scheduled days from selected tab
   riskInput["Shipping Mode"] = activeShippingMode?.mode || riskInput["Shipping Mode"];
   if (activeShippingMode?.scheduled_days !== null && activeShippingMode?.scheduled_days !== undefined) {
+    riskInput["Days for shipment (scheduled)"] = activeShippingMode.scheduled_days;
     riskInput.scheduled_days = activeShippingMode.scheduled_days;
   }
+
+  // Inject current click hour dynamically
+  const now = new Date();
+  const currentHour = now.getHours();
+  riskInput["order_hour"] = currentHour;
+  
+  // Remove static/None order_period so the backend feature builder computes it
+  delete riskInput["order_period"];
 
   predictButton.disabled = true;
   setStatus("Running late-risk model...");
   try {
     const response = await apiPost("/risk/predict", riskInput);
     const prediction = response.predictions?.[0];
-    const percent = Number(prediction?.risk_percentage ?? (prediction?.late_probability || 0) * 100);
-    resultRisk.textContent = `${formatMetric(percent)}%`;
-    setStatus(`Prediction: ${prediction?.risk_label || "-"} using ${text(riskInput["Shipping Mode"])}.`);
+    if (prediction) {
+      const isLate = prediction.risk_label === "yes";
+      // Display correct percentage based on prediction label:
+      // YES = probability of late (risk_percentage)
+      // NO = probability of on-time (100 - risk_percentage)
+      const percent = isLate 
+        ? Number(prediction.risk_percentage)
+        : Number(100 - prediction.risk_percentage);
+      
+      const labelText = isLate ? "YES — LATE RISK" : "NO — ON TIME";
+      
+      // Update container styling for the risk status
+      const parentCard = resultRisk.closest(".result-card");
+      if (parentCard) {
+        parentCard.className = `glass-card result-card risk-${prediction.risk_label}`;
+      }
+
+      // Display the risk label and percentage beautifully
+      resultRisk.innerHTML = `
+        <span class="risk-label-${prediction.risk_label}">${labelText}</span>
+        <span class="risk-percent">${formatMetric(percent)}%</span>
+      `;
+      
+      // Add simulated order hour info to result card label
+      const formatHour = String(currentHour).padStart(2, "0");
+      const riskLabelNode = document.querySelector("#result-risk-label") || parentCard?.querySelector(".result-label");
+      if (riskLabelNode) {
+        riskLabelNode.innerHTML = `Late Risk <span style="display:block; font-size:0.7rem; margin-top:0.4rem; opacity:0.8; text-transform:none;">(Simulated Order Hour: ${formatHour}:00)</span>`;
+      }
+
+      setStatus(`Prediction: ${prediction.delivery_label || (isLate ? "Late Delivery Risk" : "On Time")} using ${text(riskInput["Shipping Mode"])}.`);
+    } else {
+      resultRisk.textContent = "-";
+      setStatus("No predictions returned from model.");
+    }
   } catch (error) {
     setStatus(error.message);
   } finally {

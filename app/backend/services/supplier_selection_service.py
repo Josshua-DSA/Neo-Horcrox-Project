@@ -215,12 +215,35 @@ class SupplierSelectionService:
             "late_rate": round(float(product_rows.get("Late_delivery_risk", pd.Series(dtype=float)).mean()), 4),
         }
 
+        # Build risk_input explicitly with exact field names expected by
+        # build_late_shipment_features. Geo values are unique per product
+        # and drive model variance. order_hour is left None so the frontend
+        # injects the current hour at click-time; order_period is then derived
+        # automatically in the backend feature builder.
+        lat = _optional_float(latest.get("Latitude"))
+        lon = _optional_float(latest.get("Longitude"))
+        mode = _clean_text(latest.get("Shipping Mode")) or "Standard Class"
+        sched = _optional_int(latest.get("Days for shipment (scheduled)"))
+
+        risk_input: dict[str, Any] = {
+            # Geo — unique per product; drives geo_distance_proxy in feature builder
+            "Latitude": lat,
+            "Longitude": lon,
+            # Shipping — will be overridden by the shipping tab the user selects
+            "Shipping Mode": mode,
+            "Days for shipment (scheduled)": sched,
+            # Intentionally None — frontend injects order_hour = new Date().getHours()
+            # at predict-click time; build_late_shipment_features derives order_period.
+            "order_hour": None,
+            "order_period": None,
+        }
+
         return {
             "summary": summary,
             "trend": self._trend(product_rows),
             "shipping_modes": self._shipping_modes(product_rows),
             "forecast_input": forecast_input,
-            "risk_input": _clean_dict(latest),
+            "risk_input": risk_input,
         }
 
     def _trend(self, frame: pd.DataFrame) -> list[dict[str, Any]]:

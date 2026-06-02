@@ -421,3 +421,53 @@
     padding: 2rem 1.25rem 3rem;
   }
 }
+
+/* ── LATE RISK RESULT STYLES ── */
+.result-card {
+  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.result-card.risk-yes {
+  background: rgba(220, 70, 70, 0.15);
+  border-color: rgba(220, 70, 70, 0.4);
+  box-shadow: 
+    0 8px 32px rgba(220, 70, 70, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(220, 70, 70, 0.1);
+}
+
+.result-card.risk-no {
+  background: rgba(70, 220, 70, 0.12);
+  border-color: rgba(70, 220, 70, 0.35);
+  box-shadow: 
+    0 8px 32px rgba(70, 220, 70, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(70, 220, 70, 0.1);
+}
+
+.risk-label-yes {
+  color: #ff8888 !important;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  display: block;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.risk-label-no {
+  color: #88ff88 !important;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  display: block;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.risk-percent {
+  font-size: 3rem;
+  font-weight: 700;
+  display: block;
+  margin-top: 0.2rem;
+}
