@@ -561,6 +561,10 @@ h1, h2, h3 {
 
 .animate-in {
   animation: fadeUp 0.6s ease forwards;
+}
 
-
+/* ── NATIVE SELECT OPTIONS VISIBILITY FIX ── */
+select option {
+  background-color: #3b3d3c; /* Dark slate background to match glassmorphism theme */
+  color: #f5f5f5 !important;  /* Light text to make it clearly readable */
 }

@@ -1,4 +1,5 @@
 import { apiGet, apiPost, formatMetric, text } from "../api.js";
+import { enhanceGlassSelect } from "../glassSelect.js";
 
 const selected = readSelectedCandidate();
 const productBadge = document.querySelector("#product-badge");
@@ -18,6 +19,9 @@ const chartCanvas = document.querySelector("#trend-chart");
 
 let activeShippingMode = null;
 let forecastOptions = { categories: [], markets: [] };
+let trendCoordinates = [];
+let hoveredIndex = null;
+let tooltipNode = null;
 
 init();
 
@@ -26,6 +30,7 @@ async function init() {
   renderTrend();
   renderShippingModes();
   await loadForecastOptions();
+  initChartEvents();
   predictButton?.addEventListener("click", predictRisk);
   forecastButton?.addEventListener("click", runForecast);
   await runForecast();
@@ -60,6 +65,7 @@ function renderSelectedProduct() {
 
 function renderTrend() {
   const points = selected?.dataset_profile?.trend || [];
+  trendCoordinates = [];
   if (!chartCanvas) return;
   const context = chartCanvas.getContext("2d");
   const width = chartCanvas.width;
@@ -87,8 +93,22 @@ function renderTrend() {
     const y = padding.top + chartHeight - (((Number(point.revenue) || 0) - minRevenue) / range) * chartHeight;
     return { x, y, point };
   });
+  trendCoordinates = coordinates;
 
   drawTrendGrid(context, width, height, padding, chartHeight, chartWidth, maxRevenue, minRevenue);
+
+  // Draw vertical guide line if a point is hovered
+  if (hoveredIndex !== null && hoveredIndex >= 0 && hoveredIndex < coordinates.length) {
+    const activePt = coordinates[hoveredIndex];
+    context.strokeStyle = "rgba(255, 255, 255, 0.25)";
+    context.lineWidth = 1.5;
+    context.setLineDash([4, 4]);
+    context.beginPath();
+    context.moveTo(activePt.x, padding.top);
+    context.lineTo(activePt.x, height - padding.bottom);
+    context.stroke();
+    context.setLineDash([]);
+  }
 
   const gradient = context.createLinearGradient(0, padding.top, 0, height - padding.bottom);
   gradient.addColorStop(0, "rgba(26,24,20,0.24)");
@@ -117,16 +137,27 @@ function renderTrend() {
   context.stroke();
 
   coordinates.forEach(({ x, y, point }, index) => {
+    const isHovered = index === hoveredIndex;
+    
+    // Draw outer glowing aura for hovered point first (so it's under the main dot)
+    if (isHovered) {
+      context.beginPath();
+      context.arc(x, y, 12, 0, Math.PI * 2);
+      context.fillStyle = "rgba(255, 255, 255, 0.15)";
+      context.fill();
+    }
+
     context.beginPath();
-    context.arc(x, y, 4.5, 0, Math.PI * 2);
-    context.fillStyle = "#f7f0e6";
+    const radius = isHovered ? 6.5 : 4.5;
+    context.arc(x, y, radius, 0, Math.PI * 2);
+    context.fillStyle = isHovered ? "#ffffff" : "#f7f0e6";
     context.fill();
-    context.lineWidth = 2;
-    context.strokeStyle = "rgba(26,24,20,0.82)";
+    context.lineWidth = isHovered ? 2.5 : 2;
+    context.strokeStyle = isHovered ? "rgba(255, 255, 255, 1)" : "rgba(26,24,20,0.82)";
     context.stroke();
 
     if (index === 0 || index === coordinates.length - 1 || index % 3 === 0) {
-      context.fillStyle = "#6b6560";
+      context.fillStyle = "#cecece"; // Brightened from #6b6560
       context.font = "10px serif";
       context.textAlign = "center";
       context.fillText(String(point.date).slice(5), x, height - 12);
@@ -134,16 +165,16 @@ function renderTrend() {
   });
 
   const last = coordinates[coordinates.length - 1];
-  context.fillStyle = "rgba(26,24,20,0.88)";
+  context.fillStyle = "#f5f5f5"; // Brightened from dark brown/black
   context.font = "bold 12px serif";
   context.textAlign = "right";
   context.fillText(formatMetric(last.point.revenue, "currency"), width - padding.right, Math.max(16, last.y - 10));
 }
 
 function drawTrendGrid(context, width, height, padding, chartHeight, chartWidth, maxRevenue, minRevenue) {
-  context.strokeStyle = "rgba(26,24,20,0.1)";
+  context.strokeStyle = "rgba(255, 255, 255, 0.08)"; // Lighter grid lines
   context.lineWidth = 1;
-  context.fillStyle = "#8b827a";
+  context.fillStyle = "#cecece"; // Brightened from #8b827a
   context.font = "10px serif";
   context.textAlign = "right";
 
@@ -159,7 +190,7 @@ function drawTrendGrid(context, width, height, padding, chartHeight, chartWidth,
     context.fillText(compactCurrency(value), padding.left - 10, y + 3);
   }
 
-  context.strokeStyle = "rgba(26,24,20,0.22)";
+  context.strokeStyle = "rgba(255, 255, 255, 0.35)"; // Lighter axis lines
   context.beginPath();
   context.moveTo(padding.left, padding.top);
   context.lineTo(padding.left, height - padding.bottom);
@@ -222,6 +253,7 @@ async function loadForecastOptions() {
       forecastMarket.value = profileMarket;
     }
   }
+  enhanceGlassSelect(forecastMarket);
 }
 
 async function predictRisk() {
@@ -341,4 +373,81 @@ function setStatus(message) {
 
 function escapeAttribute(value) {
   return String(value ?? "").replaceAll('"', "&quot;");
+}
+
+function createTooltip() {
+  if (tooltipNode) return tooltipNode;
+  tooltipNode = document.createElement("div");
+  tooltipNode.className = "chart-tooltip";
+  document.body.appendChild(tooltipNode);
+  return tooltipNode;
+}
+
+function initChartEvents() {
+  if (!chartCanvas) return;
+
+  chartCanvas.addEventListener("mousemove", (event) => {
+    if (!trendCoordinates.length) return;
+
+    const rect = chartCanvas.getBoundingClientRect();
+    const mouseX = (event.clientX - rect.left) * (chartCanvas.width / rect.width);
+    const mouseY = (event.clientY - rect.top) * (chartCanvas.height / rect.height);
+
+    let closestIndex = null;
+    let minDistance = Infinity;
+
+    trendCoordinates.forEach((coord, index) => {
+      const dx = mouseX - coord.x;
+      const dy = mouseY - coord.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestIndex = index;
+      }
+    });
+
+    if (minDistance < 20 && closestIndex !== null) {
+      if (hoveredIndex !== closestIndex) {
+        hoveredIndex = closestIndex;
+        renderTrend();
+      }
+
+      const activePt = trendCoordinates[hoveredIndex];
+      const el = createTooltip();
+      el.innerHTML = `
+        <div class="chart-tooltip-date">${formatDateTooltip(activePt.point.date)}</div>
+        <div class="chart-tooltip-value">${formatMetric(activePt.point.revenue, "currency")}</div>
+      `;
+      el.style.left = `${event.pageX + 15}px`;
+      el.style.top = `${event.pageY - 15}px`;
+      el.classList.add("is-visible");
+    } else {
+      if (hoveredIndex !== null) {
+        hoveredIndex = null;
+        renderTrend();
+      }
+      hideTooltip();
+    }
+  });
+
+  chartCanvas.addEventListener("mouseleave", () => {
+    if (hoveredIndex !== null) {
+      hoveredIndex = null;
+      renderTrend();
+    }
+    hideTooltip();
+  });
+}
+
+function hideTooltip() {
+  if (tooltipNode) {
+    tooltipNode.classList.remove("is-visible");
+  }
+}
+
+function formatDateTooltip(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
 }
