@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supply Chain Analysis</title>
+
+  <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="../css/landing.css">
+</head>
+<body>
+
+  <!-- NAVBAR  -->
+  <div class="navbar-wrap">
+    <nav class="navbar">
+      <!-- Tombol garis 3 -->
+      <button class="glass-btn menu-btn" id="menuBtn">
+        <img class="menu-icon" src="../assets/navbar.png" alt="Menu">
+      </button>
+
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="glass-card sidebar" id="sidebar">
+      <a href="index.html">Home</a>
+      <a href="Dashboard.html">
+        Dashboard
+      </a>
+      <a href="SupplierSelection.html">
+        Supplier Selection
+      </a>
+    </aside>
+  </div>
+
+  <main class="landing-page">
+    <section class="landing-hero">
+      <p class="label-caps">Supply Chain Intelligence</p>
+      <h1 class="headline-xl">Supply Chain<br>Analysis</h1>
+      <p class="body-serif hero-copy">
+        Platform analitik ini membantu membaca performa rantai pasok dari sisi pesanan,
+        pengiriman, risiko keterlambatan, profitabilitas, serta rekomendasi produk dan supplier.
+        Alur pengalaman dimulai dari ringkasan bisnis, dilanjutkan ke pemilihan produk, lalu
+        masuk ke profiling produk untuk melihat tren dan estimasi risiko.
+      </p>
+    </section>
+
+    <section class="landing-section">
+      <div class="section-heading">
+        <p class="label-caps">Project Summary</p>
+        <h2 class="section-title">What This System Covers</h2>
+      </div>
+
+      <div class="summary-grid">
+        <article class="glass-card summary-card">
+          <span class="summary-index">01</span>
+          <h3>Executive Dashboard</h3>
+          <p>
+            Menampilkan metrik utama dari dataset seperti total orders, total sales,
+            shipment delay, risk count, profit, dan discount rate.
+          </p>
+        </article>
+
+        <article class="glass-card summary-card">
+          <span class="summary-index">02</span>
+          <h3>Interactive Filtering</h3>
+          <p>
+            Sidebar filter disiapkan untuk membaca data berdasarkan tanggal, market,
+            region, country, shipping mode, category, department, segment, status, dan risk level.
+          </p>
+        </article>
+
+        <article class="glass-card summary-card">
+          <span class="summary-index">03</span>
+          <h3>Supplier Selection</h3>
+          <p>
+            Produk dipilih berdasarkan kategori, kemudian kandidat terbaik dapat diarahkan
+            menuju halaman profiling produk.
+          </p>
+        </article>
+
+        <article class="glass-card summary-card">
+          <span class="summary-index">04</span>
+          <h3>Product Profiling</h3>
+          <p>
+            Halaman profiling menyajikan tren produk, sales, revenue, shipping mode, dan
+            estimasi late delivery risk.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="landing-section team-section">
+      <div class="section-heading">
+        <p class="label-caps">Team Context</p>
+        <h2 class="section-title">Analysis Focus</h2>
+      </div>
+
+      <div class="narrative-card">
+        <p>
+          Tim berfokus membangun pengalaman analitik yang mudah dibaca oleh pengguna bisnis:
+          mulai dari ringkasan performa, penyaringan data, pemilihan kandidat produk dan supplier,
+          sampai halaman profiling untuk melihat konteks produk secara lebih rinci.
+        </p>
+        <p>
+          Struktur halaman dibuat bertahap agar pengguna tidak langsung masuk ke detail teknis.
+          Landing page memberi gambaran besar, dashboard memberi kondisi dataset, supplier
+          selection membantu memilih produk, dan product profiling menjadi area analisis akhir.
+        </p>
+      </div>
+    </section>
+
+    <a class="glass-btn floating-action" href="Dashboard.html">
+      Start
+    </a>
+
+  </main>
+
+  <script src="../js/navbar.js"></script>
+</body>
+</html>

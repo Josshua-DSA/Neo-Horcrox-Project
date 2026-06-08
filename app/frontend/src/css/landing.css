@@ -1,0 +1,127 @@
+.landing-page {
+  width: min(1120px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 4rem 0 7rem;
+}
+
+.landing-hero {
+  min-height: 72vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.4rem;
+  margin-bottom: 10rem;
+  margin-top: +2rem;
+}
+
+.landing-hero .label-caps {
+  margin-left: 0.35rem;
+}
+
+.hero-copy {
+  max-width: 720px;
+  font-size: 1rem;
+}
+
+.landing-section {
+  margin: 5rem 0;
+  flex-direction: column;
+}
+
+.section-heading {
+  margin-bottom: 2rem;
+}
+
+.section-heading .section-title {
+  margin: 0.3rem 0 0;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.2rem;
+}
+
+.summary-card {
+  min-height: 230px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.summary-card:hover {
+  transform: scale(1.05);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.summary-index {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--ink3);
+}
+
+.summary-card h3,
+.narrative-card h3 {
+  font-size: 1.15rem;
+  color: var(--ink);
+}
+
+.summary-card p,
+.narrative-card p {
+  font-family: 'IM Fell English', Georgia, serif;
+  font-size: 0.93rem;
+  line-height: 1.65;
+  color: var(--ink3);
+}
+
+.team-section {
+  margin-bottom: 1rem;
+}
+
+.narrative-card {
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 920px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .narrative-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .landing-page {
+    width: min(100% - 28px, 1120px);
+    padding-top: 2.5rem;
+  }
+
+  .landing-hero {
+    min-height: auto;
+    padding: 2rem 0;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .floating-action {
+    right: 1rem;
+    bottom: 1rem;
+    max-width: calc(100% - 2rem);
+    text-align: center;
+  }
+}

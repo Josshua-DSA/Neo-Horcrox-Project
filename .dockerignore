@@ -1,0 +1,54 @@
+# Git
+.git
+.gitignore
+
+# Frontend artifacts from host Windows must not enter API build context
+app/frontend/
+app/frontend/node_modules/
+app/frontend/dist/
+**/node_modules/
+
+# Data, notebooks, and database assets not needed in API image
+dataset/
+notebook/
+reports/
+frontend/
+database/
+app/database/
+model/notebooks/
+model/dataset/
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+.eggs
+dist
+build
+*.egg
+
+# Environment
+.env
+.venv
+venv
+env
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.yaml
+Dockerfile
+.dockerignore
+
+# Misc
+*.md
+*.log

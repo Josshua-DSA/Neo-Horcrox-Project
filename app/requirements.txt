@@ -1,0 +1,21 @@
+# FastAPI and server
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.7.4
+pydantic-settings==2.3.4
+
+# PostgreSQL
+asyncpg==0.30.0
+sqlalchemy[asyncio]==2.0.35
+
+# Runtime ML and data dependencies
+numpy>=2.0.0
+pandas==2.2.2
+scikit-learn==1.7.2
+lightgbm==4.6.0
+xgboost==3.2.0
+
+# Utilities
+python-dotenv==1.0.1
+
+aiosqlite==0.20.0

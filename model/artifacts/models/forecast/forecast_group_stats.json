@@ -1,0 +1,1298 @@
+[
+  {
+    "Category Name":"Accessories",
+    "Market":"Africa",
+    "mean_sales":129.7233694919,
+    "std_sales":78.5638633981,
+    "mean_qty":5.191011236,
+    "last_date":"2017-01-13"
+  },
+  {
+    "Category Name":"Accessories",
+    "Market":"Europe",
+    "mean_sales":161.496067805,
+    "std_sales":105.7322025452,
+    "mean_qty":6.4624277457,
+    "last_date":"2017-01-07"
+  },
+  {
+    "Category Name":"Accessories",
+    "Market":"LATAM",
+    "mean_sales":170.9178426143,
+    "std_sales":104.4012903592,
+    "mean_qty":6.8394495413,
+    "last_date":"2017-04-22"
+  },
+  {
+    "Category Name":"Accessories",
+    "Market":"Pacific Asia",
+    "mean_sales":148.8193709152,
+    "std_sales":105.5922440456,
+    "mean_qty":5.9551569507,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Accessories",
+    "Market":"USCA",
+    "mean_sales":172.0326072896,
+    "std_sales":114.2624317756,
+    "mean_qty":6.884057971,
+    "last_date":"2017-01-11"
+  },
+  {
+    "Category Name":"As Seen on  TV!",
+    "Market":"Europe",
+    "mean_sales":382.3147051182,
+    "std_sales":243.0252467533,
+    "mean_qty":3.8235294118,
+    "last_date":"2017-09-09"
+  },
+  {
+    "Category Name":"As Seen on  TV!",
+    "Market":"LATAM",
+    "mean_sales":379.961999508,
+    "std_sales":250.4481921377,
+    "mean_qty":3.8,
+    "last_date":"2017-06-14"
+  },
+  {
+    "Category Name":"Baby ",
+    "Market":"Europe",
+    "mean_sales":2422.28007503,
+    "std_sales":2172.3452361783,
+    "mean_qty":41.0,
+    "last_date":"2017-10-08"
+  },
+  {
+    "Category Name":"Baby ",
+    "Market":"Pacific Asia",
+    "mean_sales":2461.6667429167,
+    "std_sales":1892.712791329,
+    "mean_qty":41.6666666667,
+    "last_date":"2017-12-19"
+  },
+  {
+    "Category Name":"Baseball & Softball",
+    "Market":"Africa",
+    "mean_sales":175.1813085683,
+    "std_sales":104.7098631258,
+    "mean_qty":3.6086956522,
+    "last_date":"2017-01-17"
+  },
+  {
+    "Category Name":"Baseball & Softball",
+    "Market":"Europe",
+    "mean_sales":205.7076912626,
+    "std_sales":124.6958615973,
+    "mean_qty":3.3055555556,
+    "last_date":"2017-09-11"
+  },
+  {
+    "Category Name":"Baseball & Softball",
+    "Market":"LATAM",
+    "mean_sales":199.5968723237,
+    "std_sales":130.6329648657,
+    "mean_qty":3.6466666667,
+    "last_date":"2017-06-16"
+  },
+  {
+    "Category Name":"Baseball & Softball",
+    "Market":"Pacific Asia",
+    "mean_sales":170.6113006007,
+    "std_sales":107.3042277518,
+    "mean_qty":3.6851851852,
+    "last_date":"2017-01-16"
+  },
+  {
+    "Category Name":"Baseball & Softball",
+    "Market":"USCA",
+    "mean_sales":217.1384560366,
+    "std_sales":180.60851027,
+    "mean_qty":4.4647887324,
+    "last_date":"2016-10-08"
+  },
+  {
+    "Category Name":"Basketball",
+    "Market":"Europe",
+    "mean_sales":1290.4442544476,
+    "std_sales":1070.4610719474,
+    "mean_qty":3.1904761905,
+    "last_date":"2017-10-02"
+  },
+  {
+    "Category Name":"Books ",
+    "Market":"Europe",
+    "mean_sales":1595.4399958933,
+    "std_sales":884.4794991704,
+    "mean_qty":51.3333333333,
+    "last_date":"2017-10-07"
+  },
+  {
+    "Category Name":"Books ",
+    "Market":"Pacific Asia",
+    "mean_sales":1004.9199974133,
+    "std_sales":966.1498467601,
+    "mean_qty":32.3333333333,
+    "last_date":"2017-12-17"
+  },
+  {
+    "Category Name":"Boxing & MMA",
+    "Market":"Africa",
+    "mean_sales":186.5053612843,
+    "std_sales":82.4065131458,
+    "mean_qty":3.3928571429,
+    "last_date":"2017-01-15"
+  },
+  {
+    "Category Name":"Boxing & MMA",
+    "Market":"Europe",
+    "mean_sales":340.1292723804,
+    "std_sales":271.3644457718,
+    "mean_qty":4.3854166667,
+    "last_date":"2017-09-09"
+  },
+  {
+    "Category Name":"Boxing & MMA",
+    "Market":"LATAM",
+    "mean_sales":288.4681483784,
+    "std_sales":233.5900550413,
+    "mean_qty":4.0927835052,
+    "last_date":"2017-06-17"
+  },
+  {
+    "Category Name":"Boxing & MMA",
+    "Market":"Pacific Asia",
+    "mean_sales":168.345628735,
+    "std_sales":94.895462053,
+    "mean_qty":3.0625,
+    "last_date":"2017-01-17"
+  },
+  {
+    "Category Name":"Boxing & MMA",
+    "Market":"USCA",
+    "mean_sales":199.426050946,
+    "std_sales":101.0919066939,
+    "mean_qty":3.6279069767,
+    "last_date":"2017-01-13"
+  },
+  {
+    "Category Name":"CDs ",
+    "Market":"Europe",
+    "mean_sales":500.52333156,
+    "std_sales":335.3592453421,
+    "mean_qty":44.3333333333,
+    "last_date":"2017-10-10"
+  },
+  {
+    "Category Name":"CDs ",
+    "Market":"Pacific Asia",
+    "mean_sales":519.33999816,
+    "std_sales":382.3628141753,
+    "mean_qty":46.0,
+    "last_date":"2017-12-21"
+  },
+  {
+    "Category Name":"Cameras ",
+    "Market":"Europe",
+    "mean_sales":28880.3338763889,
+    "std_sales":4661.9574697493,
+    "mean_qty":63.8888888889,
+    "last_date":"2017-10-18"
+  },
+  {
+    "Category Name":"Cameras ",
+    "Market":"Pacific Asia",
+    "mean_sales":7684.6801445,
+    "std_sales":null,
+    "mean_qty":17.0,
+    "last_date":"2017-12-21"
+  },
+  {
+    "Category Name":"Camping & Hiking",
+    "Market":"Africa",
+    "mean_sales":1816.3173268767,
+    "std_sales":900.8228665784,
+    "mean_qty":6.0547945205,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Camping & Hiking",
+    "Market":"Europe",
+    "mean_sales":2970.8203178146,
+    "std_sales":1845.7215752865,
+    "mean_qty":9.9033942559,
+    "last_date":"2017-10-02"
+  },
+  {
+    "Category Name":"Camping & Hiking",
+    "Market":"LATAM",
+    "mean_sales":4171.9074377483,
+    "std_sales":1087.7128561205,
+    "mean_qty":13.9072847682,
+    "last_date":"2017-06-17"
+  },
+  {
+    "Category Name":"Camping & Hiking",
+    "Market":"Pacific Asia",
+    "mean_sales":2751.9477730426,
+    "std_sales":1645.9193532901,
+    "mean_qty":9.1737704918,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Camping & Hiking",
+    "Market":"USCA",
+    "mean_sales":3065.4673760896,
+    "std_sales":1854.5908651474,
+    "mean_qty":10.2189054726,
+    "last_date":"2017-01-16"
+  },
+  {
+    "Category Name":"Cardio Equipment",
+    "Market":"Africa",
+    "mean_sales":1773.6171722811,
+    "std_sales":897.5295697495,
+    "mean_qty":18.075862069,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Cardio Equipment",
+    "Market":"Europe",
+    "mean_sales":2743.5632512077,
+    "std_sales":1727.7737143954,
+    "mean_qty":27.8253968254,
+    "last_date":"2017-10-02"
+  },
+  {
+    "Category Name":"Cardio Equipment",
+    "Market":"LATAM",
+    "mean_sales":3689.13724818,
+    "std_sales":1221.4830613025,
+    "mean_qty":37.5695364238,
+    "last_date":"2017-06-17"
+  },
+  {
+    "Category Name":"Cardio Equipment",
+    "Market":"Pacific Asia",
+    "mean_sales":2497.9913595447,
+    "std_sales":1590.6575576707,
+    "mean_qty":25.4451827243,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Cardio Equipment",
+    "Market":"USCA",
+    "mean_sales":2672.934747597,
+    "std_sales":1686.1806988294,
+    "mean_qty":27.215,
+    "last_date":"2017-01-13"
+  },
+  {
+    "Category Name":"Children's Clothing",
+    "Market":"Europe",
+    "mean_sales":20711.8003538,
+    "std_sales":7583.6473332319,
+    "mean_qty":58.0,
+    "last_date":"2017-10-26"
+  },
+  {
+    "Category Name":"Children's Clothing",
+    "Market":"Pacific Asia",
+    "mean_sales":15474.3335976667,
+    "std_sales":9120.6259086371,
+    "mean_qty":43.3333333333,
+    "last_date":"2017-12-23"
+  },
+  {
+    "Category Name":"Cleats",
+    "Market":"Africa",
+    "mean_sales":2030.2738669434,
+    "std_sales":870.4909837222,
+    "mean_qty":33.843537415,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Cleats",
+    "Market":"Europe",
+    "mean_sales":3143.2649709761,
+    "std_sales":1922.2235552526,
+    "mean_qty":52.0281329923,
+    "last_date":"2017-10-02"
+  },
+  {
+    "Category Name":"Cleats",
+    "Market":"LATAM",
+    "mean_sales":4346.4941271976,
+    "std_sales":1021.4808580736,
+    "mean_qty":72.4536423841,
+    "last_date":"2017-06-17"
+  },
+  {
+    "Category Name":"Cleats",
+    "Market":"Pacific Asia",
+    "mean_sales":2987.5802471713,
+    "std_sales":1707.1693039337,
+    "mean_qty":49.8013029316,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Cleats",
+    "Market":"USCA",
+    "mean_sales":3108.9749253338,
+    "std_sales":2050.3790611985,
+    "mean_qty":51.8248847926,
+    "last_date":"2017-01-13"
+  },
+  {
+    "Category Name":"Computers",
+    "Market":"Europe",
+    "mean_sales":87500.0,
+    "std_sales":29723.7278954037,
+    "mean_qty":58.3333333333,
+    "last_date":"2017-10-31"
+  },
+  {
+    "Category Name":"Computers",
+    "Market":"Pacific Asia",
+    "mean_sales":69000.0,
+    "std_sales":12727.9220613579,
+    "mean_qty":46.0,
+    "last_date":"2017-12-24"
+  },
+  {
+    "Category Name":"Consumer Electronics",
+    "Market":"Europe",
+    "mean_sales":14414.1602793,
+    "std_sales":4383.6586559524,
+    "mean_qty":57.0,
+    "last_date":"2017-11-04"
+  },
+  {
+    "Category Name":"Consumer Electronics",
+    "Market":"Pacific Asia",
+    "mean_sales":12306.8269051333,
+    "std_sales":5184.5540587223,
+    "mean_qty":48.6666666667,
+    "last_date":"2017-12-26"
+  },
+  {
+    "Category Name":"Crafts",
+    "Market":"Europe",
+    "mean_sales":26650.47063525,
+    "std_sales":6659.5579031247,
+    "mean_qty":57.75,
+    "last_date":"2017-11-07"
+  },
+  {
+    "Category Name":"Crafts",
+    "Market":"Pacific Asia",
+    "mean_sales":23350.8885566,
+    "std_sales":11512.0533826011,
+    "mean_qty":50.6,
+    "last_date":"2017-12-30"
+  },
+  {
+    "Category Name":"DVDs",
+    "Market":"Europe",
+    "mean_sales":8835.425263375,
+    "std_sales":4474.3883047772,
+    "mean_qty":53.75,
+    "last_date":"2017-11-10"
+  },
+  {
+    "Category Name":"DVDs",
+    "Market":"Pacific Asia",
+    "mean_sales":6293.4059018857,
+    "std_sales":5060.9417829258,
+    "mean_qty":38.2857142857,
+    "last_date":"2018-01-01"
+  },
+  {
+    "Category Name":"Electronics",
+    "Market":"Africa",
+    "mean_sales":265.4071956246,
+    "std_sales":183.9221297538,
+    "mean_qty":6.649122807,
+    "last_date":"2017-01-15"
+  },
+  {
+    "Category Name":"Electronics",
+    "Market":"Europe",
+    "mean_sales":360.4098608528,
+    "std_sales":243.9654372769,
+    "mean_qty":9.2511848341,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Electronics",
+    "Market":"LATAM",
+    "mean_sales":443.8762963197,
+    "std_sales":233.429914962,
+    "mean_qty":11.1208333333,
+    "last_date":"2017-04-22"
+  },
+  {
+    "Category Name":"Electronics",
+    "Market":"Pacific Asia",
+    "mean_sales":374.7131770572,
+    "std_sales":271.1312363192,
+    "mean_qty":9.6349206349,
+    "last_date":"2017-01-17"
+  },
+  {
+    "Category Name":"Electronics",
+    "Market":"USCA",
+    "mean_sales":403.6310791874,
+    "std_sales":243.149118113,
+    "mean_qty":10.3101265823,
+    "last_date":"2017-01-13"
+  },
+  {
+    "Category Name":"Fishing",
+    "Market":"Africa",
+    "mean_sales":3224.328660102,
+    "std_sales":1264.1758237999,
+    "mean_qty":8.0612244898,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Fishing",
+    "Market":"Europe",
+    "mean_sales":5028.4693288903,
+    "std_sales":3032.7759676567,
+    "mean_qty":12.5718015666,
+    "last_date":"2017-10-02"
+  },
+  {
+    "Category Name":"Fishing",
+    "Market":"LATAM",
+    "mean_sales":6733.4383308742,
+    "std_sales":1678.3463126433,
+    "mean_qty":16.8344370861,
+    "last_date":"2017-06-17"
+  },
+  {
+    "Category Name":"Fishing",
+    "Market":"Pacific Asia",
+    "mean_sales":4769.8914948149,
+    "std_sales":2885.8577108691,
+    "mean_qty":11.9253246753,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Fishing",
+    "Market":"USCA",
+    "mean_sales":5294.5807641649,
+    "std_sales":3058.7971794546,
+    "mean_qty":13.2371134021,
+    "last_date":"2017-01-16"
+  },
+  {
+    "Category Name":"Fitness Accessories",
+    "Market":"Africa",
+    "mean_sales":115.6191324809,
+    "std_sales":58.2013010807,
+    "mean_qty":3.3043478261,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Fitness Accessories",
+    "Market":"Europe",
+    "mean_sales":245.2689799616,
+    "std_sales":464.8966320824,
+    "mean_qty":3.7142857143,
+    "last_date":"2017-10-01"
+  },
+  {
+    "Category Name":"Fitness Accessories",
+    "Market":"LATAM",
+    "mean_sales":118.2760588794,
+    "std_sales":69.0658377623,
+    "mean_qty":3.3802816901,
+    "last_date":"2017-04-18"
+  },
+  {
+    "Category Name":"Fitness Accessories",
+    "Market":"Pacific Asia",
+    "mean_sales":98.1663914678,
+    "std_sales":66.6063917144,
+    "mean_qty":2.8055555556,
+    "last_date":"2017-01-16"
+  },
+  {
+    "Category Name":"Fitness Accessories",
+    "Market":"USCA",
+    "mean_sales":121.2986691618,
+    "std_sales":62.2353623203,
+    "mean_qty":3.4666666667,
+    "last_date":"2016-12-17"
+  },
+  {
+    "Category Name":"Garden",
+    "Market":"Pacific Asia",
+    "mean_sales":32221.09103455,
+    "std_sales":6145.3101088841,
+    "mean_qty":60.5,
+    "last_date":"2018-01-02"
+  },
+  {
+    "Category Name":"Girls' Apparel",
+    "Market":"Africa",
+    "mean_sales":180.6178574521,
+    "std_sales":159.076107187,
+    "mean_qty":4.2142857143,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Girls' Apparel",
+    "Market":"Europe",
+    "mean_sales":212.9231091488,
+    "std_sales":153.4577508877,
+    "mean_qty":5.027027027,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Girls' Apparel",
+    "Market":"LATAM",
+    "mean_sales":240.3889795667,
+    "std_sales":172.0332715789,
+    "mean_qty":5.6612903226,
+    "last_date":"2017-04-21"
+  },
+  {
+    "Category Name":"Girls' Apparel",
+    "Market":"Pacific Asia",
+    "mean_sales":216.8580466474,
+    "std_sales":167.8679164429,
+    "mean_qty":5.1436781609,
+    "last_date":"2017-01-17"
+  },
+  {
+    "Category Name":"Girls' Apparel",
+    "Market":"USCA",
+    "mean_sales":234.1807639493,
+    "std_sales":169.7338516512,
+    "mean_qty":5.8220338983,
+    "last_date":"2017-01-12"
+  },
+  {
+    "Category Name":"Golf Apparel",
+    "Market":"Africa",
+    "mean_sales":68.8544435837,
+    "std_sales":36.4965786254,
+    "mean_qty":3.4444444444,
+    "last_date":"2017-01-08"
+  },
+  {
+    "Category Name":"Golf Apparel",
+    "Market":"Europe",
+    "mean_sales":134.3778908217,
+    "std_sales":102.108269404,
+    "mean_qty":2.5779816514,
+    "last_date":"2017-09-10"
+  },
+  {
+    "Category Name":"Golf Apparel",
+    "Market":"LATAM",
+    "mean_sales":104.2595241463,
+    "std_sales":90.5390407843,
+    "mean_qty":2.619047619,
+    "last_date":"2017-06-17"
+  },
+  {
+    "Category Name":"Golf Apparel",
+    "Market":"Pacific Asia",
+    "mean_sales":63.5166125742,
+    "std_sales":36.4709972869,
+    "mean_qty":3.1774193548,
+    "last_date":"2017-01-15"
+  },
+  {
+    "Category Name":"Golf Apparel",
+    "Market":"USCA",
+    "mean_sales":74.5460405733,
+    "std_sales":37.052891166,
+    "mean_qty":3.7291666667,
+    "last_date":"2016-12-25"
+  },
+  {
+    "Category Name":"Golf Bags & Carts",
+    "Market":"Europe",
+    "mean_sales":211.0220757931,
+    "std_sales":74.029656414,
+    "mean_qty":1.2413793103,
+    "last_date":"2017-08-31"
+  },
+  {
+    "Category Name":"Golf Bags & Carts",
+    "Market":"LATAM",
+    "mean_sales":212.487506875,
+    "std_sales":75.5200417411,
+    "mean_qty":1.25,
+    "last_date":"2017-06-16"
+  },
+  {
+    "Category Name":"Golf Balls",
+    "Market":"Africa",
+    "mean_sales":80.5227151541,
+    "std_sales":51.6659207809,
+    "mean_qty":4.5185185185,
+    "last_date":"2017-01-15"
+  },
+  {
+    "Category Name":"Golf Balls",
+    "Market":"Europe",
+    "mean_sales":91.7138000042,
+    "std_sales":60.3279423341,
+    "mean_qty":5.2280701754,
+    "last_date":"2017-01-17"
+  },
+  {
+    "Category Name":"Golf Balls",
+    "Market":"LATAM",
+    "mean_sales":116.3009030392,
+    "std_sales":75.2792281506,
+    "mean_qty":6.5929648241,
+    "last_date":"2017-04-22"
+  },
+  {
+    "Category Name":"Golf Balls",
+    "Market":"Pacific Asia",
+    "mean_sales":97.3350488351,
+    "std_sales":68.1166871292,
+    "mean_qty":5.495,
+    "last_date":"2017-01-17"
+  },
+  {
+    "Category Name":"Golf Balls",
+    "Market":"USCA",
+    "mean_sales":93.7547316199,
+    "std_sales":62.211977621,
+    "mean_qty":5.4427480916,
+    "last_date":"2017-01-08"
+  },
+  {
+    "Category Name":"Golf Gloves",
+    "Market":"Africa",
+    "mean_sales":80.1549057407,
+    "std_sales":61.407796861,
+    "mean_qty":3.3773584906,
+    "last_date":"2017-01-17"
+  },
+  {
+    "Category Name":"Golf Gloves",
+    "Market":"Europe",
+    "mean_sales":243.8585268598,
+    "std_sales":236.1646534912,
+    "mean_qty":3.6210526316,
+    "last_date":"2017-09-29"
+  },
+  {
+    "Category Name":"Golf Gloves",
+    "Market":"LATAM",
+    "mean_sales":187.0078184906,
+    "std_sales":195.7269176191,
+    "mean_qty":4.8020304569,
+    "last_date":"2017-06-15"
+  },
+  {
+    "Category Name":"Golf Gloves",
+    "Market":"Pacific Asia",
+    "mean_sales":114.4000000886,
+    "std_sales":85.3417370461,
+    "mean_qty":4.4444444444,
+    "last_date":"2017-01-10"
+  },
+  {
+    "Category Name":"Golf Gloves",
+    "Market":"USCA",
+    "mean_sales":118.8921218088,
+    "std_sales":94.3106735186,
+    "mean_qty":4.7272727273,
+    "last_date":"2017-01-06"
+  },
+  {
+    "Category Name":"Golf Shoes",
+    "Market":"Africa",
+    "mean_sales":220.4347826087,
+    "std_sales":129.6140515976,
+    "mean_qty":3.3913043478,
+    "last_date":"2017-01-15"
+  },
+  {
+    "Category Name":"Golf Shoes",
+    "Market":"Europe",
+    "mean_sales":352.252173913,
+    "std_sales":266.1226746366,
+    "mean_qty":4.2434782609,
+    "last_date":"2017-09-10"
+  },
+  {
+    "Category Name":"Golf Shoes",
+    "Market":"LATAM",
+    "mean_sales":285.1461538462,
+    "std_sales":226.488978856,
+    "mean_qty":3.7538461538,
+    "last_date":"2017-06-17"
+  },
+  {
+    "Category Name":"Golf Shoes",
+    "Market":"Pacific Asia",
+    "mean_sales":220.3389830508,
+    "std_sales":103.8436507397,
+    "mean_qty":3.3898305085,
+    "last_date":"2016-12-29"
+  },
+  {
+    "Category Name":"Golf Shoes",
+    "Market":"USCA",
+    "mean_sales":228.7037037037,
+    "std_sales":131.0630886008,
+    "mean_qty":3.5185185185,
+    "last_date":"2016-12-26"
+  },
+  {
+    "Category Name":"Health and Beauty",
+    "Market":"Pacific Asia",
+    "mean_sales":13260.060384625,
+    "std_sales":7505.0776952273,
+    "mean_qty":45.25,
+    "last_date":"2018-01-04"
+  },
+  {
+    "Category Name":"Hockey",
+    "Market":"Africa",
+    "mean_sales":80.3611111111,
+    "std_sales":43.2779407866,
+    "mean_qty":3.4444444444,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Hockey",
+    "Market":"Europe",
+    "mean_sales":177.378657066,
+    "std_sales":277.5661562364,
+    "mean_qty":3.9381443299,
+    "last_date":"2017-09-28"
+  },
+  {
+    "Category Name":"Hockey",
+    "Market":"LATAM",
+    "mean_sales":94.8403361345,
+    "std_sales":55.5227824965,
+    "mean_qty":4.0588235294,
+    "last_date":"2017-04-22"
+  },
+  {
+    "Category Name":"Hockey",
+    "Market":"Pacific Asia",
+    "mean_sales":82.6239316239,
+    "std_sales":58.3050430326,
+    "mean_qty":3.5213675214,
+    "last_date":"2017-01-12"
+  },
+  {
+    "Category Name":"Hockey",
+    "Market":"USCA",
+    "mean_sales":93.7051282051,
+    "std_sales":63.9876426736,
+    "mean_qty":3.9743589744,
+    "last_date":"2016-10-17"
+  },
+  {
+    "Category Name":"Hunting & Shooting",
+    "Market":"Africa",
+    "mean_sales":94.7683995772,
+    "std_sales":41.2294326462,
+    "mean_qty":3.16,
+    "last_date":"2017-01-11"
+  },
+  {
+    "Category Name":"Hunting & Shooting",
+    "Market":"Europe",
+    "mean_sales":234.4395889961,
+    "std_sales":214.0677440529,
+    "mean_qty":3.6391752577,
+    "last_date":"2017-09-09"
+  },
+  {
+    "Category Name":"Hunting & Shooting",
+    "Market":"LATAM",
+    "mean_sales":173.0597327059,
+    "std_sales":178.412456129,
+    "mean_qty":3.5267857143,
+    "last_date":"2017-06-12"
+  },
+  {
+    "Category Name":"Hunting & Shooting",
+    "Market":"Pacific Asia",
+    "mean_sales":100.7663990369,
+    "std_sales":53.927935898,
+    "mean_qty":3.36,
+    "last_date":"2017-01-15"
+  },
+  {
+    "Category Name":"Hunting & Shooting",
+    "Market":"USCA",
+    "mean_sales":111.5906967274,
+    "std_sales":71.4880734191,
+    "mean_qty":3.7209302326,
+    "last_date":"2016-11-05"
+  },
+  {
+    "Category Name":"Indoor\/Outdoor Games",
+    "Market":"Africa",
+    "mean_sales":1351.4999871384,
+    "std_sales":589.3390491172,
+    "mean_qty":27.0408163265,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Indoor\/Outdoor Games",
+    "Market":"Europe",
+    "mean_sales":2005.8469378223,
+    "std_sales":1222.1213405881,
+    "mean_qty":40.1329923274,
+    "last_date":"2017-10-02"
+  },
+  {
+    "Category Name":"Indoor\/Outdoor Games",
+    "Market":"LATAM",
+    "mean_sales":2918.6995755949,
+    "std_sales":759.4626050804,
+    "mean_qty":58.3973509934,
+    "last_date":"2017-06-17"
+  },
+  {
+    "Category Name":"Indoor\/Outdoor Games",
+    "Market":"Pacific Asia",
+    "mean_sales":1977.6399823476,
+    "std_sales":1169.9074910167,
+    "mean_qty":39.568627451,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Indoor\/Outdoor Games",
+    "Market":"USCA",
+    "mean_sales":2036.0784285417,
+    "std_sales":1281.0633907924,
+    "mean_qty":40.7378640777,
+    "last_date":"2017-01-13"
+  },
+  {
+    "Category Name":"Kids' Golf Clubs",
+    "Market":"Europe",
+    "mean_sales":768.0836759409,
+    "std_sales":616.5165975887,
+    "mean_qty":4.4947368421,
+    "last_date":"2017-10-02"
+  },
+  {
+    "Category Name":"Kids' Golf Clubs",
+    "Market":"LATAM",
+    "mean_sales":538.1172920696,
+    "std_sales":296.4802186452,
+    "mean_qty":4.5416666667,
+    "last_date":"2017-06-17"
+  },
+  {
+    "Category Name":"Lacrosse",
+    "Market":"Africa",
+    "mean_sales":79.5136357982,
+    "std_sales":32.3874023795,
+    "mean_qty":3.1818181818,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Lacrosse",
+    "Market":"Europe",
+    "mean_sales":183.1936699778,
+    "std_sales":160.2563994714,
+    "mean_qty":3.417721519,
+    "last_date":"2017-09-10"
+  },
+  {
+    "Category Name":"Lacrosse",
+    "Market":"LATAM",
+    "mean_sales":142.0225230295,
+    "std_sales":143.8336210101,
+    "mean_qty":3.3551401869,
+    "last_date":"2017-06-17"
+  },
+  {
+    "Category Name":"Lacrosse",
+    "Market":"Pacific Asia",
+    "mean_sales":88.4261529504,
+    "std_sales":48.3515468829,
+    "mean_qty":3.5384615385,
+    "last_date":"2016-12-25"
+  },
+  {
+    "Category Name":"Lacrosse",
+    "Market":"USCA",
+    "mean_sales":82.10999905,
+    "std_sales":49.4548005064,
+    "mean_qty":3.2857142857,
+    "last_date":"2016-09-25"
+  },
+  {
+    "Category Name":"Men's Clothing",
+    "Market":"Pacific Asia",
+    "mean_sales":10964.2003172,
+    "std_sales":3582.3823503674,
+    "mean_qty":52.0,
+    "last_date":"2018-01-04"
+  },
+  {
+    "Category Name":"Men's Footwear",
+    "Market":"Africa",
+    "mean_sales":1326.428627551,
+    "std_sales":544.3060106211,
+    "mean_qty":10.2040816327,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Men's Footwear",
+    "Market":"Europe",
+    "mean_sales":2025.0727252766,
+    "std_sales":1242.0880299908,
+    "mean_qty":15.578680203,
+    "last_date":"2017-10-02"
+  },
+  {
+    "Category Name":"Men's Footwear",
+    "Market":"LATAM",
+    "mean_sales":2825.345682457,
+    "std_sales":650.4597661835,
+    "mean_qty":21.7350993377,
+    "last_date":"2017-06-17"
+  },
+  {
+    "Category Name":"Men's Footwear",
+    "Market":"Pacific Asia",
+    "mean_sales":1971.4445133811,
+    "std_sales":1102.0132660398,
+    "mean_qty":15.1661237785,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Men's Footwear",
+    "Market":"USCA",
+    "mean_sales":2048.4006448093,
+    "std_sales":1358.5724927851,
+    "mean_qty":15.7581395349,
+    "last_date":"2017-01-15"
+  },
+  {
+    "Category Name":"Men's Golf Clubs",
+    "Market":"Europe",
+    "mean_sales":358.0446184882,
+    "std_sales":232.5897774448,
+    "mean_qty":3.2307692308,
+    "last_date":"2017-09-11"
+  },
+  {
+    "Category Name":"Men's Golf Clubs",
+    "Market":"LATAM",
+    "mean_sales":360.5343448234,
+    "std_sales":239.5711559751,
+    "mean_qty":3.1698113208,
+    "last_date":"2017-06-16"
+  },
+  {
+    "Category Name":"Music",
+    "Market":"Pacific Asia",
+    "mean_sales":12569.1219280667,
+    "std_sales":7355.8940062923,
+    "mean_qty":48.2222222222,
+    "last_date":"2018-01-06"
+  },
+  {
+    "Category Name":"Pet Supplies",
+    "Market":"Pacific Asia",
+    "mean_sales":4613.8667503067,
+    "std_sales":1775.4117590806,
+    "mean_qty":54.6666666667,
+    "last_date":"2018-01-10"
+  },
+  {
+    "Category Name":"Shop By Sport",
+    "Market":"Africa",
+    "mean_sales":591.8139957411,
+    "std_sales":294.4701311872,
+    "mean_qty":14.9300699301,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Shop By Sport",
+    "Market":"Europe",
+    "mean_sales":959.4221639864,
+    "std_sales":628.4298777848,
+    "mean_qty":23.7824933687,
+    "last_date":"2017-10-02"
+  },
+  {
+    "Category Name":"Shop By Sport",
+    "Market":"LATAM",
+    "mean_sales":1336.9282334779,
+    "std_sales":450.2235389303,
+    "mean_qty":33.2284768212,
+    "last_date":"2017-06-17"
+  },
+  {
+    "Category Name":"Shop By Sport",
+    "Market":"Pacific Asia",
+    "mean_sales":870.4456726562,
+    "std_sales":559.3641171504,
+    "mean_qty":21.9473684211,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Shop By Sport",
+    "Market":"USCA",
+    "mean_sales":979.0084082563,
+    "std_sales":617.9659369253,
+    "mean_qty":24.7135678392,
+    "last_date":"2017-01-13"
+  },
+  {
+    "Category Name":"Soccer",
+    "Market":"Europe",
+    "mean_sales":293.7679965508,
+    "std_sales":201.8395094734,
+    "mean_qty":3.2,
+    "last_date":"2017-09-10"
+  },
+  {
+    "Category Name":"Soccer",
+    "Market":"LATAM",
+    "mean_sales":294.716250244,
+    "std_sales":212.2110701806,
+    "mean_qty":3.375,
+    "last_date":"2017-06-17"
+  },
+  {
+    "Category Name":"Sporting Goods",
+    "Market":"Pacific Asia",
+    "mean_sales":14625.84375,
+    "std_sales":8441.7782718892,
+    "mean_qty":44.625,
+    "last_date":"2018-01-31"
+  },
+  {
+    "Category Name":"Strength Training",
+    "Market":"Europe",
+    "mean_sales":903.3952550246,
+    "std_sales":2069.7939441795,
+    "mean_qty":1.6315789474,
+    "last_date":"2017-10-02"
+  },
+  {
+    "Category Name":"Strength Training",
+    "Market":"LATAM",
+    "mean_sales":243.0,
+    "std_sales":88.6045666474,
+    "mean_qty":1.2857142857,
+    "last_date":"2017-06-16"
+  },
+  {
+    "Category Name":"Tennis & Racquet",
+    "Market":"Africa",
+    "mean_sales":143.6219247492,
+    "std_sales":69.7205428109,
+    "mean_qty":3.1923076923,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Tennis & Racquet",
+    "Market":"Europe",
+    "mean_sales":153.1238615302,
+    "std_sales":83.6774462807,
+    "mean_qty":3.4035087719,
+    "last_date":"2016-12-06"
+  },
+  {
+    "Category Name":"Tennis & Racquet",
+    "Market":"LATAM",
+    "mean_sales":180.5936647654,
+    "std_sales":99.8774992658,
+    "mean_qty":4.014084507,
+    "last_date":"2017-04-20"
+  },
+  {
+    "Category Name":"Tennis & Racquet",
+    "Market":"Pacific Asia",
+    "mean_sales":157.7910168783,
+    "std_sales":83.3237847855,
+    "mean_qty":3.5072463768,
+    "last_date":"2017-01-10"
+  },
+  {
+    "Category Name":"Tennis & Racquet",
+    "Market":"USCA",
+    "mean_sales":164.9633355035,
+    "std_sales":106.338950714,
+    "mean_qty":3.6666666667,
+    "last_date":"2017-01-09"
+  },
+  {
+    "Category Name":"Toys",
+    "Market":"Pacific Asia",
+    "mean_sales":554.9690889855,
+    "std_sales":299.0376533635,
+    "mean_qty":48.0909090909,
+    "last_date":"2018-01-31"
+  },
+  {
+    "Category Name":"Trade-In",
+    "Market":"Africa",
+    "mean_sales":67.7464276334,
+    "std_sales":36.7722685549,
+    "mean_qty":3.9285714286,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Trade-In",
+    "Market":"Europe",
+    "mean_sales":148.4020598466,
+    "std_sales":150.1028392247,
+    "mean_qty":3.9117647059,
+    "last_date":"2017-09-08"
+  },
+  {
+    "Category Name":"Trade-In",
+    "Market":"LATAM",
+    "mean_sales":120.6074209738,
+    "std_sales":102.0440196085,
+    "mean_qty":4.5210526316,
+    "last_date":"2017-06-16"
+  },
+  {
+    "Category Name":"Trade-In",
+    "Market":"Pacific Asia",
+    "mean_sales":85.1552929276,
+    "std_sales":57.6982020456,
+    "mean_qty":4.7320261438,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Trade-In",
+    "Market":"USCA",
+    "mean_sales":86.2855868906,
+    "std_sales":51.1957278228,
+    "mean_qty":4.7745098039,
+    "last_date":"2016-12-17"
+  },
+  {
+    "Category Name":"Video Games",
+    "Market":"Pacific Asia",
+    "mean_sales":2220.7,
+    "std_sales":858.5929893894,
+    "mean_qty":55.8666666667,
+    "last_date":"2018-01-31"
+  },
+  {
+    "Category Name":"Water Sports",
+    "Market":"Africa",
+    "mean_sales":1463.3751436931,
+    "std_sales":665.2584392297,
+    "mean_qty":7.3172413793,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Water Sports",
+    "Market":"Europe",
+    "mean_sales":2270.3834024465,
+    "std_sales":1438.5209372315,
+    "mean_qty":11.274151436,
+    "last_date":"2017-10-02"
+  },
+  {
+    "Category Name":"Water Sports",
+    "Market":"LATAM",
+    "mean_sales":3114.4138935977,
+    "std_sales":838.0779358761,
+    "mean_qty":15.5728476821,
+    "last_date":"2017-06-17"
+  },
+  {
+    "Category Name":"Water Sports",
+    "Market":"Pacific Asia",
+    "mean_sales":2050.8778995392,
+    "std_sales":1226.2148446291,
+    "mean_qty":10.2549019608,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Water Sports",
+    "Market":"USCA",
+    "mean_sales":2319.8840638,
+    "std_sales":1372.893561606,
+    "mean_qty":11.6,
+    "last_date":"2017-01-13"
+  },
+  {
+    "Category Name":"Women's Apparel",
+    "Market":"Africa",
+    "mean_sales":1422.4489795918,
+    "std_sales":631.9729834662,
+    "mean_qty":28.4489795918,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Women's Apparel",
+    "Market":"Europe",
+    "mean_sales":2266.1538461538,
+    "std_sales":1392.6618469579,
+    "mean_qty":45.3230769231,
+    "last_date":"2017-10-02"
+  },
+  {
+    "Category Name":"Women's Apparel",
+    "Market":"LATAM",
+    "mean_sales":3130.4635761589,
+    "std_sales":794.6137930242,
+    "mean_qty":62.6092715232,
+    "last_date":"2017-06-17"
+  },
+  {
+    "Category Name":"Women's Apparel",
+    "Market":"Pacific Asia",
+    "mean_sales":2063.7254901961,
+    "std_sales":1224.4200406203,
+    "mean_qty":41.2745098039,
+    "last_date":"2017-01-18"
+  },
+  {
+    "Category Name":"Women's Apparel",
+    "Market":"USCA",
+    "mean_sales":2331.7073170732,
+    "std_sales":1468.7494721551,
+    "mean_qty":46.6341463415,
+    "last_date":"2017-01-15"
+  },
+  {
+    "Category Name":"Women's Clothing",
+    "Market":"Pacific Asia",
+    "mean_sales":12753.0004313636,
+    "std_sales":4072.6036493664,
+    "mean_qty":59.0909090909,
+    "last_date":"2018-01-31"
+  },
+  {
+    "Category Name":"Women's Golf Clubs",
+    "Market":"Europe",
+    "mean_sales":457.6627875298,
+    "std_sales":278.0941014248,
+    "mean_qty":4.2131147541,
+    "last_date":"2017-09-10"
+  },
+  {
+    "Category Name":"Women's Golf Clubs",
+    "Market":"LATAM",
+    "mean_sales":405.5741485922,
+    "std_sales":265.5862075105,
+    "mean_qty":3.5609756098,
+    "last_date":"2017-06-17"
+  }
+]

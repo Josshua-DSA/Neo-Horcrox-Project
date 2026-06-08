@@ -1,0 +1,63 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: neo_horcrox_postgres
+    ports:
+      - "5417:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./app/database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: neo_horcrox
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d neo_horcrox"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    container_name: neo_horcrox_api
+    ports:
+      - "8017:8017"
+    volumes:
+      - ./model/artifacts:/app/model/artifacts:ro
+      - ./model/dataset:/app/model/dataset:ro
+    environment:
+      DEBUG: "false"
+      LOG_LEVEL: INFO
+      MODEL_ROOT: /app/model
+      ARTIFACTS_DIR: /app/model/artifacts
+      RAW_SUPPLY_CHAIN_DATASET_PATH: /app/model/dataset/raw/DataCoSupplyChainDataset.csv
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/neo_horcrox
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8017/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    image: node:20-alpine
+    container_name: neo_horcrox_frontend
+    working_dir: /app
+    ports:
+      - "5117:5117"
+    volumes:
+      - ./app/frontend:/app
+    environment:
+      VITE_API_BASE_URL: http://localhost:8017/api/v1
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5117"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

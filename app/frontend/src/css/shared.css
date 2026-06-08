@@ -1,0 +1,570 @@
+/* ═══════════════════════════════════════════════
+   shared.css  —  Supply Chain Analysis
+   Variables · Reset · Typography · Glass Components
+   Shared across index.html & dashboard.html
+═══════════════════════════════════════════════ */
+
+/* ── CSS VARIABLES ── */
+:root {
+  --ink:        #f5f5f5;
+  --ink2:       #dfdfdf;
+  --ink3:       #cecece;
+
+  --border:     1px solid rgba(26,24,20,0.12);
+  --radius:     25px;
+  --radius-sm:  8px;
+  --transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* NAVBAR */
+
+.navbar {
+  position: fixed;
+  height: 90px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px;
+  z-index: 1000;
+}
+
+/* BUTTON */
+.menu-icon {
+  width: 27px;
+  height: 27px;
+  margin: auto;
+}
+
+.menu-btn {
+  right: 30px;
+  position: fixed;
+  width: 60px;
+  height: 60px;
+  margin: 50px 3px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 10px 15px;
+  justify-content: right;
+  z-index: 2000;
+}
+
+.menu-btn:hover .menu-icon {
+  transform: scale(1.1);
+  transition: var(--transition);
+}
+
+/* SIDEBAR */
+.sidebar {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  width: 300px;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 55px 3px;
+  z-index: 999;
+  /* ANIMASI */
+  opacity: 0;
+  transform:
+    translateY(-70px);
+  transform-origin: top;
+  pointer-events: none;
+  transition:
+    transform 0.4s ease;
+}
+
+/* Saat aktif */
+.sidebar.active {
+  opacity: 1;
+  transform:
+    scale(1)
+    translateY(0)
+    translateX(0);
+  pointer-events: auto;
+}
+
+/* LINK */
+.sidebar a {
+  color: var(--ink);
+  text-decoration: none;
+  padding: 20px 30px;
+  font-size: 0.9rem;
+  transition: 0.2s;
+  text-align: left;
+  border-radius: 20px;
+  margin: 0 10px;
+}
+
+.sidebar a:hover {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 2px 1px rgba(255, 255, 255, 0.1);
+  transition: var(--transition);
+  padding: 20px 30px;
+  font-size: 1.1rem;
+  margin: 0 10px;
+}
+
+/* ── RESET ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: 'Libre Baskerville', 'Georgia', serif;
+  color: var(--ink);
+  background-image: url(../assets/bg.jpg);
+  min-height: 100vh;
+  background-size: cover;
+  background-attachment: scroll;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.619);
+  z-index: -1;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle,
+      transparent 5%,
+      rgba(0, 0, 0, 0.373) 100%
+    );
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ── TYPOGRAPHY ── */
+h1, h2, h3 {
+  font-family: 'Playfair Display', 'Times New Roman', serif;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.headline-xl {
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.0;
+}
+
+.section-title {
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.label-caps {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--ink3);
+}
+
+.body-serif {
+  font-family: 'IM Fell English', 'Georgia', serif;
+  font-size: 0.93rem;
+  line-height: 1.75;
+  color: var(--ink2);
+}
+
+.ornament {
+  font-family: 'Playfair Display', serif;
+  color: var(--ink3);
+  font-size: 1.2rem;
+  letter-spacing: 0.5em;
+  display: block;
+  text-align: center;
+}
+
+/* ── GLASS COMPONENTS ── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.19);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0px 0px rgba(255, 255, 255, 0);
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.8),
+    transparent
+  );
+}
+
+.glass-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.8),
+    transparent,
+    rgba(255, 255, 255, 0.3)
+  );
+}
+
+
+/* GLASS INSET */
+.glass-inset {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(27px);
+  -webkit-backdrop-filter: blur(27px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 42px 21px rgba(255, 255, 255, 2.1);
+  overflow: hidden;
+}
+
+.glass-inset::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.8),
+    transparent
+  );
+}
+
+.glass-inset::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.8),
+    transparent,
+    rgba(255, 255, 255, 0.3)
+  );
+}
+
+/* ── BUTTON ── */
+/* Custom glass dropdown */
+.native-select-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.glass-select {
+  position: relative;
+  width: 100%;
+  z-index: 1;
+}
+
+.glass-select.is-open {
+  z-index: 80;
+}
+
+.glass-select__button {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.78rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--ink);
+  font-family: 'IM Fell English', Georgia, serif;
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.52),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 2px 1px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: var(--transition);
+}
+
+.glass-select__button:hover,
+.glass-select.is-open .glass-select__button {
+  background: rgba(255, 255, 255, 0.23);
+  border-color: rgba(255, 255, 255, 0.48);
+}
+
+.glass-select__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.glass-select__arrow {
+  flex: 0 0 auto;
+  color: var(--ink);
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+}
+
+.glass-select.is-open .glass-select__arrow {
+  transform: rotate(180deg);
+}
+
+.glass-select__menu {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  right: 0;
+  display: grid;
+  max-height: min(340px, 52vh);
+  padding: 0.35rem;
+  overflow: auto;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 18px;
+  background: rgba(82, 88, 86, 0.82);
+  color: var(--ink);
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.glass-select.is-open .glass-select__menu {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.glass-select__option {
+  width: 100%;
+  padding: 0.72rem 0.85rem;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--ink2);
+  font-family: 'IM Fell English', Georgia, serif;
+  font-size: 0.94rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+
+.glass-select__option:hover,
+.glass-select__option:focus,
+.glass-select__option.is-selected {
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--ink);
+  outline: none;
+}
+
+.glass-select__option:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.glass-select__menu::-webkit-scrollbar {
+  width: 10px;
+}
+
+.glass-select__menu::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+
+.glass-select__menu::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.38);
+  border-radius: 999px;
+}
+
+.glass-btn {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0px 0px rgba(255, 255, 255, 0);
+  overflow: hidden;
+}
+
+.glass-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.8),
+    transparent
+  );
+}
+
+.glass-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.8),
+    transparent,
+    rgba(255, 255, 255, 0.3)
+  );
+}
+
+.glass-btn:hover {
+  transition: var(--transition);
+  scale: 1.05;
+}
+
+.glass-btn:active {
+  transform: translateY(1px);
+}
+
+.glass-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.glass-btn:disabled:hover {
+  transform: none;
+  scale: 1;
+}
+
+.floating-action {
+  color: var(--ink);
+  width: 200px;
+  height: 48px;
+  text-decoration: none;
+  display: flex;
+  justify-content: center;
+  border-radius: 20px;
+  padding: 0.75rem 1rem;
+  margin: 70px 0 auto auto;
+}
+
+/* ── ORNATE DIVIDER ── */
+.divider-ornate {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2.5rem 0;
+  padding: 0 2rem;
+}
+
+.divider-ornate::before,
+.divider-ornate::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(26,24,20,0.2), transparent);
+}
+
+/* ── LOADING SPINNER ── */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(26,24,20,0.15);
+  border-top-color: var(--ink2);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 0.4rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── RISK COLOR CLASSES ── */
+/* .risk-low  { color: #4a6741 !important; }
+.risk-mid  { color: #7a6030 !important; }
+.risk-high { color: #8b4848 !important; } */
+
+/* ── FADE-UP ANIMATION ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+  animation: fadeUp 0.6s ease forwards;
+}
+
+/* ── NATIVE SELECT OPTIONS VISIBILITY FIX ── */
+select option {
+  background-color: #3b3d3c; /* Dark slate background to match glassmorphism theme */
+  color: #f5f5f5 !important;  /* Light text to make it clearly readable */
+}
