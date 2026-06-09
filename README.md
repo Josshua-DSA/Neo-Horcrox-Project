@@ -1,16 +1,3 @@
----
-title: Neo Horcrox API
-emoji: 🚀
-colorFrom: blue
-colorTo: gray
-sdk: docker
-app_port: 7860
-pinned: false
----
-
-# Neo Horcrox API Backend
-Repository untuk kebutuhan backend dan model inference proyek #Horcrux Project.
-
 # Neo Horcrox Supply Chain Analytics
 
 Neo Horcrox adalah aplikasi analitik supply chain berbasis web yang membantu stakeholder melihat kondisi operasional, memilih produk/supplier terbaik, memprediksi risiko keterlambatan pengiriman, dan menjalankan demand forecast berdasarkan produk yang dipilih.
