@@ -6,9 +6,11 @@ WORKDIR /app
 COPY app/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy seluruh source code backend & artifacts model yang BENAR
+# Copy seluruh source code backend
 COPY app/backend /app/backend
-COPY model/artifacts /app/model/artifacts
+
+# Copy KESELURUHAN folder model (termasuk artifacts dan src)
+COPY model /app/model
 
 EXPOSE 8017
 
