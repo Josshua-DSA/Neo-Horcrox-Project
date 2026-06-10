@@ -18,7 +18,10 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 COPY app/__init__.py ./app/__init__.py
 COPY app/backend ./app/backend
-COPY model ./model
+# NOTE: model artifacts (*.pkl, dataset) are NOT baked into the image.
+# They are mounted as read-only volumes via docker-compose.yaml:
+#   - ./model/artifacts -> /app/model/artifacts:ro
+#   - ./model/dataset   -> /app/model/dataset:ro
 
 ENV PYTHONPATH=/app/app:/app
 WORKDIR /app/app

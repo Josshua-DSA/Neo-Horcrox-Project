@@ -57,9 +57,12 @@ config.local.*
 # =========================
 model/dataset/processed/*
 model/dataset/engineered/*
+# Large raw dataset files — place manually or via DVC/download script
+model/dataset/raw/*.csv
 
 !model/dataset/processed/.gitkeep
 !model/dataset/engineered/.gitkeep
+!model/dataset/raw/.gitkeep
 
 # =========================
 # Model Artifacts / MLflow
@@ -72,6 +75,10 @@ model/artifacts/logs/*
 mlruns/
 mlartifacts/
 catboost_info/
+
+# Large binary model files — do NOT commit to Git
+# Mount these via Docker volume or download separately
+*.pkl
 *.joblib
 *.sav
 *.ubj
