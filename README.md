@@ -560,6 +560,43 @@ risk_level
 | POST | `/api/v1/orders` | Insert one order |
 | POST | `/api/v1/orders/bulk` | Insert many orders |
 
+## Model Evaluation Results & Project Conclusions
+
+### 1. Late Shipment Risk Prediction Model (Classification)
+Kami mengevaluasi beberapa algoritma klasifikasi pada set data validasi (imbalanced label, proporsi kelas ditangani secara khusus menggunakan tuning hyperparameter dan regularisasi). Model **XGBoost Classifier** terpilih sebagai champion model dengan performa terbaik:
+
+* **Perbandingan Metrik Algoritma:**
+  | Model | Accuracy | F1-Score | AUC-ROC |
+  | --- | --- | --- | --- |
+  | **Decision Tree (Baseline)** | 63.23% | 0.6624 | 0.6312 |
+  | **Logistic Regression** | 69.46% | 0.6579 | 0.7266 |
+  | **Random Forest** | 71.87% | 0.6942 | 0.7573 |
+  | **Extra Trees** | 71.93% | 0.6945 | 0.7551 |
+  | **LightGBM** | 71.46% | 0.6943 | 0.7595 |
+  | **CatBoost** | 71.93% | 0.6949 | 0.7580 |
+  | **XGBoost (Tuned Champion)** | **70.42%** | **0.7025** | **0.7609** |
+
+* **Metrik Evaluasi Akhir Champion Model (Optuna Tuned XGBoost) pada Test Set:**
+  * **Accuracy**: 69.52%
+  * **Precision (Late Class)**: 77.23%
+  * **Recall (Late Class)**: 62.98%
+  * **F1-Score**: 69.38%
+  * **ROC AUC**: 0.7560
+
+### 2. Demand Forecasting Model (Regression)
+Untuk melakukan forecasting permintaan produk per kategori dan market secara berkala, kami melatih model **XGBoost Regressor** berbasis fitur temporal (lag, rolling statistics, seasonality) dengan metrik performa sebagai berikut:
+* **Mean Absolute Error (MAE)**: 127.53
+* **Root Mean Squared Error (RMSE)**: 341.10
+* **R² (Coefficient of Determination)**: **0.9742 (97.42%)** — Menunjukkan model mampu menjelaskan 97.42% variansi dari demand historis.
+
+### 3. Supplier Selection (Multi-Criteria Decision Making)
+Menggunakan metode **Analytic Hierarchy Process (AHP)**, sistem berhasil melakukan pembobotan kriteria secara objektif untuk memilih produk/supplier terbaik berdasarkan kombinasi metrik biaya, pengiriman, profitabilitas, dan tingkat risiko keterlambatan.
+
+### Kesimpulan Proyek
+1. **Sistem End-to-End Terintegrasi**: Project berhasil diintegrasikan secara penuh dari frontend, backend FastAPI, database PostgreSQL, hingga model ML serving dalam satu pipeline orkestrasi kontainer Docker Compose.
+2. **Pengambilan Keputusan Berbasis Data**: Stakeholder dapat memanfaatkan dashboard interaktif untuk memonitor operasional secara real-time, memilih supplier terbaik secara objektif, serta memitigasi risiko keterlambatan dan merencanakan inventori stok dengan demand forecasting otomatis.
+3. **Pipeline MLOps Matang**: Siklus hidup ML mulai dari pembersihan data, feature engineering, pelatihan/tuning hyperparameter menggunakan Optuna, tracking menggunakan MLflow, penyimpanan artifact, hingga penyajian (serving) model melalui REST API telah berhasil diselesaikan secara terstruktur.
+
 ## Setup and Run
 
 ### Prerequisites
