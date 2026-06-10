@@ -1,5 +1,16 @@
 # Neo Horcrox Supply Chain Analytics
 
+> **Decision Support System berbasis Machine Learning untuk Analitik Rantai Pasok**
+>
+> Mata Kuliah: MLOps | Semester 4 | Politeknik Elektronika Negeri Surabaya (PENS-EEPIS) | 2026
+
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Josshua--DSA%2FNeo--Horcrox--Project-blue?logo=github)](https://github.com/Josshua-DSA/Neo-Horcrox-Project)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Docker](https://img.shields.io/badge/Deploy-Docker%20Compose-2496ED?logo=docker)](https://docs.docker.com/)
+[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL%2016-336791?logo=postgresql)](https://www.postgresql.org/)
+
+---
+
 Neo Horcrox adalah aplikasi analitik supply chain berbasis web yang membantu stakeholder melihat kondisi operasional, memilih produk/supplier terbaik, memprediksi risiko keterlambatan pengiriman, dan menjalankan demand forecast berdasarkan produk yang dipilih.
 
 Project ini disusun sebagai sistem end-to-end:
@@ -9,6 +20,26 @@ Project ini disusun sebagai sistem end-to-end:
 - PostgreSQL untuk database transaksional dan logging.
 - CSV/JSON/model artifact untuk dashboard fallback, supplier ranking, risk model, dan forecast model.
 - Docker Compose agar aplikasi dapat dijalankan secara konsisten di environment lokal.
+
+---
+
+## Quick Start
+
+```powershell
+git clone https://github.com/Josshua-DSA/Neo-Horcrox-Project
+cd Neo-Horcrox-Project
+docker compose up --build
+```
+
+Buka di browser:
+
+| Layanan | URL |
+| --- | --- |
+| Frontend | http://localhost:5117 |
+| API Docs (Swagger UI) | http://localhost:8017/docs |
+| API Health Check | http://localhost:8017/api/v1/health |
+
+---
 
 ## Executive Summary
 
@@ -113,16 +144,17 @@ Vite Frontend
   | http://localhost:8017/api/v1
   v
 FastAPI Backend
+  |           |
+  |           | SQLAlchemy async
+  |           v
+  |       PostgreSQL
   |
-  | SQLAlchemy async
-  v
-PostgreSQL
-
-FastAPI Backend
-  |
-  | Reads artifacts
+  | Reads model artifacts
   v
 model/artifacts/
+  ├── champion_model/late_shipment_model.pkl   (Risk Model - XGBoost)
+  ├── forecast/forecast_model.pkl              (Forecast Model - XGBoost Regressor)
+  └── metrics/supplier_selection_outputs/      (AHP Ranking Output CSV/JSON)
 
 FastAPI Backend
   |
@@ -141,6 +173,7 @@ model/dataset/raw/DataCoSupplyChainDataset.csv
 | ORM | SQLAlchemy AsyncIO, asyncpg | PostgreSQL connection and queries |
 | Data Processing | pandas, numpy | Dataset aggregation and feature preparation |
 | ML Runtime | scikit-learn, xgboost, lightgbm | Risk and forecast artifact loading |
+| Hyperparameter Tuning | Optuna | XGBoost champion model tuning |
 | Container | Docker, Docker Compose | Local full-stack orchestration |
 
 ## Runtime Ports
@@ -163,7 +196,7 @@ Important note:
 ## Repository Structure
 
 ```text
-Project TA/
+Neo-Horcrox-Project/
 |-- .dockerignore
 |-- .env.example
 |-- .gitignore
@@ -408,6 +441,34 @@ model/artifacts/metrics/supplier_selection_outputs/supplier_selection_by_categor
 model/artifacts/metrics/supplier_selection_outputs/supplier_selection_ahp_weights.csv
 ```
 
+## Data Understanding
+
+Dataset yang digunakan:
+
+| Atribut | Detail |
+| --- | --- |
+| **Nama** | DataCoSupplyChainDataset.csv |
+| **Sumber** | DataCo Smart Supply Chain Dataset (Kaggle / DataCo Global) |
+| **Path** | `model/dataset/raw/DataCoSupplyChainDataset.csv` |
+
+Dataset ini mencakup data transaksi order, pengiriman, produk, pelanggan, dan market dari berbagai wilayah global.
+
+Fitur utama yang digunakan:
+
+| Kolom | Deskripsi |
+| --- | --- |
+| `Type` | Tipe pembayaran (DEBIT, TRANSFER, CASH, dll.) |
+| `Days for shipping` | Jumlah hari pengiriman yang direncanakan |
+| `Days for shipment` | Jumlah hari aktual pengiriman |
+| `Late_delivery_risk` | Label risiko keterlambatan (0 = tepat, 1 = terlambat) |
+| `Category Name` | Nama kategori produk |
+| `Customer Segment` | Segmen pelanggan (Consumer, Corporate, Home Office) |
+| `Market` | Pasar geografis (LATAM, Europe, Pacific Asia, dll.) |
+| `Shipping Mode` | Mode pengiriman (Standard, First Class, Second Class, dll.) |
+| `Sales` | Total penjualan |
+| `Order Profit Per Order` | Profit per order |
+| `Product Name` | Nama produk |
+
 ## Data Flow
 
 ### Dashboard
@@ -563,39 +624,77 @@ risk_level
 ## Model Evaluation Results & Project Conclusions
 
 ### 1. Late Shipment Risk Prediction Model (Classification)
-Kami mengevaluasi beberapa algoritma klasifikasi pada set data validasi (imbalanced label, proporsi kelas ditangani secara khusus menggunakan tuning hyperparameter dan regularisasi). Model **XGBoost Classifier** terpilih sebagai champion model dengan performa terbaik:
 
-* **Perbandingan Metrik Algoritma:**
-  | Model | Accuracy | F1-Score | AUC-ROC |
-  | --- | --- | --- | --- |
-  | **Decision Tree (Baseline)** | 63.23% | 0.6624 | 0.6312 |
-  | **Logistic Regression** | 69.46% | 0.6579 | 0.7266 |
-  | **Random Forest** | 71.87% | 0.6942 | 0.7573 |
-  | **Extra Trees** | 71.93% | 0.6945 | 0.7551 |
-  | **LightGBM** | 71.46% | 0.6943 | 0.7595 |
-  | **CatBoost** | 71.93% | 0.6949 | 0.7580 |
-  | **XGBoost (Tuned Champion)** | **70.42%** | **0.7025** | **0.7609** |
+Dataset: `DataCoSupplyChainDataset.csv` — target label `Late_delivery_risk` (class imbalance ditangani menggunakan Optuna hyperparameter tuning dan regularisasi).
 
-* **Metrik Evaluasi Akhir Champion Model (Optuna Tuned XGBoost) pada Test Set:**
-  * **Accuracy**: 69.52%
-  * **Precision (Late Class)**: 77.23%
-  * **Recall (Late Class)**: 62.98%
-  * **F1-Score**: 69.38%
-  * **ROC AUC**: 0.7560
+**Perbandingan Algoritma:**
+
+| Model | Accuracy | F1-Score | AUC-ROC | Keterangan |
+| --- | --- | --- | --- | --- |
+| Decision Tree | 63.23% | 0.6624 | 0.6312 | Baseline |
+| Logistic Regression | 69.46% | 0.6579 | 0.7266 | Alternatif Baseline |
+| Random Forest | 71.87% | 0.6942 | 0.7573 | — |
+| Extra Trees | 71.93% | 0.6945 | 0.7551 | — |
+| LightGBM | 71.46% | 0.6943 | 0.7595 | — |
+| XGBoost (Default) | 71.46% | 0.6954 | 0.7594 | — |
+| CatBoost | 71.93% | 0.6949 | 0.7580 | — |
+| **XGBoost (Tuned — Optuna)** | **70.42%** | **0.7025** | **0.7609** | ✓ **Champion Model** |
+
+**Metrik Evaluasi Champion Model pada Validation Set:**
+
+| Metrik | Nilai |
+| --- | --- |
+| Accuracy | 70.42% |
+| Precision (Late Class) | 78.12% |
+| Recall (Late Class) | 63.83% |
+| F1-Score | 70.25% |
+| AUC-ROC | 0.7609 |
+
+**Metrik Evaluasi Final pada Test Set:**
+
+| Metrik | Nilai |
+| --- | --- |
+| Accuracy | 69.52% |
+| Precision (Late Class) | 77.23% |
+| Recall (Late Class) | 62.98% |
+| F1-Score | 69.38% |
+| AUC-ROC | 0.7560 |
+
+XGBoost dipilih sebagai champion model karena memiliki F1-Score dan AUC-ROC tertinggi — dua metrik yang paling penting untuk kasus class imbalance pada deteksi risiko keterlambatan.
 
 ### 2. Demand Forecasting Model (Regression)
-Untuk melakukan forecasting permintaan produk per kategori dan market secara berkala, kami melatih model **XGBoost Regressor** berbasis fitur temporal (lag, rolling statistics, seasonality) dengan metrik performa sebagai berikut:
-* **Mean Absolute Error (MAE)**: 127.53
-* **Root Mean Squared Error (RMSE)**: 341.10
-* **R² (Coefficient of Determination)**: **0.9742 (97.42%)** — Menunjukkan model mampu menjelaskan 97.42% variansi dari demand historis.
 
-### 3. Supplier Selection (Multi-Criteria Decision Making)
-Menggunakan metode **Analytic Hierarchy Process (AHP)**, sistem berhasil melakukan pembobotan kriteria secara objektif untuk memilih produk/supplier terbaik berdasarkan kombinasi metrik biaya, pengiriman, profitabilitas, dan tingkat risiko keterlambatan.
+Model: **XGBoost Regressor** berbasis fitur temporal (lag features, rolling statistics, seasonality).
+
+| Metrik | Nilai |
+| --- | --- |
+| MAE (Mean Absolute Error) | 127.53 |
+| RMSE (Root Mean Squared Error) | 341.10 |
+| R² (Coefficient of Determination) | **0.9742 (97.42%)** |
+
+R² sebesar 0.9742 menunjukkan model mampu menjelaskan 97.42% variansi dari demand historis.
+
+### 3. Supplier Selection (Multi-Criteria Decision Making — AHP)
+
+Menggunakan metode **Analytic Hierarchy Process (AHP)**, sistem melakukan pembobotan kriteria secara objektif untuk meranking produk/supplier berdasarkan kombinasi metrik:
+
+- Biaya
+- Performa pengiriman
+- Profitabilitas
+- Tingkat risiko keterlambatan
+
+Output berupa ranking produk per kategori yang disimpan dalam CSV/JSON artifact.
 
 ### Kesimpulan Proyek
-1. **Sistem End-to-End Terintegrasi**: Project berhasil diintegrasikan secara penuh dari frontend, backend FastAPI, database PostgreSQL, hingga model ML serving dalam satu pipeline orkestrasi kontainer Docker Compose.
-2. **Pengambilan Keputusan Berbasis Data**: Stakeholder dapat memanfaatkan dashboard interaktif untuk memonitor operasional secara real-time, memilih supplier terbaik secara objektif, serta memitigasi risiko keterlambatan dan merencanakan inventori stok dengan demand forecasting otomatis.
-3. **Pipeline MLOps Matang**: Siklus hidup ML mulai dari pembersihan data, feature engineering, pelatihan/tuning hyperparameter menggunakan Optuna, tracking menggunakan MLflow, penyimpanan artifact, hingga penyajian (serving) model melalui REST API telah berhasil diselesaikan secara terstruktur.
+
+1. **Sistem End-to-End Terintegrasi**: Project berhasil diintegrasikan secara penuh dari frontend, backend FastAPI, database PostgreSQL, hingga model ML serving dalam satu pipeline orkestrasi kontainer Docker Compose — dapat dijalankan dengan satu perintah: `docker compose up --build`.
+2. **Tiga Kapabilitas ML Utama Terimplementasi**:
+   - Late Shipment Risk Prediction (XGBoost Champion, AUC-ROC 0.7560)
+   - Demand Forecasting (XGBoost Regressor, R² 0.9742)
+   - Supplier Selection (AHP multi-criteria ranking)
+3. **Pengambilan Keputusan Berbasis Data**: Stakeholder dapat memonitor operasional secara real-time, memilih supplier terbaik secara objektif, serta memitigasi risiko keterlambatan dan merencanakan inventori stok dengan demand forecasting otomatis.
+4. **Pipeline MLOps Tersusun**: Siklus hidup ML dari pembersihan data, feature engineering, pelatihan/tuning (Optuna), tracking (notebook-based), penyimpanan artifact, hingga penyajian via REST API telah diselesaikan secara terstruktur.
+5. **Arsitektur Skalabel**: Pemisahan layer (frontend, backend, database, model artifacts) memudahkan pengembangan, pemeliharaan, dan scaling di masa depan.
 
 ## Setup and Run
 
@@ -610,7 +709,8 @@ Menggunakan metode **Analytic Hierarchy Process (AHP)**, sistem berhasil melakuk
 From project root:
 
 ```powershell
-cd "D:\PENS-EEPIS\SDT A Semester 4 2026\Project TA"
+git clone https://github.com/Josshua-DSA/Neo-Horcrox-Project
+cd Neo-Horcrox-Project
 docker compose up --build
 ```
 
@@ -730,7 +830,11 @@ Important variables:
 - Product detail endpoint returns `forecast_input`, `risk_input`, and `dataset_profile`.
 - Product Profiling can automatically run forecast based on selected product.
 - Risk model loads champion artifact and can predict late shipment risk.
+- XGBoost champion model tuned with Optuna (best F1-Score 0.7025, AUC-ROC 0.7609).
+- Forecast model (XGBoost Regressor) trained with R² 0.9742.
+- Supplier Selection ranking generated using AHP method.
 - README and environment documentation are aligned with current ports and architecture.
+- Repository pushed to GitHub: https://github.com/Josshua-DSA/Neo-Horcrox-Project
 
 ### Verified During Development
 
@@ -762,42 +866,36 @@ Important variables:
 
 Potential next development stages:
 
+**Jangka Pendek:**
+
 1. Data ingestion pipeline
    - Import raw CSV into PostgreSQL automatically.
    - Add scheduled refresh jobs.
    - Validate schema and data quality before insert.
+2. Autentikasi user (JWT) untuk keamanan akses.
+3. Unit test dan integration test untuk backend.
 
-2. Production dashboard
+**Jangka Menengah:**
+
+4. Production dashboard
    - Persist filter state.
    - Add charts and drill-down views.
    - Add export to PDF/CSV.
+5. MLflow integration untuk experiment tracking dan model versioning.
+6. SHAP values untuk model interpretability.
+7. Batch prediction dan scheduled retraining.
+8. Confidence interval pada visualisasi forecast.
 
-3. Supplier decision support
+**Jangka Panjang:**
+
+9. Supplier decision support
    - Add explainability for ranking criteria.
    - Compare multiple products/suppliers side by side.
    - Add threshold-based recommendation rules.
-
-4. Forecasting enhancement
-   - Add confidence interval visualization.
-   - Add market/category scenario simulation.
-   - Add retraining pipeline and model registry metadata.
-
-5. Risk prediction enhancement
-   - Add SHAP or feature contribution explanation.
-   - Add batch upload prediction.
-   - Add monitoring dashboard for prediction logs.
-
-6. MLOps maturity
-   - Standardize training pipeline.
-   - Add experiment tracking workflow.
-   - Add model versioning and deployment approval.
-
-7. Enterprise readiness
-   - Add authentication.
-   - Add role-based permissions.
-   - Add CI/CD.
-   - Add cloud deployment option.
-   - Add observability with logs, metrics, and alerts.
+10. Cloud deployment (GCP, AWS, atau Azure).
+11. CI/CD pipeline (GitHub Actions).
+12. Model monitoring (data drift detection, performance monitoring).
+13. Enterprise readiness: RBAC, observability, alerts.
 
 ## Troubleshooting
 
@@ -868,6 +966,38 @@ This is expected if `model/artifacts/models/risk/` is not present. The active pr
 model/artifacts/models/champion_model/late_shipment_model.pkl
 ```
 
+## References
+
+### Dataset
+
+- **DataCo SMART Supply Chain Dataset** — DataCo Global
+  https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis
+
+### Framework & Library
+
+- FastAPI Documentation: https://fastapi.tiangolo.com/
+- XGBoost Documentation: https://xgboost.readthedocs.io/
+- LightGBM Documentation: https://lightgbm.readthedocs.io/
+- scikit-learn User Guide: https://scikit-learn.org/stable/user_guide.html
+- SQLAlchemy AsyncIO: https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html
+- Docker Documentation: https://docs.docker.com/
+- Vite Documentation: https://vitejs.dev/
+- PostgreSQL 16 Documentation: https://www.postgresql.org/docs/16/
+- Optuna Documentation: https://optuna.readthedocs.io/
+
+### Metode
+
+- Saaty, T. L. (1980). *The Analytic Hierarchy Process*. McGraw-Hill, New York.
+- Chen, T., & Guestrin, C. (2016). XGBoost: A Scalable Tree Boosting System. *Proceedings of the 22nd ACM SIGKDD International Conference*. https://doi.org/10.1145/2939672.2939785
+
+### MLOps Referensi
+
+- Sculley, D., et al. (2015). Hidden Technical Debt in Machine Learning Systems. *NIPS 2015*.
+- Huyen, Chip (2022). *Designing Machine Learning Systems*. O'Reilly Media.
+- MLflow Documentation: https://mlflow.org/docs/latest/index.html
+
+---
+
 ## Stakeholder Summary
 
 Neo Horcrox is currently a working local decision-support prototype for supply chain analytics. It already connects frontend, backend, database, dataset artifacts, supplier ranking outputs, risk prediction, and demand forecast into one navigable application.
@@ -884,3 +1014,7 @@ With further development, this project can evolve into:
 Operational supply chain intelligence platform with automated ingestion,
 model monitoring, decision explainability, and enterprise deployment.
 ```
+
+---
+
+*Repository: https://github.com/Josshua-DSA/Neo-Horcrox-Project*
